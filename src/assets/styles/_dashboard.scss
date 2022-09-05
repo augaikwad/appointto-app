@@ -1,0 +1,202 @@
+/* Dashboard */
+
+.performance-overview-carousel {
+
+  .carousel-item {
+    .item {
+      &::after {
+        content: '';
+        width: 1px;
+        height: 60px;
+        background: theme-color(info);
+        position: absolute;
+        right: 0;
+        top: 25%;
+        @media(max-width: 767px) {
+          display: none;
+        }
+      }
+    }  
+  }
+  .slick-slider {
+    .slick-arrow {
+      &.slick-prev,
+      &.slick-next {
+        top: -30px;
+        width: 1.875rem;
+        height: 1.875rem;
+        background: #3698fc;
+        border-radius: 0.375rem;
+      }
+      &.slick-prev {
+        left: auto;
+        right: 2.2rem;
+        &:before {
+          font-family: "themify";
+          content: '\e64a';
+          font-size: .875rem;
+          color: $white;
+          line-height: 1.875rem;
+          margin-right: 0.48rem;
+        }
+      }
+      &.slick-next {
+        left: auto;
+        right: 0rem;
+        &:before {
+          font-family: "themify";
+          content: '\e649';
+          font-size: .875rem;
+          color: $white;
+          line-height: 1.875rem;
+          margin-right: 0.48rem;
+        }
+      }
+    }
+  }
+}
+
+.detailed-reports-carousel {
+
+  .slick-slider {
+    .slick-arrow {
+      &.slick-prev,
+      &.slick-next {
+        top: -30px;
+        width: 1.875rem;
+        height: 1.875rem;
+        background: #ecedf2;
+        border-radius: 0.375rem;
+      }
+      &.slick-prev {
+        left: auto;
+        right: 2.2rem;
+        &:before {
+          font-family: "themify";
+          content: '\e64a';
+          font-size: .875rem;
+          color: #6c7383;
+          line-height: 1.875rem;
+          margin-right: 0.48rem;
+        }
+      }
+      &.slick-next {
+        left: auto;
+        right: 0rem;
+        &:before {
+          font-family: "themify";
+          content: '\e649';
+          font-size: .875rem;
+          color: #6c7383;
+          line-height: 1.875rem;
+          margin-right: 0.48rem;
+        }
+      }
+    }
+  }
+
+  .report-table {
+    &::after {
+      content: '';
+      width: 1px;
+      height: 174px;
+      background: #b1b1b5;
+      position: absolute;
+      right: -1rem;
+      top: 15%;
+      @media(max-width: 767px) {
+        display: none;
+      }
+    }
+  }
+}
+
+.sales-report-legend {
+  ul {
+    margin-bottom: 0;
+    list-style: none;
+    padding-left: 0;
+    @include display-flex;
+    @include align-items(flex-end);
+    @include flex-direction(column);
+    @include flex-wrap(wrap);
+    li {
+      @include display-flex;
+      @include align-items(center);
+      span {
+        width: 2.25rem;
+        height: 1rem;
+        margin-right: .4rem;
+        display: inline-block;
+        font-size: $default-font-size;
+      }
+      &:nth-child(1) {
+        span {
+          background: #ffc100;
+        }
+      }
+      &:nth-child(2) {
+        span {
+          background: #f5a623;
+        }
+      }
+    }
+  }
+}
+
+.detailed-reports-chart-legend {
+  .item {
+    .bullet {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+  }
+  &.north-america-legend {
+    .item {
+      &:nth-child(1) {
+        .bullet {
+          background: theme-color(success);          
+        }
+      }
+      &:nth-child(2) {
+        .bullet {
+          background: theme-color(warning);          
+        }
+      }
+      &:nth-child(3) {
+        .bullet {
+          background: theme-color(primary);          
+        }
+      }
+    }
+  }
+  &.south-america-legend {
+    .item {
+      &:nth-child(1) {
+        .bullet {
+          background: theme-color(warning);          
+        }
+      }
+      &:nth-child(2) {
+        .bullet {
+          background: theme-color(primary);          
+        }
+      }
+      &:nth-child(3) {
+        .bullet {
+          background: theme-color(success);          
+        }
+      }
+    }
+  }
+}
+
+.charts-data {
+  .progress {
+    background: transparent;
+    .progress-bar {
+      border-radius: 11px;
+    }
+  }
+}

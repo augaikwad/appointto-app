@@ -1,0 +1,11 @@
+.sidebar {
+    .nav-link {
+        display: flex;
+        flex-direction: column;
+
+        &>.menu-icon {
+            margin: 0 0 8px !important;
+            width: 20px,
+        }
+    }
+}

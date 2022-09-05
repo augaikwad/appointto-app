@@ -1,0 +1,90 @@
+.navbar {
+    &.default-layout-navbar {
+        box-shadow: 0px 1px 8px rgb(0 0 0 / 20%);
+    }
+
+    .form-control {
+        border-width: 1px !important;
+    }
+
+    &>.navbar-menu-wrapper {
+        &>ul.nav-middle-section {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &>li.nav-search {
+                margin: 0 !important;
+
+                &>div.input-group {
+                    min-width: 400px;
+
+                    &>div.input-group-prepend>.input-group-text {
+                        border-right: none;
+                        width: 42px;
+                        text-align: center;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+                        &>.ti-search {
+                            font-size: 18px;
+                        }
+                    }
+
+                    &>input.form-control {
+                        margin: 0 !important;
+                        border-left: none;
+                        padding-left: 5px;
+                    }
+                }
+            }
+        }
+
+        &>ul.nav-actions {
+            &>li {
+                width: 60px !important;
+                margin: 0 !important;
+                justify-content: center;
+
+                &>.dropdown {
+                    width: 100%;
+
+                    &>button.nav-link {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                }
+            }
+        }
+    }
+
+    div.globalSearchField {
+        &>div {
+            &>input.form-control {
+                margin-left: 0 !important;
+                border-left: none;
+            }
+        }
+
+        & .rbt-input-hint {
+            top: 3px !important
+        }
+
+        &>ul.dropdown-menu {
+            width: 500px !important;
+            left: -41px !important
+        }
+    }
+}
+
+ul#globalSearch {
+    padding: 0 !important;
+
+    &>li>a {
+        padding-right: 0;
+        padding-left: 12px;
+        font-size: 14px;
+    }
+}

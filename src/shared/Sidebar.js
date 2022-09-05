@@ -1,0 +1,165 @@
+import React, { Component } from "react";
+import { Link, withRouter } from "react-router-dom";
+
+import Dashboard from "../assets/images/sidebar/Dashboard.png";
+import Queue from "../assets/images/sidebar/Queue.png";
+import Appointments from "../assets/images/sidebar/Appointments.png";
+import Reports from "../assets/images/sidebar/Reports.png";
+import Dental from "../assets/images/sidebar/Dental.png";
+import Stock from "../assets/images/sidebar/Stock.png";
+import Setting from "../assets/images/sidebar/Setting.png";
+
+class Sidebar extends Component {
+  state = {};
+
+  toggleMenuState(menuState) {
+    if (this.state[menuState]) {
+      this.setState({ [menuState]: false });
+    } else if (Object.keys(this.state).length === 0) {
+      this.setState({ [menuState]: true });
+    } else {
+      Object.keys(this.state).forEach((i) => {
+        this.setState({ [i]: false });
+      });
+      this.setState({ [menuState]: true });
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.location !== prevProps.location) {
+      this.onRouteChanged();
+    }
+  }
+
+  onRouteChanged() {
+    document.querySelector("#sidebar").classList.remove("active");
+    Object.keys(this.state).forEach((i) => {
+      this.setState({ [i]: false });
+    });
+
+    const dropdownPaths = [
+      { path: "/apps", state: "appsMenuOpen" },
+      { path: "/basic-ui", state: "basicUiMenuOpen" },
+      { path: "/advanced-ui", state: "advancedUiMenuOpen" },
+      { path: "/form-elements", state: "formElementsMenuOpen" },
+      { path: "/tables", state: "tablesMenuOpen" },
+      { path: "/maps", state: "mapsMenuOpen" },
+      { path: "/editors", state: "editorsMenuOpen" },
+      { path: "/icons", state: "iconsMenuOpen" },
+      { path: "/charts", state: "chartsMenuOpen" },
+      { path: "/user-pages", state: "userPagesMenuOpen" },
+      { path: "/error-pages", state: "errorPagesMenuOpen" },
+      { path: "/general-pages", state: "generalPagesMenuOpen" },
+      { path: "/ecommerce", state: "ecommercePagesMenuOpen" },
+    ];
+
+    dropdownPaths.forEach((obj) => {
+      if (this.isPathActive(obj.path)) {
+        this.setState({ [obj.state]: true });
+      }
+    });
+  }
+
+  render() {
+    return (
+      <nav className="sidebar sidebar-offcanvas" id="sidebar">
+        <ul className="nav">
+          <li
+            className={
+              this.isPathActive("/dashboard") ? "nav-item active" : "nav-item"
+            }
+          >
+            <Link className="nav-link" to="/dashboard">
+              <img src={Dashboard} className="menu-icon" />
+              <span className="menu-title">Dashboard</span>
+            </Link>
+          </li>
+          <li
+            className={
+              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+            }
+          >
+            <Link className="nav-link" to="/widgets">
+              <img src={Queue} className="menu-icon" />
+              <span className="menu-title">Patients</span>
+            </Link>
+          </li>
+          <li
+            className={
+              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+            }
+          >
+            <Link className="nav-link" to="/widgets">
+              <img src={Appointments} className="menu-icon" />
+              <span className="menu-title">Appointments</span>
+            </Link>
+          </li>
+          <li
+            className={
+              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+            }
+          >
+            <Link className="nav-link" to="/widgets">
+              <img src={Reports} className="menu-icon" />
+              <span className="menu-title">Reports</span>
+            </Link>
+          </li>
+          <li
+            className={
+              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+            }
+          >
+            <Link className="nav-link" to="/widgets">
+              <img src={Dental} className="menu-icon" />
+              <span className="menu-title">Lab Work</span>
+            </Link>
+          </li>
+          <li
+            className={
+              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+            }
+          >
+            <Link className="nav-link" to="/widgets">
+              <img src={Stock} className="menu-icon" />
+              <span className="menu-title">Inventory</span>
+            </Link>
+          </li>
+          <li
+            className={
+              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+            }
+          >
+            <Link className="nav-link" to="/widgets">
+              <img src={Setting} className="menu-icon" />
+              <span className="menu-title">Settings</span>
+            </Link>
+          </li>
+        </ul>
+      </nav>
+    );
+  }
+
+  isPathActive(path) {
+    return this.props.location.pathname.startsWith(path);
+  }
+
+  componentDidMount() {
+    this.onRouteChanged();
+    // add class 'hover-open' to sidebar navitem while hover in sidebar-icon-only menu
+    const body = document.querySelector("body");
+    document.querySelectorAll(".sidebar .nav-item").forEach((el) => {
+      el.addEventListener("mouseover", function () {
+        if (body.classList.contains("sidebar-icon-only")) {
+          el.classList.add("hover-open");
+        }
+      });
+      el.addEventListener("mouseout", function () {
+        if (body.classList.contains("sidebar-icon-only")) {
+          el.classList.remove("hover-open");
+        }
+      });
+    });
+  }
+}
+
+export default withRouter(Sidebar);
