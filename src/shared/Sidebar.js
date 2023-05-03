@@ -1,14 +1,6 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 
-import Dashboard from "../assets/images/sidebar/Dashboard.png";
-import Queue from "../assets/images/sidebar/Queue.png";
-import Appointments from "../assets/images/sidebar/Appointments.png";
-import Reports from "../assets/images/sidebar/Reports.png";
-import Dental from "../assets/images/sidebar/Dental.png";
-import Stock from "../assets/images/sidebar/Stock.png";
-import Setting from "../assets/images/sidebar/Setting.png";
-
 class Sidebar extends Component {
   state = {};
 

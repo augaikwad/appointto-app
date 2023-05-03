@@ -62,11 +62,13 @@ const CreateAppointmentModal = () => {
     const formData = { ...data };
     formData.start_time = moment(new Date(data.start_time)).format("h:mm A");
     formData.end_time = moment(new Date(data.end_time)).format("h:mm A");
+    formData.date = moment(new Date(formData.date)).format(
+      "YYYY-MM-DDTHH:mm:ss.sssZ"
+    );
 
     if (["/dashboard", "/"].includes(location.pathname)) {
       actions.setCanResetSearchBox(true);
     }
-    console.log("onSubmit === ", data, formData);
     if (isAdd) {
       actions.createAppointment(formData, callback);
     } else {
