@@ -3,9 +3,9 @@ import { Modal as BSModal } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
-  modal:{
-    backgroundColor:'rgba(0,0,0,0.5)'
-  }
+  modal: {
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
 });
 
 const Modal = ({
@@ -17,11 +17,11 @@ const Modal = ({
   footerActions,
   backdrop = "static",
   scrollable = true,
-  dialogClassName="",
+  dialogClassName = "",
   children,
 }) => {
   const classes = useStyles();
-  
+
   return (
     <BSModal
       id={id}
@@ -42,9 +42,7 @@ const Modal = ({
 
       <BSModal.Body>{children}</BSModal.Body>
 
-      {!!footerActions && (
-        <BSModal.Footer>{footerActions}</BSModal.Footer>
-      )}
+      {!!footerActions && <BSModal.Footer>{footerActions}</BSModal.Footer>}
     </BSModal>
   );
 };

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { createUseStyles } from "react-jss";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useFieldArray, useFormContext, Controller } from "react-hook-form";
 import { AutocompleteField, Modal } from "../../../components";
+import { ReactSelectField } from "../../../components/Forms";
 import InputMask from "react-input-mask";
 import MedicineNameField from "./MedicineNameField";
 import CommonMedicineTable from "./CommonMedicineTable";
@@ -83,52 +84,106 @@ const useStyles = createUseStyles({
       padding: "5px 8px",
     },
   },
+  reactSelect: { "& > div": { border: "none", boxShadow: "none" } },
+  textCenter: { textAlign: "center" },
 });
+
+const unitOptions = [
+  { label: "mg", value: "mg" },
+  { label: "mcg", value: "mcg" },
+  { label: "ml", value: "ml" },
+  { label: "IU", value: "IU" },
+  { label: "g", value: "g" },
+  { label: "ug", value: "ug" },
+  { label: "tsp", value: "tsp" },
+  { label: "drps", value: "drps" },
+  { label: "units", value: "units" },
+  { label: "tab", value: "tab" },
+  { label: "cap", value: "cap" },
+  { label: "puffs", value: "puffs" },
+];
+
+const typeOptions = [
+  { label: "TAB", value: "TAB" },
+  { label: "SYP", value: "SYP" },
+  { label: "CRM", value: "CRM" },
+  { label: "POW", value: "POW" },
+  { label: "INJ", value: "INJ" },
+  { label: "CAP", value: "CAP" },
+  { label: "DRP", value: "DRP" },
+  { label: "SUS", value: "SUS" },
+  { label: "LIQ", value: "LIQ" },
+  { label: "SAC", value: "SAC" },
+  { label: "EXP", value: "EXP" },
+  { label: "OIN", value: "OIN" },
+  { label: "GEN", value: "GEN" },
+  { label: "LOT", value: "LOT" },
+  { label: "GEL", value: "GEL" },
+  { label: "GRA", value: "GRA" },
+  { label: "SOAP", value: "SOAP" },
+  { label: "SOL", value: "SOL" },
+  { label: "VAC", value: "VAC" },
+  { label: "PAS", value: "PAS" },
+  { label: "INH", value: "INH" },
+  { label: "OTH", value: "OTH" },
+  { label: "SPR", value: "SPR" },
+];
 
 const initFields = {
   type: "",
-  name: "",
+  medicineName: "",
   dose: "",
+  unit: "",
   timing: "",
   duration: "",
   notes: "",
 };
 
-const MedicinesTable = ({ rxGroupData }) => {
+const headerColumns = [
+  { field: "sr", label: "#", width: "20px" },
+  { field: "type", label: "Type", width: "60px" },
+  { field: "medicineName", label: "Medicine", width: "30%" },
+  { field: "dose", label: "Dose", width: "80px" },
+  { field: "unit", label: "Unit", width: "80px" },
+  { field: "timing", label: "Timing", width: "120px" },
+  { field: "duration", label: "Duration", width: "120px" },
+  { field: "note", label: "Notes" },
+];
+
+const MedicinesTable = ({ rxGroupData, control }) => {
   const classes = useStyles();
+
   const [durationData, setDurationData] = useState([
     "Days",
     "Weeks",
     "Months",
     "Years",
   ]);
-  const { setValue, control, handleSubmit, register, watch } = useForm({
-    defaultValues: {
-      medicine: [initFields],
-    },
-  });
+
+  const { setValue, register } = useFormContext();
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "medicine",
+    name: "prescribedMedicines",
   });
 
-  const headerColumns = [
-    { field: "type", label: "Unit", width: "55px" },
-    { field: "name", label: "Medicine", width: "30%" },
-    { field: "dose", label: "Dose", width: "80px" },
-    { field: "timing", label: "Timing", width: "120px" },
-    { field: "duration", label: "Duration", width: "120px" },
-    { field: "notes", label: "Notes" },
-  ];
-
-  const onSubmit = (data) => {
-    console.log("onSubmit ==== ", data);
-  };
-
   const getInputs = (key, obj, ind, isFilled) => {
-    let name = `medicine[${ind}].${key}`;
-    if (key === "name") {
+    let name = `prescribedMedicines[${ind}].${key}`;
+    if (key === "type") {
+      return (
+        <ReactSelectField
+          name={name}
+          options={typeOptions}
+          menuPortalTarget={document.body}
+          className={classes.reactSelect}
+          placeholder=""
+          components={{
+            DropdownIndicator: () => null,
+            IndicatorSeparator: () => null,
+          }}
+        />
+      );
+    } else if (key === "medicineName") {
       const props = {
         objKey: key,
         ind,
@@ -138,12 +193,11 @@ const MedicinesTable = ({ rxGroupData }) => {
         control,
         setValue,
       };
-      console.log("watch ====== ", watch(`medicine[${ind}]`));
       return (
         <MedicineNameField
           {...props}
-          onChange={([val]) => {
-            setValue(`medicine[${ind}]`, { ...obj, ...val });
+          onChange={(val) => {
+            setValue(name, val);
             if (fields.length - 1 === ind) {
               append(initFields);
             }
@@ -164,23 +218,39 @@ const MedicinesTable = ({ rxGroupData }) => {
           )}
         />
       );
+    } else if (key === "unit") {
+      return (
+        <ReactSelectField
+          name={name}
+          options={unitOptions}
+          menuPortalTarget={document.body}
+          className={classes.reactSelect}
+          components={{
+            DropdownIndicator: () => null,
+            IndicatorSeparator: () => null,
+          }}
+        />
+      );
     } else if (key === "timing") {
       return (
-        <AutocompleteField
-          id="TimingAutocomplete"
+        <ReactSelectField
           name={name}
-          control={control}
-          className="medicinesAutocomplete"
-          data={[
+          options={[
             {
-              value: 1,
-              name: "Before Food",
+              value: "Beforefood",
+              label: "Before Food",
             },
             {
-              value: 2,
-              name: "After Food",
+              value: "Afterfood",
+              label: "After Food",
             },
           ]}
+          menuPortalTarget={document.body}
+          className={classes.reactSelect}
+          components={{
+            DropdownIndicator: () => null,
+            IndicatorSeparator: () => null,
+          }}
         />
       );
     } else if (key === "duration") {
@@ -252,10 +322,16 @@ const MedicinesTable = ({ rxGroupData }) => {
             {fields.map((field, ind) => {
               return (
                 <tr key={ind}>
+                  <td
+                    key={`sr-${ind}`}
+                    className={`${classes.td} ${classes.textCenter}`}
+                  >
+                    {ind + 1}
+                  </td>
                   {Object.keys(field).length > 0 &&
                     Object.keys(field).map((objKey, objInd) => {
                       let isFilled = false;
-                      if (objKey === "name" && !!field[objKey]) {
+                      if (objKey === "medicineName" && !!field[objKey]) {
                         isFilled = true;
                       }
                       return (

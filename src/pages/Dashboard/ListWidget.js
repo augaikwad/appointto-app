@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useContext } from "react";
 import { Dropdown } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,8 +8,11 @@ import {
   faUsersBetweenLines,
   faCalendarDays,
 } from "@fortawesome/free-solid-svg-icons";
-import PatientModal from "../Patient/PatientModal";
+import CreateAppointmentModal from "../Patient/CreateAppointmentModal";
 import { useHistory } from "react-router-dom";
+import { Tooltip } from "../../components";
+import { AppointmentContext } from "../../context/Appointment";
+import { PatientContext } from "../../context/Patient";
 
 const useStyles = createUseStyles({
   tr: {
@@ -38,128 +41,141 @@ const useStyles = createUseStyles({
   },
 });
 
-const listData = [
-  {
-    patientName: "Soham Thorait",
-    appointmentTime: { start: "09:00 AM", end: "10:00 AM" },
-    billStatus: "Paid",
-    isAppointment: true,
-  },
-  {
-    patientName: "Bala Naik",
-    appointmentTime: { start: "10:00 AM", end: "11:00 AM" },
-    billStatus: "Pending",
-    isAppointment: false,
-  },
-  {
-    patientName: "Karan Ahuja",
-    appointmentTime: { start: "11:00 AM", end: "12:00 PM" },
-    billStatus: "Paid",
-    isAppointment: false,
-  },
-  {
-    patientName: "Shyam Kumar",
-    appointmentTime: { start: "12:00 PM", end: "01:00 PM" },
-    billStatus: "Pending",
-    isAppointment: true,
-  },
-];
-
 const ListWidget = () => {
   const classes = useStyles();
 
   const history = useHistory();
 
-  const [modalState, setModalState] = useState({
-    title: "Patient",
-    show: false,
-    selectedTab: 0,
-  });
+  const [state, actions] = useContext(AppointmentContext);
+  const { appointmentList, appointmentStatusList } = state;
+  const [patientState, patientActions] = useContext(PatientContext);
+
+  useEffect(() => {
+    if (appointmentStatusList.length === 0) {
+      actions.getAppointmentStatusList();
+    }
+  }, [appointmentStatusList]);
+
+  const updateAppointment = (req) => {
+    actions.updateAppointment(req, () => {
+      actions.getAppointmentByDoctor();
+    });
+  };
+
+  const handleButtonClick = (patientId, tab) => {
+    patientActions.getPatientById(patientId, () => {
+      history.push({
+        pathname: "/patient/" + patientId,
+        state: {
+          selectedTab: tab,
+        },
+      });
+    });
+  };
+
+  const IconButton = ({
+    tooltipText = "",
+    placement = "top",
+    btnClasses = "",
+    btnOnClick = () => {},
+    icon = faUsersBetweenLines,
+  }) => {
+    return (
+      <Tooltip text={tooltipText} placement={placement}>
+        <button
+          type="button"
+          className={`btn btn-rounded btn-icon ${classes.iconBtn} ${btnClasses}`}
+          onClick={() => btnOnClick()}
+        >
+          <FontAwesomeIcon icon={icon} />
+        </button>
+      </Tooltip>
+    );
+  };
 
   return (
     <>
-      <PatientModal
-        {...modalState}
-        onHide={() =>
-          setModalState({ ...modalState, ...{ show: false, selectedTab: 0 } })
-        }
-      />
-
-      <div className="table-responsive" style={{ minHeight: 125 }}>
+      <CreateAppointmentModal isAdd={false} />
+      <div className="table-responsive">
         <table className="table table-borderless">
           <tbody>
-            {listData &&
-              listData.map((item, ind) => {
+            {appointmentList.length === 0 && (
+              <tr key="NoRecords">
+                <td style={{ textAlign: "center", fontWeight: "500" }}>
+                  No Appointments Found
+                </td>
+              </tr>
+            )}
+            {appointmentList.length > 0 &&
+              appointmentList.map((item, ind) => {
                 return (
-                  <tr key={ind} className={classes.tr}>
+                  <tr key={item.id_appointment} className={classes.tr}>
                     <td className={`text-center ${classes.td}`} width="30px">
                       {ind + 1}
                     </td>
                     <td className={`font-weight-bold ${classes.td}`}>
                       <button
                         className={`btn btn-sm btn-link ${classes.patientName}`}
-                        onClick={
-                          () =>
-                            history.push({
-                              pathname: "/patient/" + (ind + 1),
-                              state: {
-                                data: item,
-                                selectedTab: 0,
-                              },
-                            })
-                          // setModalState({
-                          //   ...modalState,
-                          //   ...{ show: true, selectedTab: 0 },
-                          // })
-                        }
+                        onClick={() => handleButtonClick(item.id_patient, 0)}
                       >
-                        {item.patientName}
+                        {item.patient_first_name} {item.patient_last_name}
                       </button>
                     </td>
                     <td
                       className={`font-weight-bold text-center ${classes.td}`}
                       width="26px"
                     >
-                      {item.isAppointment && (
-                        <FontAwesomeIcon
-                          icon={faCalendarDays}
-                          style={{ fontSize: 18, color: "green" }}
-                        />
+                      {item.queue_type === 0 && (
+                        <Tooltip text="Has Appointment" placement="top">
+                          <FontAwesomeIcon
+                            icon={faCalendarDays}
+                            style={{ fontSize: 18, color: "green" }}
+                          />
+                        </Tooltip>
+                      )}
+                      {item.queue_type === 1 && (
+                        <Tooltip text="Walk in" placement="top">
+                          <i
+                            className="mdi mdi-walk"
+                            style={{ fontSize: 21 }}
+                          ></i>
+                        </Tooltip>
                       )}
                     </td>
                     <td className={`${classes.td} text-right`} width="130px">
-                      {item.appointmentTime.start} - {item.appointmentTime.end}
+                      {item.start_time} - {item.end_time}
                     </td>
                     <td
                       className={`font-weight-bold ${
-                        item.billStatus === "Paid"
-                          ? "text-success"
-                          : "text-warning"
+                        item.payment_status === 0
+                          ? "text-warning"
+                          : "text-success"
                       } text-center ${classes.td}`}
                       width="105px"
                     >
-                      <span>{item.billStatus}</span>
+                      <span>
+                        {`${item.payment_status === 0 ? "Pending" : "Paid"}`}
+                      </span>
                     </td>
                     <td className={classes.td} width={56}>
-                      <button
-                        type="button"
-                        className={`btn btn-inverse-primary btn-rounded btn-icon ${classes.iconBtn}`}
-                      >
-                        <FontAwesomeIcon icon={faUsersBetweenLines} />
-                      </button>
-                      {/* <div className="form-check">
-                <label className="form-check-label">
-                  <input
-                    type="radio"
-                    className="form-check-input"
-                    name="ExampleRadio3"
-                    id="membershipRadios2"
-                    defaultChecked
-                  />{" "}
-                  Checked In
-                  <i className="input-helper"></i>
-                </label>
-              </div> */}
+                      <IconButton
+                        tooltipText={`${
+                          item.checked_in === 0
+                            ? "Mark as Checked In"
+                            : "Checked In"
+                        }`}
+                        btnClasses={`${
+                          item.checked_in === 0
+                            ? "btn-inverse-primary"
+                            : "btn-success"
+                        }`}
+                        icon={faUsersBetweenLines}
+                        btnOnClick={() => {
+                          let req = { ...item };
+                          req.checked_in = req.checked_in === 0 ? 1 : 0;
+                          updateAppointment(req);
+                        }}
+                      />
                     </td>
                     <td
                       className={`font-weight-bold text-success ${classes.td}`}
@@ -167,48 +183,35 @@ const ListWidget = () => {
                     >
                       <select
                         className={`${classes.statusDropdown} form-control form-control-sm`}
+                        value={item.appointment_status}
+                        onChange={(e) => {
+                          let req = { ...item };
+                          req.appointment_status = e.target.value;
+                          updateAppointment(req);
+                        }}
                       >
-                        <option>Select</option>
-                        <option>Arrived</option>
-                        <option>In Queue</option>
-                        <option>On Going</option>
-                        <option>Completed</option>
-                        <option>No Show</option>
+                        {appointmentStatusList.map((item, ind) => (
+                          <option key={ind} value={item.statusValue}>
+                            {item.statusName}
+                          </option>
+                        ))}
                       </select>
                     </td>
                     <td className={`${classes.td} text-center`} width={56}>
-                      <button
-                        type="button"
-                        className={`btn btn-primary btn-rounded btn-icon ${classes.iconBtn}`}
-                        onClick={() =>
-                          history.push({
-                            pathname: "/patient/" + (ind + 1),
-                            state: {
-                              data: item,
-                              selectedTab: 1,
-                            },
-                          })
-                        }
-                      >
-                        <FontAwesomeIcon icon={faPrescription} />
-                      </button>
+                      <IconButton
+                        tooltipText="Prescription"
+                        btnClasses="btn-primary"
+                        btnOnClick={() => handleButtonClick(item.id_patient, 1)}
+                        icon={faPrescription}
+                      />
                     </td>
                     <td className={`${classes.td} text-center`} width={56}>
-                      <button
-                        type="button"
-                        className={`btn btn-dark btn-rounded btn-icon ${classes.iconBtn}`}
-                        onClick={() =>
-                          history.push({
-                            pathname: "/patient/" + (ind + 1),
-                            state: {
-                              data: item,
-                              selectedTab: 2,
-                            },
-                          })
-                        }
-                      >
-                        <FontAwesomeIcon icon={faWallet} />
-                      </button>
+                      <IconButton
+                        tooltipText="Bill"
+                        btnClasses="btn-dark"
+                        btnOnClick={() => handleButtonClick(item.id_patient, 2)}
+                        icon={faWallet}
+                      />
                     </td>
                     <td className={`${classes.td} text-center`} width={56}>
                       <Dropdown variant="p-0" alignRight>
@@ -219,7 +222,17 @@ const ListWidget = () => {
                           <i className="ti-more-alt"></i>
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                          <Dropdown.Item>Edit</Dropdown.Item>
+                          <Dropdown.Item
+                            onClick={() => {
+                              actions.setAppointmentForm(item);
+                              actions.setAppointmentModal({
+                                isAdd: false,
+                                show: true,
+                              });
+                            }}
+                          >
+                            Edit
+                          </Dropdown.Item>
                           <Dropdown.Item>Delete</Dropdown.Item>
                           <Dropdown.Item>Add Vitals</Dropdown.Item>
                         </Dropdown.Menu>

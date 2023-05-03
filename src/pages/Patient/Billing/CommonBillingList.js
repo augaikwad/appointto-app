@@ -44,54 +44,6 @@ const CommonBillingList = ({
         columns={columns}
         {...tableProps}
       />
-
-      {/* <div className="table-responsive">
-        <table className="table">
-          <thead>
-            <tr>
-              {columns.map((col, ind) => {
-                let thProps = {};
-                if (!!col.width) {
-                  thProps = { ...thProps, width: col.width };
-                }
-                let className = classes.th;
-                if (!!col.align && col.align === "center") {
-                  className = `${className} text-center`;
-                } else if (!!col.align && col.align === "right") {
-                  className = `${className} text-right`;
-                }
-
-                return (
-                  <th key={ind} className={className} {...thProps}>
-                    {col.label}
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, ind) => (
-              <tr key={ind}>
-                {columns.map((col, i) => {
-                  let className = classes.td;
-                  if (!!col.align && col.align === "center") {
-                    className = `${className} text-center`;
-                  } else if (!!col.align && col.align === "right") {
-                    className = `${className} text-right`;
-                  }
-                  return (
-                    <td key={`${col.field}_${ind}_${i}`} className={className}>
-                      {col.formatter
-                        ? col.formatter(item[col.field], item)
-                        : item[col.field]}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div> */}
     </>
   );
 };

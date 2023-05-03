@@ -2,14 +2,14 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
-    th:{
-        textAlign: "center",
-        padding: "8px 10px !important",
-      },
-      td:{
-        padding: "8px 10px !important",
-      }
-})
+  th: {
+    textAlign: "center",
+    padding: "8px 10px !important",
+  },
+  td: {
+    padding: "8px 10px !important",
+  },
+});
 
 const CommonMedicineTable = ({ columns, data }) => {
   const classes = useStyles();

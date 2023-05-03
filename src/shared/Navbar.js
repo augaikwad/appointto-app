@@ -76,7 +76,10 @@ function Navbar(props) {
                     </Dropdown.Item>
                     <Dropdown.Item
                       className="dropdown-item preview-item"
-                      onClick={(evt) => evt.preventDefault()}
+                      onClick={(evt) => {
+                        localStorage.clear();
+                        window.location.reload(false);
+                      }}
                     >
                       <div className="d-flex align-items-center">
                         <i className="ti-power-off text-primary"></i>
@@ -92,7 +95,15 @@ function Navbar(props) {
           <>
             <ul className="navbar-nav nav-actions navbar-nav-right">
               <li className="nav-item nav-login">
-                <Link to="/login">Login</Link>
+                <Link
+                  to="/login"
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.reload(false);
+                  }}
+                >
+                  Login
+                </Link>
               </li>
             </ul>
           </>

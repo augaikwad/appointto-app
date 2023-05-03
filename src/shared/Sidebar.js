@@ -62,7 +62,7 @@ class Sidebar extends Component {
 
   render() {
     return (
-      <nav className="sidebar sidebar-offcanvas" id="sidebar">
+      <nav className="sidebar sidebar-offcanvas short-sidebar" id="sidebar">
         <ul className="nav">
           <li
             className={
@@ -70,67 +70,76 @@ class Sidebar extends Component {
             }
           >
             <Link className="nav-link" to="/dashboard">
-              <img src={Dashboard} className="menu-icon" />
+              {/* <img src={Dashboard} className="menu-icon" /> */}
+              <i className="fa fa-th-large menu-font-icon"></i>
               <span className="menu-title">Dashboard</span>
             </Link>
           </li>
           <li
             className={
-              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+              this.isPathActive("/patients") ? "nav-item active" : "nav-item"
             }
           >
-            <Link className="nav-link" to="/widgets">
-              <img src={Queue} className="menu-icon" />
+            <Link className="nav-link" to="/patients">
+              {/* <img src={Queue} className="menu-icon" /> */}
+              <i className="fa fa-users menu-font-icon"></i>
               <span className="menu-title">Patients</span>
             </Link>
           </li>
           <li
             className={
-              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+              this.isPathActive("/appointments")
+                ? "nav-item active"
+                : "nav-item"
             }
           >
-            <Link className="nav-link" to="/widgets">
-              <img src={Appointments} className="menu-icon" />
+            <Link className="nav-link" to="/appointments">
+              {/* <img src={Appointments} className="menu-icon" /> */}
+              <i className="fa fa-calendar menu-font-icon"></i>
               <span className="menu-title">Appointments</span>
             </Link>
           </li>
           <li
             className={
-              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+              this.isPathActive("/reports") ? "nav-item active" : "nav-item"
             }
           >
             <Link className="nav-link" to="/widgets">
-              <img src={Reports} className="menu-icon" />
+              {/* <img src={Reports} className="menu-icon" /> */}
+              <i className="fa fa-file-text menu-font-icon"></i>
               <span className="menu-title">Reports</span>
             </Link>
           </li>
           <li
             className={
-              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+              this.isPathActive("/labWork") ? "nav-item active" : "nav-item"
             }
           >
             <Link className="nav-link" to="/widgets">
-              <img src={Dental} className="menu-icon" />
+              {/* <img src={Dental} className="menu-icon" /> */}
+              <i className="mdi mdi-tooth menu-font-icon"></i>
               <span className="menu-title">Lab Work</span>
             </Link>
           </li>
           <li
             className={
-              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+              this.isPathActive("/inventory") ? "nav-item active" : "nav-item"
             }
           >
             <Link className="nav-link" to="/widgets">
-              <img src={Stock} className="menu-icon" />
+              {/* <img src={Stock} className="menu-icon" /> */}
+              <i className="fa fa-cubes menu-font-icon"></i>
               <span className="menu-title">Inventory</span>
             </Link>
           </li>
           <li
             className={
-              this.isPathActive("/widgets") ? "nav-item active" : "nav-item"
+              this.isPathActive("/settings") ? "nav-item active" : "nav-item"
             }
           >
             <Link className="nav-link" to="/widgets">
-              <img src={Setting} className="menu-icon" />
+              {/* <img src={Setting} className="menu-icon" /> */}
+              <i className="fa fa-cog menu-font-icon"></i>
               <span className="menu-title">Settings</span>
             </Link>
           </li>

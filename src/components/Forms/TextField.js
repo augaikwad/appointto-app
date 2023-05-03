@@ -1,6 +1,7 @@
 import React from "react";
 import { Form } from "react-bootstrap";
 import Field from "./Field";
+import { useFormContext } from "react-hook-form";
 
 const TextField = ({
   label,
@@ -9,21 +10,21 @@ const TextField = ({
   size = "sm",
   placeholder = "",
   inline = false,
-  required = false,
   labelWidth,
-  register,
   rules = {},
-  error = null,
   ...restProps
 }) => {
-  const errorClass = !!error ? "error" : "";
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
+
   const fieldProps = {
     label: label,
     name: name,
     inline: inline,
     labelWidth: labelWidth,
-    required: required,
-    classNames: errorClass,
+    required: rules.hasOwnProperty("required"),
   };
   return (
     <Field {...fieldProps}>
@@ -36,9 +37,6 @@ const TextField = ({
         {...register(name, rules)}
         {...restProps}
       />
-      {!!error && !!error.message && (
-        <div className="invalid-feedback">{error.message}</div>
-      )}
     </Field>
   );
 };

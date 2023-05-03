@@ -12,7 +12,6 @@ const ReactTagsField = React.forwardRef(
           name={name}
           control={control}
           render={({ field }) => {
-            console.log("ReactTagsField ===== ", field);
             return (
               <ReactTags
                 {...field}

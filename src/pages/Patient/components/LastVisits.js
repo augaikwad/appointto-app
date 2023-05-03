@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useEffect, useContext, useRef } from "react";
 import { Card, Tooltip } from "../../../components";
 import { createUseStyles } from "react-jss";
 import { format } from "date-fns";
 import CommonMedicineTable from "./CommonMedicineTable";
+import { PrescriptionContext } from "../../../context/Prescription";
+import { PatientContext } from "../../../context/Patient";
+import PrescriptionPrint from "../components/PrescriptionPrint";
+import ReactToPrint from "react-to-print";
 
 const useStyles = createUseStyles({
   container: {
@@ -71,22 +75,61 @@ const useStyles = createUseStyles({
 });
 
 const headerColumns = [
-  { field: "type", label: "Unit", width: "55px" },
-  { field: "name", label: "Medicine", width: "30%" },
+  { field: "type", label: "Type", width: "55px" },
+  { field: "medicineName", label: "Medicine", width: "30%" },
   { field: "dose", label: "Dose", width: "80px" },
+  { field: "unit", label: "Unit", width: "55px" },
   { field: "timing", label: "Timing", width: "120px" },
   { field: "duration", label: "Duration", width: "120px" },
-  { field: "notes", label: "Notes" },
+  { field: "note", label: "Notes" },
 ];
 
-const LastVisits = ({ data }) => {
+const PrintButton = ({ data }) => {
   const classes = useStyles();
+  const ref = useRef();
+  return (
+    <>
+      <Tooltip text="Print" placement="auto">
+        <ReactToPrint
+          trigger={() => (
+            <button
+              type="button"
+              className={`btn btn-inverse-info btn-icon ${classes.timelineActionBtn}`}
+            >
+              <i className="fa fa-print"></i>
+            </button>
+          )}
+          content={() => ref.current}
+        />
+      </Tooltip>
+      <PrescriptionPrint ref={ref} data={data} />
+    </>
+  );
+};
+
+const LastVisits = ({ data = [] }) => {
+  const classes = useStyles();
+
+  const [state, actions] = useContext(PrescriptionContext);
+  const { allPrescriptions } = state;
+
+  const [patientState, patientActions] = useContext(PatientContext);
+  const { patientData } = patientState;
+
+  useEffect(() => {
+    if (patientData !== null) {
+      actions.getPrescriptions({ PatientId: patientData.id_patient });
+    }
+  }, [patientData]);
 
   const getCardTitle = (item) => {
     return (
       <>
-        <b className="pr-5">{format(new Date(item.date), "dd-MMM-yyyy")}</b> By:{" "}
-        {item.by}
+        <b className="pr-5">
+          {format(new Date(item.prescriptionDate), "dd-MMM-yyyy")}
+        </b>{" "}
+        By: {localStorage.getItem("id_doctor")}
+        {/* {item.by} */}
       </>
     );
   };
@@ -96,13 +139,13 @@ const LastVisits = ({ data }) => {
       <div className="row">
         <div className="col-lg-12">
           <h5 className="text-center">
-            {data.length > 0 ? `Timeline` : "No Visits Available"}
+            {allPrescriptions.length > 0 ? `Timeline` : "No Visits Available"}
           </h5>
         </div>
         <div className={`col-lg-12 ${classes.visitsContainer}`}>
           <div className={`timeline ${classes.visitsTimeline}`}>
-            {data.length > 0 &&
-              data.map((item, ind) => {
+            {allPrescriptions.length > 0 &&
+              allPrescriptions.map((item, ind) => {
                 return (
                   <div
                     key={ind}
@@ -112,14 +155,7 @@ const LastVisits = ({ data }) => {
                     <div className="timeline-panel">
                       <div className="timeline-heading">
                         <h6 className="timeline-title">{getCardTitle(item)}</h6>
-                        <Tooltip text="Print" placement="auto">
-                          <button
-                            type="button"
-                            className={`btn btn-inverse-info btn-icon ${classes.timelineActionBtn}`}
-                          >
-                            <i className="fa fa-print"></i>
-                          </button>
-                        </Tooltip>
+                        <PrintButton data={item} />
                       </div>
                       <div className="timeline-body">
                         <div className="row">
@@ -127,9 +163,9 @@ const LastVisits = ({ data }) => {
                             <div className="form-group inline-form-group">
                               <label>Complaints:</label>
                               <div>
-                                {!!item.complaints &&
-                                  item.complaints.length > 0 &&
-                                  item.complaints
+                                {!!item.lstComplaints &&
+                                  item.lstComplaints.length > 0 &&
+                                  item.lstComplaints
                                     .map((elem) => {
                                       return elem.name;
                                     })
@@ -139,9 +175,9 @@ const LastVisits = ({ data }) => {
                             <div className="form-group inline-form-group">
                               <label>Observations:</label>
                               <div>
-                                {!!item.observations &&
-                                  item.observations.length > 0 &&
-                                  item.observations
+                                {!!item.lstObservations &&
+                                  item.lstObservations.length > 0 &&
+                                  item.lstObservations
                                     .map((elem) => {
                                       return elem.name;
                                     })
@@ -151,9 +187,9 @@ const LastVisits = ({ data }) => {
                             <div className="form-group inline-form-group">
                               <label>Diagnosis:</label>
                               <div>
-                                {!!item.diagnosis &&
-                                  item.diagnosis.length > 0 &&
-                                  item.diagnosis
+                                {!!item.lstDiagnosis &&
+                                  item.lstDiagnosis.length > 0 &&
+                                  item.lstDiagnosis
                                     .map((elem) => {
                                       return elem.name;
                                     })
@@ -163,9 +199,9 @@ const LastVisits = ({ data }) => {
                             <div className="form-group inline-form-group">
                               <label>Work Done:</label>
                               <div>
-                                {!!item.workDone &&
-                                  item.workDone.length > 0 &&
-                                  item.workDone
+                                {!!item.lstWorkDone &&
+                                  item.lstWorkDone.length > 0 &&
+                                  item.lstWorkDone
                                     .map((elem) => {
                                       return elem.name;
                                     })
@@ -177,16 +213,16 @@ const LastVisits = ({ data }) => {
                             <h6>Medicines</h6>
                             <CommonMedicineTable
                               columns={headerColumns}
-                              data={item.medicines}
+                              data={item.prescribedMedicines}
                             />
                           </div>
                           <div className="col-lg-12">
                             <div className="form-group inline-form-group">
                               <label>Advice:</label>
                               <div>
-                                {!!item.advice &&
-                                  item.advice.length > 0 &&
-                                  item.advice
+                                {!!item.lstAdvice &&
+                                  item.lstAdvice.length > 0 &&
+                                  item.lstAdvice
                                     .map((elem) => {
                                       return elem.name;
                                     })
@@ -196,9 +232,9 @@ const LastVisits = ({ data }) => {
                             <div className="form-group inline-form-group">
                               <label>Investigations:</label>
                               <div>
-                                {!!item.investigations &&
-                                  item.investigations.length > 0 &&
-                                  item.investigations
+                                {!!item.lstInvestigations &&
+                                  item.lstInvestigations.length > 0 &&
+                                  item.lstInvestigations
                                     .map((elem) => {
                                       return elem.name;
                                     })
@@ -213,98 +249,6 @@ const LastVisits = ({ data }) => {
                 );
               })}
           </div>
-          {/* {data.length > 0 &&
-            data.map((item, ind) => {
-              return (
-                <Card key={ind} title={getCardTitle(item)}>
-                  <div className="row">
-                    <div className="col-lg-12">
-                      <div className="form-group inline-form-group">
-                        <label>Complaints:</label>
-                        <div>
-                          {!!item.complaints &&
-                            item.complaints.length > 0 &&
-                            item.complaints
-                              .map((elem) => {
-                                return elem.name;
-                              })
-                              .join(", ")}
-                        </div>
-                      </div>
-                      <div className="form-group inline-form-group">
-                        <label>Observations:</label>
-                        <div>
-                          {!!item.observations &&
-                            item.observations.length > 0 &&
-                            item.observations
-                              .map((elem) => {
-                                return elem.name;
-                              })
-                              .join(", ")}
-                        </div>
-                      </div>
-                      <div className="form-group inline-form-group">
-                        <label>Diagnosis:</label>
-                        <div>
-                          {!!item.diagnosis &&
-                            item.diagnosis.length > 0 &&
-                            item.diagnosis
-                              .map((elem) => {
-                                return elem.name;
-                              })
-                              .join(", ")}
-                        </div>
-                      </div>
-                      <div className="form-group inline-form-group">
-                        <label>Work Done:</label>
-                        <div>
-                          {!!item.workDone &&
-                            item.workDone.length > 0 &&
-                            item.workDone
-                              .map((elem) => {
-                                return elem.name;
-                              })
-                              .join(", ")}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-lg-12 mb-3">
-                      <h6>Medicines</h6>
-                      <CommonMedicineTable
-                        columns={headerColumns}
-                        data={item.medicines}
-                      />
-                    </div>
-                    <div className="col-lg-12">
-                      <div className="form-group inline-form-group">
-                        <label>Advice:</label>
-                        <div>
-                          {!!item.advice &&
-                            item.advice.length > 0 &&
-                            item.advice
-                              .map((elem) => {
-                                return elem.name;
-                              })
-                              .join(", ")}
-                        </div>
-                      </div>
-                      <div className="form-group inline-form-group">
-                        <label>Investigations:</label>
-                        <div>
-                          {!!item.investigations &&
-                            item.investigations.length > 0 &&
-                            item.investigations
-                              .map((elem) => {
-                                return elem.name;
-                              })
-                              .join(", ")}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })} */}
         </div>
       </div>
     </div>

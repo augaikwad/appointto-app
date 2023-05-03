@@ -1,9 +1,11 @@
-import React from "react";
-import AddEditPatientModal from "../pages/Patient/AddEditPatientModal";
+import React, { useContext, useEffect, useRef } from "react";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { createUseStyles } from "react-jss";
-import cogoToast from "cogo-toast";
 import CreateAppointmentModal from "../pages/Patient/CreateAppointmentModal";
+import AddEditPatientModal from "../pages/Patient/AddEditPatient/AddEditPatientModal";
+import { PatientContext } from "../context/Patient";
+import { AppointmentContext } from "../context/Appointment";
+import moment from "moment";
 
 const useStyles = createUseStyles({
   customMenuItem: {
@@ -17,17 +19,23 @@ const useStyles = createUseStyles({
 
 const NavbarSearch = () => {
   const classes = useStyles();
+  const ref = useRef();
+  const [state, actions] = useContext(PatientContext);
+  const { globalPatientList } = state;
 
-  const [modalState, setModalState] = React.useState({
-    title: "Add Patient",
-    show: false,
-    selectedTab: 0,
-  });
+  const [aptState, aptActions] = useContext(AppointmentContext);
+  const { appointmentForm, canResetSearchBox } = aptState;
 
-  const [appointmentModal, setAppointmentModal] = React.useState({
-    title: "Add Appointment",
-    show: false,
-  });
+  useEffect(() => {
+    actions.getGlobalList();
+  }, []);
+
+  useEffect(() => {
+    if (canResetSearchBox) {
+      ref.current?.clear();
+      aptActions.setCanResetSearchBox(false);
+    }
+  }, [canResetSearchBox]);
 
   return (
     <>
@@ -41,35 +49,43 @@ const NavbarSearch = () => {
           </span>
         </div>
         <Typeahead
-          labelKey="label"
+          labelKey="patient_name"
+          filterBy={["patient_name", "mobile_number"]}
           id="globalSearch"
           name="globalSearch"
-          minLength={3}
-          options={[
-            { value: 1, label: "Soham Thorait" },
-            { value: 2, label: "Bala Naik" },
-            { value: 3, label: "Karan Ahuja" },
-            { value: 4, label: "Shyam Kumar" },
-          ]}
+          // minLength={3}
+          options={globalPatientList}
           renderMenuItemChildren={(option, props, index) => {
             return (
-              <div className={classes.customMenuItem}>
-                <div className="label">{option.label}</div>
+              <div className={classes.customMenuItem} key={index}>
+                <div className="label">{option.patient_name}</div>
                 <button
                   className="btn btn-sm btn-link"
-                  onClick={() =>
-                    cogoToast.success("Successfully added in Queue.", {
-                      position: "top-right",
-                    })
-                  }
+                  onClick={() => {
+                    let currentDate = new Date();
+                    let req = { ...appointmentForm };
+                    req.id_patient = option.id_patient;
+                    req.date = currentDate.toISOString();
+                    req.day = moment(currentDate).format("dddd");
+                    req.reason = "Consultation";
+
+                    aptActions.createAppointment(req, () => {
+                      ref.current?.clear();
+                      aptActions.getAppointmentByDoctor();
+                    });
+                  }}
                 >
                   Add to Queue
                 </button>
                 <button
                   className="btn btn-sm btn-link"
-                  onClick={() =>
-                    setAppointmentModal({ ...appointmentModal, show: true })
-                  }
+                  onClick={() => {
+                    aptActions.setAppointmentForm({
+                      id_patient: option.id_patient,
+                      id_doctor: localStorage.getItem("id_doctor"),
+                    });
+                    aptActions.setAppointmentModal({ show: true });
+                  }}
                 >
                   Add Appointment
                 </button>
@@ -78,33 +94,26 @@ const NavbarSearch = () => {
           }}
           placeholder="Search & Add Patients"
           className="globalSearchField"
+          ref={ref}
         />
         <div className="input-group-append">
           <button
             type="button"
             className="btn btn-primary btn-icon-text"
-            onClick={() =>
-              setModalState({
-                ...modalState,
-                ...{ show: true, selectedTab: 0 },
-              })
-            }
+            onClick={() => {
+              actions.setPatientModalOpen(true);
+            }}
           >
-            <i className="ti-plus btn-icon-prepend"></i>
+            <i
+              className="ti-plus btn-icon-prepend"
+              style={{ fontWeight: "bolder" }}
+            ></i>
             Add Patient
           </button>
         </div>
       </div>
-      <CreateAppointmentModal
-        {...appointmentModal}
-        onHide={() => setAppointmentModal({ ...appointmentModal, show: false })}
-      />
-      <AddEditPatientModal
-        {...modalState}
-        onHide={() =>
-          setModalState({ ...modalState, ...{ show: false, selectedTab: 0 } })
-        }
-      />
+      <CreateAppointmentModal />
+      <AddEditPatientModal />
     </>
   );
 };

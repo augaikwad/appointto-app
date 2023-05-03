@@ -1,53 +1,8 @@
 import React from "react";
 import { Form } from "react-bootstrap";
 import Field from "./Field";
-
-// const TextFieldWithIcon = React.forwardRef(
-//   (
-//     {
-//       label,
-//       name,
-//       type = "text",
-//       size = "sm",
-//       placeholder = "",
-//       inline = false,
-//       required = false,
-//       labelWidth,
-//       register,
-//       rules = {},
-//       ...restProps
-//     },
-//     ref
-//   ) => {
-//     const fieldProps = {
-//       label: label,
-//       name: name,
-//       inline: inline,
-//       labelWidth: labelWidth,
-//       required: required,
-//     };
-//     return (
-//       <Field {...fieldProps}>
-//         <div className="input-group">
-//           <div className="input-group-prepend bg-transparent">
-//             <span className="input-group-text bg-transparent border-right-0">
-//               <i className="ti-mobile text-primary"></i>
-//             </span>
-//           </div>
-//           <Form.Control
-//             type={type}
-//             id={name}
-//             name={name}
-//             placeholder={placeholder}
-//             size={size}
-//             // {...register(name, rules)}
-//             {...restProps}
-//           />
-//         </div>
-//       </Field>
-//     );
-//   }
-// );
+import { useFormContext } from "react-hook-form";
+import { hasError } from "../../helpers/hasError";
 
 const TextFieldWithIcon = ({
   label,
@@ -56,28 +11,30 @@ const TextFieldWithIcon = ({
   size = "sm",
   placeholder = "",
   inline = false,
-  required = false,
   labelWidth,
-  register,
   rules = {},
-  error = null,
+  icon = "ti-mobile",
   ...restProps
 }) => {
-  const errorClass = !!error ? "error" : "";
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
+
   const fieldProps = {
     label: label,
     name: name,
     inline: inline,
     labelWidth: labelWidth,
-    required: required,
-    classNames: errorClass,
+    required: rules.hasOwnProperty("required"),
   };
+
   return (
     <Field {...fieldProps}>
       <div className="input-group">
         <div className="input-group-prepend bg-transparent">
           <span className="input-group-text bg-transparent border-right-0">
-            <i className="ti-mobile text-primary"></i>
+            <i className={`${icon} text-primary`}></i>
           </span>
         </div>
         <Form.Control
@@ -86,12 +43,10 @@ const TextFieldWithIcon = ({
           name={name}
           placeholder={placeholder}
           size={size}
+          style={{ borderLeft: "none" }}
           {...register(name, rules)}
           {...restProps}
         />
-        {!!error && !!error.message && (
-          <div className="invalid-feedback">{error.message}</div>
-        )}
       </div>
     </Field>
   );

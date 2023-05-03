@@ -1,7 +1,12 @@
-import React from "react";
-import { TagsAutocomplete, Modal, Tooltip } from "../../../components";
-import cogoToast from "cogo-toast";
+import React, { useState } from "react";
+import { Button, Form } from "react-bootstrap";
+import { Tooltip, Modal } from "../../../components";
+import { CreatableReactSelect } from "../../../components/Forms";
+import { useFormContext } from "react-hook-form";
 import { createUseStyles } from "react-jss";
+import cogoToast from "cogo-toast";
+
+const toastOption = { hideAfter: 5, position: "bottom-center" };
 
 const useStyles = createUseStyles({
   btnContainer: {
@@ -18,152 +23,126 @@ const useStyles = createUseStyles({
       marginLeft: "12px",
     },
   },
-  groups: {
-    background: "#f1f1f1",
-    borderRadius: "5px",
-    padding: 5,
-    marginBottom: 15,
-    "& > div.groupsHeader": {
-      display: "flex",
-      padding: "5px 8px",
-      marginBottom: 10,
-      " & > span:first-child": {
-        flex: 1,
-      },
-    },
-    "& > div.groupsBody": {
-      padding: "5px 8px",
-    },
-  },
 });
 
 const CreateSelectTagsAutoComplete = ({
   name,
   label,
-  tags,
-  setTags = () => {},
-  placeholder = "Add Tag",
-  formGroupClasses = "",
-  handleAddition = () => {},
-  handleDelete = () => {},
-  createGroupMsg = "",
-  suggestionModal,
+  options,
+  onCreateGroup = () => {},
+  selectGroupBtnClick = () => {},
   ...restProps
 }) => {
   const classes = useStyles();
+  const { setValue, getValues } = useFormContext();
+  const [open, setOpen] = useState(false);
 
-  const onHide = () => {
-    suggestionModal.setState({
-      ...suggestionModal.state,
-      show: false,
-    });
-  };
-
-  const getLabel = () => {
+  const GetLabel = ({ name }) => {
     return (
       <>
         {label}
         <Tooltip text="Clear All" placement="top">
-          <button
-            className={`btn btn-sm btn-link btn-undo ${classes.btn}`}
-            onClick={(e) => {
-              e.preventDefault();
-              setTags([]);
+          <Button
+            variant="link"
+            size="sm"
+            className={`btn-undo ${classes.btn}`}
+            onClick={() => {
+              setValue(name, []);
             }}
           >
             <i className="fa fa-undo"></i>
-          </button>
+          </Button>
         </Tooltip>
       </>
     );
   };
 
+  const LinkButton = ({ label = "", onClick = () => {} }) => {
+    return (
+      <Button
+        variant="link"
+        size="sm"
+        className={classes.btn}
+        onClick={onClick}
+      >
+        {label}
+      </Button>
+    );
+  };
+
+  const CreateGroupModal = () => {
+    const [groupName, setGroupName] = useState("");
+
+    const onHide = () => {
+      setGroupName("");
+      setOpen(false);
+    };
+
+    const callback = () => {
+      onHide();
+    };
+
+    const FooterActions = () => {
+      return (
+        <div className="text-right">
+          <Button
+            disabled={groupName.length === 0}
+            className="btn btn-sm btn-primary"
+            onClick={() => onCreateGroup(groupName, callback)}
+          >
+            Create
+          </Button>
+        </div>
+      );
+    };
+
+    return (
+      <Modal
+        title="Create Group"
+        show={open}
+        onHide={onHide}
+        size="sm"
+        footerActions={<FooterActions />}
+      >
+        <Form.Group>
+          <label>Group Name</label>
+          <Form.Control
+            type="text"
+            placeholder="Enter Group Name"
+            onChange={(e) => setGroupName(e.target.value)}
+          />
+        </Form.Group>
+      </Modal>
+    );
+  };
+
+  const createGroupBtnClick = () => {
+    let value = getValues(name) || [];
+    if (value.length > 0) {
+      setOpen(true);
+    } else {
+      cogoToast.error(
+        `Please Select One or More ${
+          name === "advice" ? "Advice" : "Investigation"
+        } to create group`,
+        toastOption
+      );
+    }
+  };
+
   return (
     <>
-      <TagsAutocomplete
+      <CreatableReactSelect
         name={name}
-        label={getLabel()}
-        tags={tags}
-        placeholder={placeholder}
-        handleAddition={(tag) => {
-          const tempTags = [].concat(tags, tag);
-          setTags(tempTags);
-        }}
-        handleDelete={(i) => {
-          const tempTags = tags.slice(0);
-          tempTags.splice(i, 1);
-          setTags(tempTags);
-        }}
+        label={<GetLabel name={name} />}
+        options={options}
         {...restProps}
       />
       <div className={classes.btnContainer}>
-        <button
-          className={`btn btn-sm btn-link ${classes.btn}`}
-          onClick={(e) => {
-            e.preventDefault();
-            cogoToast.success(createGroupMsg, {
-              position: "top-right",
-            });
-          }}
-        >
-          Create Group
-        </button>
-        <button
-          className={`btn btn-sm btn-link ${classes.btn}`}
-          onClick={(e) => {
-            e.preventDefault();
-            suggestionModal.setState({
-              ...suggestionModal.state,
-              show: true,
-            });
-          }}
-        >
-          Select Group
-        </button>
-        <Modal
-          title={suggestionModal.state.title}
-          show={suggestionModal.state.show}
-          onHide={() => onHide()}
-          size="md"
-        >
-          {suggestionModal.state.data.length > 0 &&
-            suggestionModal.state.data.map((group, ind) => {
-              return (
-                <div key={ind} className={classes.groups}>
-                  <div className="groupsHeader">
-                    <span>{group.label}</span>
-                    <button
-                      className={`btn btn-sm btn-link ${classes.btn}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const mergedTags = [].concat(tags, group.items);
-
-                        setTags(mergedTags);
-
-                        onHide();
-                      }}
-                    >
-                      Select
-                    </button>
-                  </div>
-                  <div className="groupsBody">
-                    {group.items.length > 0 &&
-                      group.items.map((item, i) => {
-                        return (
-                          <div
-                            key={item.id}
-                            className="badge badge-primary mr-2 mb-2"
-                          >
-                            {item.name}
-                          </div>
-                        );
-                      })}
-                  </div>
-                </div>
-              );
-            })}
-        </Modal>
+        <LinkButton label="Create Group" onClick={createGroupBtnClick} />
+        <LinkButton label="Select Group" onClick={selectGroupBtnClick} />
       </div>
+      <CreateGroupModal />
     </>
   );
 };

@@ -1,9 +1,44 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
+import CountUp from "react-countup";
 import { Card } from "../../components";
 import ListFilters from "./ListFilters";
 import ListWidget from "./ListWidget";
+import { AppointmentContext } from "../../context/Appointment";
 
 function Dashboard(props) {
+  const [state, actions] = useContext(AppointmentContext);
+  const {
+    appointmentCount,
+    followUpPatient,
+    newPatient,
+    queueCount,
+    totalCount,
+  } = state;
+
+  const counts = [
+    { title: "Today's Queue", count: queueCount, icon: "ti-menu-alt" },
+    {
+      title: "Today's Appointment",
+      count: appointmentCount,
+      icon: "ti-calendar",
+    },
+    { title: "New Patients", count: newPatient, icon: "ti-user" },
+    { title: "Follow Ups", count: followUpPatient, icon: "ti-layers-alt" },
+  ];
+
+  const CountCard = ({ title = "", count = 0, icon = "" }) => {
+    return (
+      <Card title={title} titleClasses="text-md-center text-xl-left">
+        <div className="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
+          <h3 className="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">
+            <CountUp start="0" end={count} />
+          </h3>
+          <i className={`icon-md text-muted mb-0 mb-md-3 mb-xl-0 ${icon}`}></i>
+        </div>
+      </Card>
+    );
+  };
+
   return (
     <div>
       <div className="row">
@@ -13,57 +48,26 @@ function Dashboard(props) {
           </p>
         </div>
       </div>
+
       <div className="row">
-        <div className="col-md-3 grid-margin stretch-card">
-          <Card
-            title="Today's Queue"
-            titleClasses="text-md-center text-xl-left"
-          >
-            <div className="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
-              <h3 className="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">50</h3>
-              <i className="ti-menu-alt icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
-            </div>
-          </Card>
-        </div>
-        <div className="col-md-3 grid-margin stretch-card">
-          <Card
-            title="Today's Appointment"
-            titleClasses="text-md-center text-xl-left"
-          >
-            <div className="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
-              <h3 className="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">20</h3>
-              <i className="ti-calendar icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
-            </div>
-          </Card>
-        </div>
-        <div className="col-md-3 grid-margin stretch-card">
-          <Card title="New Patients" titleClasses="text-md-center text-xl-left">
-            <div className="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
-              <h3 className="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">10</h3>
-              <i className="ti-user icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
-            </div>
-          </Card>
-        </div>
-        <div className="col-md-3 grid-margin stretch-card">
-          <Card title="Follow ups" titleClasses="text-md-center text-xl-left">
-            <div className="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
-              <h3 className="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">50</h3>
-              <i className="ti-layers-alt icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
-            </div>
-          </Card>
-        </div>
+        {counts.map((item, ind) => (
+          <div key={ind} className="col-md-3 grid-margin stretch-card">
+            <CountCard {...item} />
+          </div>
+        ))}
       </div>
 
       <div className="row">
         <div className="col-md-12 grid-margin stretch-card">
-          <div className="card">
-            <div className="card-body">
-              <ListFilters />
-              <div className="mt-3 mb-3 p-3" style={{ background: "#EDEDED" }}>
-                <ListWidget />
-              </div>
+          <Card>
+            <ListFilters />
+            <div
+              className="mt-2 p-3"
+              style={{ background: "#EDEDED", minHeight: 140 }}
+            >
+              <ListWidget />
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

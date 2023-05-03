@@ -1,12 +1,29 @@
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import Routes from "./Routes";
 import Layout from "./shared/Layout";
 import Loader from "./shared/Loader";
-
 import GlobalContextProvider, { GlobalContext } from "./context/Global";
 import DoctorContextProvider from "./context/Doctor";
+import PatientContextProvider from "./context/Patient";
+import AuthContextProvider from "./context/Auth";
+import AppointmentContextProvider from "./context/Appointment";
+import PrescriptionContextProvider from "./context/Prescription";
+import BillingContextProvider from "./context/Billing";
+
+import { setAuthToken } from "./helpers/setAuthToken";
 
 function App(props) {
+  const history = useHistory();
+
+  useEffect(() => {
+    //check jwt token
+    const token = localStorage.getItem("token");
+    if (token) {
+      setAuthToken(token);
+    }
+  }, []);
+
   const [isFullPageLayout, setIsFullPageLayout] = useState(true);
 
   return (
@@ -23,13 +40,23 @@ function App(props) {
           </>
         )}
       </GlobalContext.Consumer>
-      <DoctorContextProvider>
-        <Suspense fallback={<Loader open={true} />}>
-          <Layout isFullPageLayout={isFullPageLayout}>
-            <Routes setIsFullPageLayout={setIsFullPageLayout} />
-          </Layout>
-        </Suspense>
-      </DoctorContextProvider>
+      <AuthContextProvider>
+        <DoctorContextProvider>
+          <PatientContextProvider>
+            <AppointmentContextProvider>
+              <PrescriptionContextProvider>
+                <BillingContextProvider>
+                  <Suspense fallback={<Loader open={true} />}>
+                    <Layout isFullPageLayout={isFullPageLayout}>
+                      <Routes setIsFullPageLayout={setIsFullPageLayout} />
+                    </Layout>
+                  </Suspense>
+                </BillingContextProvider>
+              </PrescriptionContextProvider>
+            </AppointmentContextProvider>
+          </PatientContextProvider>
+        </DoctorContextProvider>
+      </AuthContextProvider>
     </GlobalContextProvider>
   );
 }

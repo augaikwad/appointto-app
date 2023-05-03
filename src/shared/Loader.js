@@ -7,7 +7,7 @@ const useStyles = createUseStyles({
     display: "none",
     justifyContent: "center",
     alignItems: "center",
-    position: "absolute",
+    position: "fixed",
     height: "100%",
     width: "100%",
     zIndex: 99999,

@@ -49,6 +49,30 @@ div.form-group {
 
     &>div.react-datepicker-wrapper {
         width: 100%;
+
+        &.withIcon {
+            &>div {
+                position: relative;
+
+                &::after {
+                    position: absolute;
+                    transform: translate(0, -50%);
+                    right: 10px;
+                    top: 50%;
+                    font-family: "FontAwesome";
+
+                    color: #7c7c7c;
+                }
+            }
+
+            &.calender>div::after {
+                content: "\f073";
+            }
+
+            &.time>div::after {
+                content: "\f017";
+            }
+        }
     }
 
     &>.react-datepicker-popper .react-datepicker--time-only .react-datepicker__time-container {
@@ -59,8 +83,16 @@ div.form-group {
         }
     }
 
-    &.error div.invalid-feedback{
+    .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box{
+        width:90px !important;
+    }
+    
+    &.error div.invalid-feedback {
         display: block;
+    }
+
+    &.error .form-control{
+        border-color: rgb(172, 0, 0);
     }
 }
 
@@ -93,6 +125,14 @@ div.form-group {
 
         &>label.form-check-label {
             margin: 0;
+        }
+    }
+
+    &>div.form-check {
+        margin-left: 15px;
+
+        &:first-child {
+            margin-left: 0px;
         }
     }
 }

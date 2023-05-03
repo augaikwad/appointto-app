@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import { AutocompleteField, Modal, InputField } from "../../../components";
+import React, { useState, useContext, useEffect } from "react";
+import { Modal, InputField } from "../../../components";
+import { ReactSelectField } from "../../../components/Forms";
 import { createUseStyles } from "react-jss";
-import { Menu, MenuItem } from "react-bootstrap-typeahead";
-import {Button} from 'react-bootstrap';
+import { Button } from "react-bootstrap";
 import cogoToast from "cogo-toast";
+import { PrescriptionContext } from "../../../context/Prescription";
+import { useFormContext } from "react-hook-form";
 
 const useStyles = createUseStyles({
   nameEditBtn: {},
@@ -17,6 +19,9 @@ const useStyles = createUseStyles({
     display: "block",
     marginTop: "-3px",
     position: "relative",
+  },
+  reactSelect: {
+    "& > div": { border: "none", boxShadow: "none" },
   },
 });
 
@@ -44,21 +49,30 @@ const MedicineNameField = ({
   objKey,
   obj,
   isFilled,
-  control,
   onChange,
   setValue,
-  ind
+  ind,
 }) => {
   const classes = useStyles();
   const [show, setShow] = useState(false);
 
-  const [genericVal,setGenericVal]=useState(null);
+  const [state, actions] = useContext(PrescriptionContext);
+  const { doctorMedicines, medicines } = state;
 
-  const getTitle = (medicineNameString) => {
+  const { getValues } = useFormContext();
+
+  useEffect(() => {
+    actions.getDoctorMedicines();
+  }, []);
+
+  const [composition, setComposition] = useState(null);
+  const [medicineName, setMedicineName] = useState("");
+
+  const getTitle = () => {
     return (
       <>
-        <span style={{ fontWeight: 300 }}>Generic name for </span>
-        <b>{medicineNameString}</b>
+        <span style={{ fontWeight: 300 }}>Generic name </span>
+        <b>{medicineName}</b>
       </>
     );
   };
@@ -71,7 +85,7 @@ const MedicineNameField = ({
           className={classes.buttonMinWidth}
           onClick={(e) => {
             e.preventDefault();
-            setValue(`medicine[${ind}].compositionName`,genericVal);
+            setValue(`medicines[${ind}].composition`, composition);
             cogoToast.success("Generic Name added successfully", {
               position: "top-right",
             });
@@ -96,54 +110,61 @@ const MedicineNameField = ({
 
   return (
     <>
-      <AutocompleteField
-        id="medicineAutoField"
+      <ReactSelectField
         name={name}
-        control={control}
-        data={data}
-        onChange={onChange}
-        renderMenu={(results, menuProps) => (
-          <Menu {...menuProps}>
-            {results.map((result, index) => {
-              return (
-                <MenuItem option={result} position={index}>
-                  <span>{result.type}</span>
-                  <span>{result.name}</span>
-                </MenuItem>
-              );
-            })}
-          </Menu>
-        )}
+        labelField="medicineName"
+        valueField="medicineId"
+        options={[...doctorMedicines, ...medicines]}
+        menuPortalTarget={document.body}
+        className={classes.reactSelect}
+        onChange={(val) => {
+          setMedicineName(val.medicineName);
+          setComposition(val.composition);
+          onChange(val);
+        }}
+        onInputChange={(value) => {
+          if (value.length > 2) {
+            actions.searchMedicines(value);
+          }
+        }}
+        components={{
+          DropdownIndicator: () => null,
+          IndicatorSeparator: () => null,
+        }}
       />
       {isFilled && (
         <>
-          {!!genericVal && <span className={`${classes.comosition} compositionName`}>({genericVal})</span>}
+          {!!composition && (
+            <span className={`${classes.comosition} compositionName`}>
+              ({composition || ""})
+            </span>
+          )}
           <button
             className={`btn btn-inverse-info btn-icon nameEditBtn`}
+            type="button"
             onClick={(e) => {
-              e.preventDefault();
               setShow(true);
             }}
           >
             <i className="fa fa-pencil"></i>
           </button>
-          <Modal
-            title={getTitle(obj[objKey])}
-            size="md"
-            show={show}
-            onHide={() => setShow(false)}
-            footerActions={<FooterActions />}
-          >
-            <InputField
-              name="genericName"
-              value={genericVal}
-              onChange={(e) => {
-                setGenericVal(e.target.value)
-              }}
-            />
-          </Modal>
         </>
       )}
+      <Modal
+        title={getTitle()}
+        size="md"
+        show={show}
+        onHide={() => setShow(false)}
+        footerActions={<FooterActions />}
+      >
+        <InputField
+          name="genericName"
+          value={composition}
+          onChange={(e) => {
+            setComposition(e.target.value);
+          }}
+        />
+      </Modal>
     </>
   );
 };

@@ -13,6 +13,7 @@ const useStyles = createUseStyles({
     paddingRight: 10,
   },
   inputField: {
+    position: "relative",
     "&.form-group-inline": {
       display: "flex",
       alignItems: "flex-start",
@@ -30,7 +31,6 @@ const Field = ({
   children,
 }) => {
   const classes = useStyles({ inline: inline, labelWidth: labelWidth });
-  console.log();
   return (
     <Form.Group
       className={`${inline ? `form-group-inline` : ""} ${classes.inputField}`}

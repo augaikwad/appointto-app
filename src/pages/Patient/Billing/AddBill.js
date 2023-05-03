@@ -1,10 +1,14 @@
-import React, { useState } from "react";
-import { InputField, SelectField, Tooltip } from "../../../components";
-import { Form, Alert } from "react-bootstrap";
+import React, { useEffect, useContext } from "react";
+import { Tooltip } from "../../../components";
+import { Form, Alert, Button } from "react-bootstrap";
 import { format } from "date-fns";
 import CommonBillingList from "./CommonBillingList";
 import AddEditBillModal from "./AddEditBillModal";
+import AddEditPaymentModal from "./AddEditPaymentModal";
 import { createUseStyles } from "react-jss";
+import { BillingContext } from "../../../context/Billing";
+import { PatientContext } from "../../../context/Patient";
+import AmountWithCurrancy from "../../../components/AmountWithCurrancy";
 
 const useStyles = createUseStyles({
   th: {
@@ -71,56 +75,23 @@ const useStyles = createUseStyles({
   },
 });
 
-const data = [
-  {
-    id: 1,
-    date: "2022/06/10",
-    drName: "Doctor Name",
-    treatmentName: "Tratment Name",
-    status: true,
-    rate: 2500,
-    qty: 1,
-    discount: 0,
-    amount: 2000,
-    balance: 1000,
-  },
-  {
-    id: 2,
-    date: "2022/06/9",
-    drName: "Doctor Name",
-    treatmentName: "Tratment Name",
-    status: false,
-    rate: 1000,
-    qty: 1,
-    discount: 0,
-    amount: 500,
-    balance: 500,
-  },
-  {
-    id: 3,
-    date: "2022/06/8",
-    drName: "Doctor Name",
-    treatmentName: "Tratment Name",
-    status: true,
-    rate: 1500,
-    qty: 1,
-    discount: 0,
-    amount: 1000,
-    balance: 500,
-  },
-];
-
-const billModalInit = {
-  title: "Add Bill",
-  show: false,
-  data: null,
-};
-
 const AddBill = () => {
   const classes = useStyles();
-  const [isPercent, setIsPercent] = useState(false);
 
-  const [billModal, setBillModal] = useState(billModalInit);
+  const [state, actions] = useContext(BillingContext);
+  const { allBillData, billSummary } = state;
+
+  const [patientState, patientActions] = useContext(PatientContext);
+  const { patientData } = patientState;
+
+  useEffect(() => {
+    if (patientData !== null && allBillData.length === 0) {
+      actions.getAllBillData({
+        id_doctor: localStorage.getItem("id_doctor"),
+        id_patient: patientData.id_patient,
+      });
+    }
+  }, [patientData]);
 
   const getDateFormatted = (cell, row) => {
     return format(new Date(cell), "dd/MM/yyyy");
@@ -130,18 +101,23 @@ const AddBill = () => {
     return <div className="text-right">{`Rs ${cell}`}</div>;
   };
 
-  const [val, setVal] = useState(false);
-
   const getStatusFormatter = (cell, row) => {
     return (
       <Form.Check
         type="switch"
         id="custom-switch"
         label=""
-        checked={val}
+        checked={row.is_Completed === 0 ? false : true}
         className={classes.switch}
         onChange={(e) => {
-          setVal(e.target.checked);
+          let rowData = { ...row };
+          rowData.is_Completed = e.target.checked ? 1 : 0;
+          actions.updateBill(rowData, (res) => {
+            actions.getAllBillData({
+              id_doctor: res.id_doctor,
+              id_patient: res.id_patient,
+            });
+          });
         }}
       />
     );
@@ -153,34 +129,52 @@ const AddBill = () => {
         <Tooltip text="Add Payment" placement="top">
           <button
             type="button"
-            className={`${classes.listActionBtn} btn btn-inverse-info btn-icon `}
+            className={`${classes.listActionBtn} btn btn-inverse-info btn-icon`}
+            disabled={row.is_Completed === 1}
+            onClick={() => {
+              actions.setPaymentModalForm({ bill_id: row.bill_id });
+              actions.setPaymentModalOpen(true);
+            }}
           >
             <i className="fa fa-plus"></i>
           </button>
         </Tooltip>
         <Tooltip text="Edit Bill" placement="top">
-          <button
-            type="button"
-            className={`${classes.listActionBtn} btn btn-inverse-info btn-icon `}
+          <Button
+            size="sm"
+            className={`${classes.listActionBtn} btn-inverse-info btn-icon`}
+            onClick={() => {
+              actions.setBillForm(row);
+              actions.setBillModalOpen(true);
+            }}
           >
             <i className="fa fa-pencil"></i>
-          </button>
+          </Button>
         </Tooltip>
         <Tooltip text="Print" placement="top">
           <button
             type="button"
-            className={`${classes.listActionBtn} btn btn-inverse-info btn-icon `}
+            className={`${classes.listActionBtn} btn btn-inverse-info btn-icon`}
           >
             <i className="fa fa-print"></i>
           </button>
         </Tooltip>
         <Tooltip text="Delete Payment" placement="auto">
-          <button
-            type="button"
-            className={`${classes.listActionBtn} btn btn-inverse-danger btn-icon`}
+          <Button
+            size="sm"
+            className={`${classes.listActionBtn} btn-inverse-danger btn-icon`}
+            onClick={() => {
+              let req = { bill_id: row.bill_id };
+              actions.deleteBill(req, () => {
+                actions.getAllBillData({
+                  id_doctor: row.id_doctor,
+                  id_patient: row.id_patient,
+                });
+              });
+            }}
           >
             <i className="fa fa-trash"></i>
-          </button>
+          </Button>
         </Tooltip>
       </div>
     );
@@ -188,15 +182,15 @@ const AddBill = () => {
 
   const columns = [
     {
-      dataField: "date",
+      dataField: "bill_date",
       text: "Date",
       headerAttrs: {
         width: 90,
       },
       formatter: getDateFormatted,
     },
-    { dataField: "drName", text: "Dr. Name" },
-    { dataField: "treatmentName", text: "Treatment Name" },
+    { dataField: "doctor_name", text: "Dr. Name" },
+    { dataField: "treatment.treatment_name", text: "Treatment Name" },
     {
       dataField: "status",
       text: "Completed",
@@ -217,9 +211,14 @@ const AddBill = () => {
         width: 80,
       },
     },
-    { dataField: "qty", text: "Qty", headerAlign: "center", align: "center" },
     {
-      dataField: "discount",
+      dataField: "quantity",
+      text: "Qty",
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      dataField: "discount_value",
       text: "Discount",
       headerAlign: "center",
       formatter: getAmountFormatter,
@@ -229,7 +228,7 @@ const AddBill = () => {
       },
     },
     {
-      dataField: "amount",
+      dataField: "amount_received",
       text: "Amount",
       headerAlign: "center",
       formatter: getAmountFormatter,
@@ -249,7 +248,7 @@ const AddBill = () => {
       },
     },
     {
-      dataField: "id",
+      dataField: "bill_id",
       text: "",
       formatter: getActionFormatter,
       align: "right",
@@ -261,113 +260,9 @@ const AddBill = () => {
 
   return (
     <>
-      <AddEditBillModal
-        {...billModal}
-        onHide={() => {
-          setBillModal(billModalInit);
-        }}
-      />
+      <AddEditPaymentModal />
+      <AddEditBillModal />
       <div className="row">
-        <div className="col-lg-9 hide">
-          <div
-            className="row"
-            style={{ background: "#f1f1f1", paddingTop: 15 }}
-          >
-            <div className="col-lg-3">
-              <InputField label="Date" name="date" type="date" />
-            </div>
-            <div className="col-lg-3">
-              <InputField label="Dr. Name" name="drName" />
-            </div>
-            <div className="col-lg-3">
-              <InputField label="Name of Treatment" name="treatment" />
-            </div>
-            <div className="col-lg-3">
-              <div className="row">
-                <div className="col-lg-6">
-                  <InputField label="Qty" name="qty" />
-                </div>
-                <div className="col-lg-6">
-                  <InputField label="Rate" name="rate" />
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3">
-              <InputField label="Amount" name="amount" />
-            </div>
-            <div className="col-lg-3">
-              <Form.Group>
-                <label style={{ marginBottom: 0 }}>Discount</label>
-                <div className="input-group">
-                  <div className="input-group-prepend">
-                    <button
-                      className={`btn btn-sm ${
-                        isPercent ? "btn-secondary" : "btn-primary"
-                      }`}
-                      onClick={() => setIsPercent(false)}
-                    >
-                      <i className="fa fa-inr"></i>
-                    </button>
-                  </div>
-                  <Form.Control
-                    type="text"
-                    className={`form-control ${isPercent ? "text-right" : ""}`}
-                    name="discount"
-                  />
-                  <div className="input-group-append">
-                    <button
-                      className={`btn btn-sm ${
-                        isPercent ? "btn-primary" : "btn-secondary"
-                      }`}
-                      onClick={() => setIsPercent(true)}
-                    >
-                      <i className="fa fa-percent"></i>
-                    </button>
-                  </div>
-                </div>
-              </Form.Group>
-            </div>
-            <div className="col-lg-3">
-              <InputField label="Payment Recieved" name="recieved" />
-            </div>
-            <div className="col-lg-3">
-              <SelectField
-                label="Payment Mode"
-                name="mode"
-                options={[
-                  { label: "Select", value: null },
-                  { label: "Card", value: "card" },
-                  { label: "UPI", value: "upi" },
-                  { label: "Cash", value: "cash" },
-                ]}
-                placeholder="Select"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="col-lg-3 hide">
-          <table className="table">
-            <tbody>
-              <tr>
-                <th className={`${classes.th} noBorder`}>Total Fees</th>
-                <td className={`${classes.td} noBorder text-right`}>Rs 5000</td>
-              </tr>
-              <tr>
-                <th className={classes.th}>Balance</th>
-                <td className={`${classes.td} text-right balance`}>Rs 1000</td>
-              </tr>
-              <tr>
-                <th className={classes.th}></th>
-                <td className={`${classes.td} text-right`}>
-                  <button className="btn btn-sm btn-primary">
-                    Pay Rs 1000
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <button className="btn btn-primary btn-sm">Add Bill</button>
-        </div>
         <div className="col-lg-12">
           <Alert variant="info" className={classes.cardContent}>
             <div className={`row`}>
@@ -375,7 +270,7 @@ const AddBill = () => {
                 <button
                   className={`btn btn-sm btn-primary`}
                   onClick={() => {
-                    setBillModal({ ...billModalInit, show: true });
+                    actions.setBillModalOpen(true);
                   }}
                 >
                   Add New Bill
@@ -388,20 +283,27 @@ const AddBill = () => {
                       <tr>
                         <th className={`${classes.th} noBorder`}>Total Fees</th>
                         <td className={`${classes.td} noBorder text-right`}>
-                          Rs 5000
+                          <AmountWithCurrancy
+                            amount={billSummary.totalBillAmount}
+                          />
                         </td>
                       </tr>
                       <tr>
                         <th className={classes.th}>Balance</th>
                         <td className={`${classes.td} text-right balance`}>
-                          Rs 1000
+                          <AmountWithCurrancy
+                            amount={billSummary.balanceBillAmount}
+                          />
                         </td>
                       </tr>
                       <tr>
                         <th className={classes.th}></th>
                         <td className={`${classes.td} text-right`}>
                           <button className="btn btn-sm btn-primary">
-                            Pay Rs 1000
+                            Pay{" "}
+                            <AmountWithCurrancy
+                              amount={billSummary.balanceBillAmount}
+                            />
                           </button>
                         </td>
                       </tr>
@@ -409,25 +311,11 @@ const AddBill = () => {
                   </table>
                 </div>
               </div>
-              <div className={`col-lg-3 field hide`}>
-                <div
-                  className="form-group inline-form-group"
-                  style={{ color: "red" }}
-                >
-                  <label>Balance:</label>
-                  <div>Rs 2500</div>
-                </div>
-              </div>
-              <div className={`col-lg-3 text-center hide`}>
-                <button className={`btn btn-sm btn-primary`}>
-                  Pay Rs 2500
-                </button>
-              </div>
             </div>
           </Alert>
         </div>
         <div className="col-lg-12 pt-4">
-          <CommonBillingList columns={columns} data={data} />
+          <CommonBillingList columns={columns} data={allBillData} />
         </div>
       </div>
     </>

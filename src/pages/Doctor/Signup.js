@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import LogoLarge from "../../assets/images/logo-large.svg";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import TextField from "../../components/Forms/TextField";
 import { Button } from "react-bootstrap";
 import { DoctorContext } from "../../context/Doctor";
@@ -18,12 +18,13 @@ function Register(props) {
     }
   }, [otpData, verifyOTPData]);
 
+  const form = useForm();
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm();
+  } = form;
 
   const onSubmit = (formData) => {
     let req = { ...formData };
@@ -47,99 +48,89 @@ function Register(props) {
               <div className="brand-logo">
                 <img src={LogoLarge} alt="logo" />
               </div>
-              <form className="pt-3" onSubmit={handleSubmit(onSubmit)}>
-                <TextField
-                  label="First Name"
-                  name="firstName"
-                  register={register}
-                  required={true}
-                  rules={{
-                    required: "First Name Required",
-                  }}
-                  error={errors?.firstName}
-                />
-                <TextField
-                  label="Last Name"
-                  name="lastName"
-                  register={register}
-                  required={true}
-                  rules={{
-                    required: "Last Name Required",
-                  }}
-                  error={errors?.lastName}
-                />
-                <TextField
-                  label="Email"
-                  name="emailId"
-                  type="email"
-                  register={register}
-                  required={true}
-                  rules={{
-                    required: "Email Required",
-                    pattern: {
-                      value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
-                      message: "Please enter email in correct format",
-                    },
-                  }}
-                  error={errors?.emailId}
-                />
-                <TextField
-                  label="Password"
-                  name="password"
-                  type="password"
-                  register={register}
-                  required={true}
-                  rules={{
-                    required: "Password Required",
-                  }}
-                  error={errors?.password}
-                />
-                <TextField
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  type="password"
-                  register={register}
-                  required={true}
-                  rules={{
-                    required: "Confirm Password Required",
-                    validate: (val) => {
-                      if (watch("password") != val) {
-                        return "Your passwords do no match";
-                      }
-                    },
-                  }}
-                  error={errors?.confirmPassword}
-                />
+              <FormProvider {...form}>
+                <form className="pt-3" onSubmit={handleSubmit(onSubmit)}>
+                  <TextField
+                    label="First Name"
+                    name="firstName"
+                    rules={{
+                      required: "First Name Required",
+                    }}
+                  />
+                  <TextField
+                    label="Last Name"
+                    name="lastName"
+                    rules={{
+                      required: "Last Name Required",
+                    }}
+                  />
+                  <TextField
+                    label="Email"
+                    name="emailId"
+                    type="email"
+                    rules={{
+                      required: "Email Required",
+                      pattern: {
+                        value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+                        message: "Please enter email in correct format",
+                      },
+                    }}
+                  />
+                  <TextField
+                    label="Password"
+                    name="password"
+                    type="password"
+                    rules={{
+                      required: "Password Required",
+                    }}
+                  />
+                  <TextField
+                    label="Confirm Password"
+                    name="confirmPassword"
+                    type="password"
+                    rules={{
+                      required: "Confirm Password Required",
+                      validate: (val) => {
+                        if (watch("password") != val) {
+                          return "Your passwords do not match";
+                        }
+                      },
+                    }}
+                  />
 
-                <div className="my-2 d-flex justify-content-between align-items-center">
-                  <div className="form-check">
-                    <label className="form-check-label text-muted">
-                      <input
-                        type="checkbox"
-                        name="termsAccepted"
-                        className="form-check-input"
-                        {...register("termsAccepted")}
-                      />
-                      <i className="input-helper"></i>I agree to all Terms &
-                      Conditions
-                    </label>
+                  <div className="my-2 d-flex justify-content-between align-items-center">
+                    <div className="form-check">
+                      <label className="form-check-label text-muted">
+                        <input
+                          type="checkbox"
+                          name="termsAccepted"
+                          className="form-check-input"
+                          {...register("termsAccepted")}
+                        />
+                        <i className="input-helper"></i>I agree to all Terms &
+                        Conditions
+                      </label>
+                    </div>
                   </div>
-                </div>
-                <div className="my-3">
-                  <Button
-                    className="btn btn-block btn-primary btn-lg"
-                    type="submit"
-                  >
-                    SIGN UP
-                  </Button>
-                </div>
-                <div className="my-2 d-flex justify-content-between align-items-center">
-                  Already have an account?{" "}
-                  <Button variant="link" onClick={() => history.push("/login")}>
-                    Login
-                  </Button>
-                </div>
-              </form>
+                  <div className="my-3">
+                    <Button
+                      className="btn btn-block btn-primary btn-lg"
+                      type="submit"
+                    >
+                      SIGN UP
+                    </Button>
+                  </div>
+                  <div className="my-2 d-flex justify-content-between align-items-center">
+                    Already have an account?{" "}
+                    <Button
+                      variant="link"
+                      onClick={() => history.push("/login")}
+                    >
+                      Login
+                    </Button>
+                  </div>
+                </form>
+              </FormProvider>
             </div>
           </div>
           <div className="col-lg-6 login-half-bg d-flex flex-row"></div>

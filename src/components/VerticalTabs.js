@@ -21,7 +21,7 @@ const useStyles = createUseStyles({
     padding: "1em !important",
     textAlign: "center",
     borderRadius: "0.25rem !important",
-    "&.step-done":{
+    "&.step-done": {
       background: "#bcdcff !important",
       color: "#ffffff !important",
     },
@@ -36,10 +36,7 @@ const VerticalTabs = ({ tabs = [], selectedTab, setSelectedTab }) => {
   const classes = useStyles();
   return (
     <div className="tab-pills-vertical">
-      <Tab.Container
-        id="left-tabs-example"
-        activeKey={selectedTab}
-      >
+      <Tab.Container id="left-tabs-example" activeKey={selectedTab}>
         <Row>
           <Col sm={3}>
             <Nav variant="pills" className="flex-column">
@@ -47,9 +44,9 @@ const VerticalTabs = ({ tabs = [], selectedTab, setSelectedTab }) => {
                 return (
                   <Nav.Item
                     key={`tab+${ind}`}
-                    onClick={() => {
-                      setSelectedTab(ind);
-                    }}
+                    // onClick={() => {
+                    //   setSelectedTab(ind);
+                    // }}
                     className={classes.navItem}
                   >
                     <Nav.Link

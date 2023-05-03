@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { createUseStyles } from "react-jss";
-import AddEditPatientModal from "./AddEditPatientModal";
+import { PatientContext } from "../../context/Patient";
+import moment from "moment";
 
 const useStyles = createUseStyles({
   smAddBtn: {
@@ -50,202 +51,193 @@ const useStyles = createUseStyles({
   },
 });
 
-const Profile = ({ data }) => {
+const Profile = () => {
   const classes = useStyles();
 
-  const { firstName, lastName, gender, mobileNo, dob, age, email } = data;
-
-  const [modalState, setModalState] = React.useState({
-    title: "Edit Patient",
-    show: false,
-    selectedTab: 0,
-  });
+  const [state, actions] = useContext(PatientContext);
+  const { patientData } = state;
 
   return (
     <>
-      <AddEditPatientModal
-        {...modalState}
-        onHide={() =>
-          setModalState({ ...modalState, ...{ show: false, selectedTab: 0 } })
-        }
-      />
-      <div className="row">
-        <div className={`col-lg-4 ${classes.cardContainer}`}>
-          <div className={classes.card}>
-            <h6 className={classes.cardHeader}>
-              General{" "}
-              <button
-                className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
-                onClick={() =>
-                  setModalState({
-                    ...modalState,
-                    ...{ show: true, selectedTab: 0 },
-                  })
-                }
-              >
-                <i className="fa fa-pencil"></i>
-              </button>
-            </h6>
-            <div className={classes.cardContent}>
-              <div className="row">
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Name:</label>
-                    <div>
-                      {firstName} {lastName}
+      {patientData !== null && (
+        <div className="row">
+          <div className={`col-lg-4 ${classes.cardContainer}`}>
+            <div className={classes.card}>
+              <h6 className={classes.cardHeader}>
+                General{" "}
+                <button
+                  className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
+                  onClick={() => {
+                    actions.setActiveTab(0);
+                    actions.setPatientModalOpen(true);
+                  }}
+                >
+                  <i className="fa fa-pencil"></i>
+                </button>
+              </h6>
+              <div className={classes.cardContent}>
+                <div className="row">
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Name:</label>
+                      <div>
+                        {patientData.first_name} {patientData.last_name}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Gender:</label>
+                      <div>{patientData.gender}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-7">
+                    <div className="form-group inline-form-group">
+                      <label>D. O. B.:</label>
+                      <div>
+                        {!!patientData.dob
+                          ? moment(new Date(patientData.dob)).format(
+                              "DD/MM/yyyy"
+                            )
+                          : "-"}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-lg-5">
+                    <div className="form-group inline-form-group">
+                      <label>Age:</label>
+                      <div>{patientData.age}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Mobile:</label>
+                      <div>{patientData.mobile_number}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Emergency Contact No.:</label>
+                      <div>{patientData.emergency_contact}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Email:</label>
+                      <div>{patientData.email_id}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Address:</label>
+                      <div>{patientData.address}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Area:</label>
+                      <div>{patientData.area}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-7">
+                    <div className="form-group inline-form-group">
+                      <label>City:</label>
+                      <div>{patientData.city}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-5">
+                    <div className="form-group inline-form-group">
+                      <label>Pin:</label>
+                      <div>{patientData.pincode}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Referred By:</label>
+                      <div>{patientData.reffered_by}</div>
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Gender:</label>
-                    <div>{gender}</div>
+              </div>
+            </div>
+          </div>
+          <div className={`col-lg-4 ${classes.cardContainer}`}>
+            <div className={classes.card}>
+              <h6 className={classes.cardHeader}>
+                Medical{" "}
+                <button
+                  className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
+                  onClick={() => {
+                    actions.setActiveTab(1);
+                    actions.setPatientModalOpen(true);
+                  }}
+                >
+                  <i className="fa fa-pencil"></i>
+                </button>
+              </h6>
+              <div className={classes.cardContent}>
+                <div className="row">
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <div>{patientData.medicalPrecondition}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Allergies:</label>
+                      <div>{patientData.allergies}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Blood Group:</label>
+                      <div>{patientData.blood_group}</div>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Current Medications:</label>
+                      <div>{patientData.current_medicine}</div>
+                    </div>
                   </div>
                 </div>
-                <div className="col-lg-7">
-                  <div className="form-group inline-form-group">
-                    <label>D. O. B.:</label>
-                    <div>{!!dob ? dob : "-"}</div>
+              </div>
+            </div>
+          </div>
+          <div className={`col-lg-4 ${classes.cardContainer}`}>
+            <div className={classes.card}>
+              <h6 className={classes.cardHeader}>
+                Additional{" "}
+                <button
+                  className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
+                  onClick={() => {
+                    actions.setActiveTab(2);
+                    actions.setPatientModalOpen(true);
+                  }}
+                >
+                  <i className="fa fa-pencil"></i>
+                </button>
+              </h6>
+              <div className={classes.cardContent}>
+                <div className="row">
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Habits:</label>
+                      <div>{patientData.habbits}</div>
+                    </div>
                   </div>
-                </div>
-                <div className="col-lg-5">
-                  <div className="form-group inline-form-group">
-                    <label>Age:</label>
-                    <div>{age}</div>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Mobile:</label>
-                    <div>{mobileNo}</div>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Emergency Contact No.:</label>
-                    <div>{mobileNo}</div>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Email:</label>
-                    <div>{email}</div>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Address:</label>
-                    <div>Lorem Ipsum es simplemente el texto de relleno de</div>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Area:</label>
-                    <div>Lorem Ipsum es simplemente</div>
-                  </div>
-                </div>
-                <div className="col-lg-7">
-                  <div className="form-group inline-form-group">
-                    <label>City:</label>
-                    <div>Aurangabad</div>
-                  </div>
-                </div>
-                <div className="col-lg-5">
-                  <div className="form-group inline-form-group">
-                    <label>Pin:</label>
-                    <div>123456</div>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Referred By:</label>
-                    <div>Dr. XYZ</div>
+                  <div className="col-lg-12">
+                    <div className="form-group inline-form-group">
+                      <label>Diet:</label>
+                      <div>{patientData.diet}</div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div className={`col-lg-4 ${classes.cardContainer}`}>
-          <div className={classes.card}>
-            <h6 className={classes.cardHeader}>
-              Medical{" "}
-              <button
-                className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
-                onClick={() =>
-                  setModalState({
-                    ...modalState,
-                    ...{ show: true, selectedTab: 1 },
-                  })
-                }
-              >
-                <i className="fa fa-pencil"></i>
-              </button>
-            </h6>
-            <div className={classes.cardContent}>
-              <div className="row">
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <div>High BP, Asthma, Diabetes</div>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Allergies:</label>
-                    <div>ABC, EFG, XYZ</div>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Blood Group:</label>
-                    <div>O+</div>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Current Medications:</label>
-                    <div>ABC, EFG, XYZ</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className={`col-lg-4 ${classes.cardContainer}`}>
-          <div className={classes.card}>
-            <h6 className={classes.cardHeader}>
-              Additional{" "}
-              <button
-                className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
-                onClick={() =>
-                  setModalState({
-                    ...modalState,
-                    ...{ show: true, selectedTab: 2 },
-                  })
-                }
-              >
-                <i className="fa fa-pencil"></i>
-              </button>
-            </h6>
-            <div className={classes.cardContent}>
-              <div className="row">
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Habits:</label>
-                    <div>Tobacco Chewing, Smoking, Alcohol</div>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group inline-form-group">
-                    <label>Diet:</label>
-                    <div>Mix</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </>
   );
 };

@@ -1,88 +1,165 @@
-import React, { useState } from "react";
-import { Modal, InputField, DateTimeField } from "../../components";
+import React, { useEffect, useContext } from "react";
+import { useLocation } from "react-router-dom";
+import { Modal } from "../../components";
+import {
+  TextField,
+  DateTimePickerField,
+  DatePickerField,
+} from "../../components/Forms";
+import { useForm, FormProvider } from "react-hook-form";
+import { AppointmentContext } from "../../context/Appointment";
+import moment from "moment";
+import { Button } from "react-bootstrap";
 
-const FooterActions = ({ closeModal = () => {} }) => {
-  return (
-    <div className="text-right">
-      <button className="btn btn-sm btn-primary" onClick={() => closeModal()}>
-        Create
-      </button>
-    </div>
-  );
+const getFormattedTime = (date, time) => {
+  let oDate = "";
+  if (!!date) {
+    let otime = moment(time, "hh:mm A");
+    oDate = new Date(
+      moment(date).set({
+        hour: otime.get("hour"),
+        minute: otime.get("minute"),
+      })
+    );
+  }
+  return oDate;
 };
 
-const CreateAppointmentModal = ({ show = false, onHide = () => {} }) => {
-  const [appointmentDate, setAppointmentDate] = useState(new Date());
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
+const formattedFormData = (data) => {
+  let obj = { ...data };
+  obj.date = !!data.date ? new Date(data.date) : "";
+  obj.start_time = getFormattedTime(data.date, data.start_time);
+  obj.end_time = getFormattedTime(data.date, data.end_time);
+  return obj;
+};
 
-  const footerActionsProps = {
-    closeModal: onHide,
+const CreateAppointmentModal = () => {
+  const location = useLocation();
+
+  const [state, actions] = useContext(AppointmentContext);
+  const { appointmentForm } = state;
+  const { isAdd, show } = state.appointmentModal;
+
+  const form = useForm({
+    defaultValues: appointmentForm,
+  });
+
+  const { reset, setValue, handleSubmit } = form;
+
+  useEffect(() => {
+    reset(formattedFormData(appointmentForm));
+  }, [appointmentForm]);
+
+  const callback = () => {
+    actions.resetAppointmentForm();
+    actions.setAppointmentModal({ show: false });
+    if (["/dashboard", "/"].includes(location.pathname)) {
+      actions.getAppointmentByDoctor();
+    }
+  };
+
+  const onSubmit = (data) => {
+    const formData = { ...data };
+    formData.start_time = moment(new Date(data.start_time)).format("h:mm A");
+    formData.end_time = moment(new Date(data.end_time)).format("h:mm A");
+
+    if (["/dashboard", "/"].includes(location.pathname)) {
+      actions.setCanResetSearchBox(true);
+    }
+    console.log("onSubmit === ", data, formData);
+    if (isAdd) {
+      actions.createAppointment(formData, callback);
+    } else {
+      actions.updateAppointment(formData, callback);
+    }
+  };
+
+  const FooterActions = () => {
+    return (
+      <div className="text-right">
+        <Button
+          className="btn btn-sm btn-primary"
+          onClick={handleSubmit(onSubmit)}
+        >
+          {isAdd ? "Create" : "Save"}
+        </Button>
+      </div>
+    );
   };
 
   return (
     <Modal
       id="CreateAppointment"
-      title="Create Appointment"
+      title={`${isAdd ? "Create" : "Update"} Appointment`}
       size="md"
       show={show}
-      onHide={onHide}
-      footerActions={<FooterActions {...footerActionsProps} />}
+      onHide={() => {
+        actions.resetAppointmentForm();
+        actions.setAppointmentModal({ isAdd: true, show: false });
+      }}
+      footerActions={<FooterActions />}
     >
-      <div className="row">
-        <div className="col-lg-6">
-          <InputField label="Doctor" name="doctor" />
-        </div>
-        <div className="col-lg-6">
-          <InputField label="Speciality" name="speciality" />
-        </div>
-        <div className="col-lg-12">
-          <InputField label="Patient" name="patient" />
-        </div>
-        <div className="col-lg-6">
-          <DateTimeField
-            label="Date"
-            name="date"
-            selected={appointmentDate}
-            onChange={(date) => setAppointmentDate(date)}
-            withPortal={true}
-          />
-        </div>
-        <div className="col-lg-6">
-          <InputField label="Day" name="day" />
-        </div>
-        <div className="col-lg-6">
-          <DateTimeField
-            label="Start Time"
-            name="startTime"
-            selected={startTime}
-            onChange={(date) => setStartTime(date)}
-            withPortal={false}
-            showTimeSelect
-            showTimeSelectOnly
-            timeIntervals={15}
-            timeCaption="Time"
-            dateFormat="h:mm aa"
-          />
-        </div>
-        <div className="col-lg-6">
-          <DateTimeField
-            label="End Time"
-            name="endTime"
-            selected={endTime}
-            onChange={(date) => setEndTime(date)}
-            withPortal={false}
-            showTimeSelect
-            showTimeSelectOnly
-            timeIntervals={15}
-            timeCaption="Time"
-            dateFormat="h:mm aa"
-          />
-        </div>
-        <div className="col-lg-12">
-          <InputField label="Reason" name="reason" />
-        </div>
-      </div>
+      <FormProvider {...form}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="row">
+            <div className="col-lg-6">
+              <DatePickerField
+                label="Date"
+                name="date"
+                rules={{
+                  required: "Please select Date",
+                }}
+                inputOnChange={(date) => {
+                  setValue("day", moment(new Date(date)).format("dddd"));
+                }}
+              />
+            </div>
+            <div className="col-lg-6">
+              <TextField label="Day" name="day" disabled />
+            </div>
+            <div className="col-lg-6">
+              <DateTimePickerField
+                label="Start time"
+                name="start_time"
+                dateFormat="h:mmaa"
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={15}
+                timeCaption="Time"
+                inputOnChange={(val) => {
+                  setValue("end_time", moment(val).add(15, "m").toDate());
+                }}
+                rules={{
+                  required: "Start Time Required",
+                }}
+              />
+            </div>
+            <div className="col-lg-6">
+              <DateTimePickerField
+                label="End Time"
+                name="end_time"
+                dateFormat="h:mmaa"
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={15}
+                timeCaption="Time"
+                rules={{
+                  required: "End Time Required",
+                }}
+              />
+            </div>
+            <div className="col-lg-12">
+              <TextField
+                label="Reason"
+                name="reason"
+                rules={{
+                  required: "Please Enter Reason",
+                }}
+              />
+            </div>
+          </div>
+        </form>
+      </FormProvider>
     </Modal>
   );
 };

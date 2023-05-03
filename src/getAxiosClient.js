@@ -14,8 +14,14 @@ const getAxiosClient = (baseUrl = null) => {
   client.interceptors.request.use(
     (config) => {
       config.headers["Content-Type"] = "application/json; charset=utf-8";
-      // config.headers.Authorization =
-      //   "Bearer " + window.sessionStorage.AuthToken;
+
+      const token = localStorage.getItem("token");
+      if (token !== null) {
+        config.headers.Authorization =
+          "Bearer " + localStorage.getItem("token");
+      } else {
+        delete config.headers["Authorization"];
+      }
       window.sessionStorage.LastServiceCallTime = Date.now();
       return config;
     },

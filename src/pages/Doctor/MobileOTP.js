@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Button } from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import LogoLarge from "../../assets/images/logo-large.svg";
 
 import { DoctorContext } from "../../context/Doctor";
@@ -11,12 +11,13 @@ function MobileOTP(props) {
   const [states, actions] = useContext(DoctorContext);
   const { otpData } = states;
 
+  const form = useForm();
   const {
     register,
     handleSubmit,
     getValues,
     formState: { errors },
-  } = useForm();
+  } = form;
 
   const onSubmit = (data) => {
     let req = { ...data };
@@ -46,73 +47,69 @@ function MobileOTP(props) {
               <div className="brand-logo">
                 <img src={LogoLarge} alt="logo" />
               </div>
-              <form className="pt-3" onSubmit={handleSubmit(onSubmit)}>
-                {otpData === null && (
-                  <>
-                    <TextFieldWithIcon
-                      label="Mobile Number"
-                      name="mobile_no"
-                      type="number"
-                      placeholder="Enter 10 Digit Mobile Number"
-                      required={true}
-                      register={register}
-                      rules={{
-                        required: "Please enter 10 digit mobile number",
-                        minLength: {
-                          value: 10,
-                          message: "Please enter correct Mobile Number",
-                        },
-                        maxLength: {
-                          value: 10,
-                          message: "Please enter correct Mobile Number",
-                        },
-                      }}
-                      error={errors?.mobile_no}
-                    />
-                    <Button
-                      className="btn btn-block btn-primary btn-lg"
-                      type="submit"
-                    >
-                      Send OTP
-                    </Button>
-                  </>
-                )}
-                {!!otpData && (
-                  <>
-                    <TextField
-                      label="An OTP has been sent on your mobile number"
-                      name="otp"
-                      type="number"
-                      required={true}
-                      register={register}
-                      rules={{
-                        required: "Please Enter OTP",
-                        minLength: {
-                          value: 6,
-                          message: "Please enter correct OTP",
-                        },
-                        maxLength: {
-                          value: 6,
-                          message: "Please enter correct OTP",
-                        },
-                      }}
-                      error={errors?.otp}
-                    />
-                    <div className="my-2 d-flex justify-content-between align-items-center">
-                      Didn't receive OTP?{" "}
-                      <Button variant="link" onClick={() => resendOTP()}>
-                        Resend OTP
+              <FormProvider {...form}>
+                <form className="pt-3" onSubmit={handleSubmit(onSubmit)}>
+                  {otpData === null && (
+                    <>
+                      <TextFieldWithIcon
+                        label="Mobile Number"
+                        name="mobile_no"
+                        type="number"
+                        placeholder="Enter 10 Digit Mobile Number"
+                        rules={{
+                          required: "Please enter 10 digit mobile number",
+                          minLength: {
+                            value: 10,
+                            message: "Please enter correct Mobile Number",
+                          },
+                          maxLength: {
+                            value: 10,
+                            message: "Please enter correct Mobile Number",
+                          },
+                        }}
+                      />
+                      <Button
+                        className="btn btn-block btn-primary btn-lg"
+                        type="submit"
+                      >
+                        Send OTP
                       </Button>
-                    </div>
-                    <Button
-                      className="btn btn-block btn-primary btn-lg"
-                      type="submit"
-                    >
-                      Verify
-                    </Button>
-                  </>
-                )}
-              </form>
+                    </>
+                  )}
+                  {!!otpData && (
+                    <>
+                      <TextField
+                        label="An OTP has been sent on your mobile number"
+                        name="otp"
+                        type="number"
+                        rules={{
+                          required: "Please Enter OTP",
+                          minLength: {
+                            value: 6,
+                            message: "Please enter correct OTP",
+                          },
+                          maxLength: {
+                            value: 6,
+                            message: "Please enter correct OTP",
+                          },
+                        }}
+                      />
+                      <div className="my-2 d-flex justify-content-between align-items-center">
+                        Didn't receive OTP?{" "}
+                        <Button variant="link" onClick={() => resendOTP()}>
+                          Resend OTP
+                        </Button>
+                      </div>
+                      <Button
+                        className="btn btn-block btn-primary btn-lg"
+                        type="submit"
+                      >
+                        Verify
+                      </Button>
+                    </>
+                  )}
+                </form>
+              </FormProvider>
             </div>
           </div>
           <div className="col-lg-6 login-half-bg d-flex flex-row"></div>

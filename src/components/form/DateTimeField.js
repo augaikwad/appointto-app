@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import Field from "./Field";
 import DatePicker from "react-datepicker";
 
@@ -11,9 +11,11 @@ const DateTimeField = ({
   inline = false,
   required = false,
   labelWidth,
-  dateFormat="dd/MM/yyyy",
+  dateFormat = "dd/MM/yyyy",
   ...restProps
 }) => {
+  const datepickerRef = useRef(null);
+
   const fieldProps = {
     label: label,
     name: name,
@@ -29,8 +31,24 @@ const DateTimeField = ({
         placeholder={placeholder}
         dateFormat={dateFormat}
         className="form-control form-control-sm"
+        calendarClassName="form-control-calendar"
+        ref={datepickerRef}
         {...restProps}
       />
+      <i
+        className="fa fa-calendar"
+        style={{
+          position: "absolute",
+          right: "8px",
+          bottom: "8px",
+          color: "#707070",
+          pointer: "curser",
+        }}
+        onClick={() => {
+          const datepickerElement = datepickerRef.current;
+          datepickerElement.setFocus(true);
+        }}
+      ></i>
     </Field>
   );
 };
