@@ -131,7 +131,16 @@ const General = (props) => {
             <TextField label="Referred By" name="reffered_by" />
           </div>
           <div className="col-lg-4">
-            <TextField label="Email Id" name="email_id" />
+            <TextField
+              label="Email Id"
+              name="email_id"
+              rules={{
+                pattern: {
+                  value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+                  message: "Please enter correct email",
+                },
+              }}
+            />
           </div>
           <div className="col-lg-4">
             <TextField

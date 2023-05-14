@@ -174,7 +174,7 @@ function Login(props) {
   const [isForgotPassModalOpen, setIsForgotPassModalOpen] = useState(false);
 
   const form = useForm();
-  const { handleSubmit } = form;
+  const { handleSubmit, register } = form;
 
   const onSubmit = (formData) => {
     actions.login(formData);
@@ -223,7 +223,11 @@ function Login(props) {
           <div className="my-2 d-flex justify-content-between align-items-center">
             <div className="form-check">
               <label className="form-check-label text-muted">
-                <input type="checkbox" className="form-check-input" />
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  {...register("keepMeSignIn")}
+                />
                 <i className="input-helper"></i>
                 Keep me signed in
               </label>

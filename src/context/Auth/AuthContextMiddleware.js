@@ -22,6 +22,9 @@ export const applyAuthContextMiddleware =
               const { data } = res;
               if (data.response_code === 2000) {
                 cogoToast.success(data.message, toastOption);
+                //set token and refresh token in cookies if keepMeSignIn is true
+                if (action.request.keepMeSignIn) {
+                }
                 //set JWT token to local
                 localStorage.setItem("token", data.payload.token);
                 localStorage.setItem("id_doctor", data.payload.id_doctor);
