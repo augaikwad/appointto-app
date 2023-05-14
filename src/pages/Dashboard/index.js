@@ -1,9 +1,10 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CountUp from "react-countup";
 import { Card } from "../../components";
 import ListFilters from "./ListFilters";
 import ListWidget from "./ListWidget";
 import { AppointmentContext } from "../../context/Appointment";
+import { DoctorContext } from "../../context/Doctor";
 import moment from "moment";
 
 function Dashboard(props) {
@@ -15,6 +16,11 @@ function Dashboard(props) {
     queueCount,
     totalCount,
   } = state;
+
+  const [drState, drActions] = useContext(DoctorContext);
+  const { doctorsByClinicId } = drState;
+
+  const [doctorName, setDoctorName] = useState(null);
 
   const counts = [
     { title: "Today's Queue", count: queueCount, icon: "ti-menu-alt" },
@@ -39,6 +45,16 @@ function Dashboard(props) {
       </Card>
     );
   };
+
+  useEffect(() => {
+    if (doctorName === null && doctorsByClinicId.length > 0) {
+      let filteredList = doctorsByClinicId.filter(
+        (item) => parseInt(localStorage.getItem("id_doctor")) === item.id_doctor
+      );
+      const doctor = filteredList[0];
+      setDoctorName(`${doctor.first_name} ${doctor.last_name}`);
+    }
+  }, [doctorsByClinicId, doctorName]);
 
   const getGreetingTime = (m) => {
     var g = null; //return g
@@ -67,7 +83,8 @@ function Dashboard(props) {
       <div className="row">
         <div className="col-12 col-xl-5 mb-4 mb-xl-0 grid-margin">
           <p className="card-description">
-            Hi, Good {getGreetingTime(moment())}! <b>Dr. Uday</b>
+            Hi, Good {getGreetingTime(moment())}!{" "}
+            <b>Dr. {!!doctorName && doctorName}</b>
           </p>
         </div>
       </div>
