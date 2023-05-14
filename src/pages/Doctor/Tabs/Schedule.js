@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { DateTimePickerField } from "../../../components/Forms";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button } from "react-bootstrap";
@@ -6,6 +6,7 @@ import { createUseStyles } from "react-jss";
 import moment from "moment";
 import { DoctorContext } from "../../../context/Doctor";
 import { useHistory } from "react-router-dom";
+import { hasError } from "../../../helpers/hasError";
 
 const useStyles = createUseStyles({
   customErrorMsg: {
@@ -73,8 +74,14 @@ const Schedule = () => {
 
   const {
     handleSubmit,
+    register,
+    watch,
+    setValue,
     formState: { errors },
   } = form;
+
+  const daysVal = watch("days");
+  const hasDaysError = hasError("days", errors);
 
   const GetTimeFormatter = (field, rowData) => {
     return rowData.hasOwnProperty(field) && rowData.selected
@@ -91,23 +98,36 @@ const Schedule = () => {
   const handleOnSelectAll = (e) => {
     const { checked } = e.target;
     let newDays = [...days];
+    newDays = newDays.map((opt) => ({ ...opt, selected: checked }));
+
     if (!checked) {
-      newDays = newDays.map((opt) => ({ ...opt, selected: false }));
+      setValue("days", []);
     } else {
-      newDays = newDays.map((opt) => ({ ...opt, selected: true }));
+      let daysStringArray = [];
+      newDays.forEach((day) => daysStringArray.push(day.name));
+      setValue("days", daysStringArray);
     }
     setDays(newDays);
   };
 
-  const handleOnChange = (e) => {
-    const { name, checked } = e.target;
-    let newDays = [...days];
-    const index = newDays.findIndex((h) => h.name === name);
-    if (index > -1) {
-      newDays[index] = { ...newDays[index], selected: checked };
+  const checkIsSelected = (name, selected) => {
+    let newSelectedVal = selected;
+    if (daysVal.includes(name)) {
+      newSelectedVal = true;
     }
-    setDays(newDays);
+    return newSelectedVal;
   };
+
+  useEffect(() => {
+    if (!!daysVal && daysVal.length > 0) {
+      let newDays = [...days];
+      newDays = newDays.map((opt) => ({
+        ...opt,
+        selected: checkIsSelected(opt.name, opt.selected),
+      }));
+      setDays(newDays);
+    }
+  }, [daysVal]);
 
   const handleTimeChange = (name, val) => {
     let newDays = [...days];
@@ -168,7 +188,7 @@ const Schedule = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="row">
               <div className="col-lg-12">
-                <div className="form-group">
+                <div className={`form-group ${hasDaysError ? "error" : ""}`}>
                   <label>
                     Available Days{" "}
                     <span style={{ color: "red", marginLeft: 2 }}>*</span>
@@ -182,7 +202,7 @@ const Schedule = () => {
                           type="checkbox"
                           className="form-check-input"
                           onChange={(e) => handleOnSelectAll(e)}
-                          checked={days.every((opt) => opt.selected)}
+                          checked={!!daysVal && daysVal.length === 7}
                         />
                         All
                         <i className="input-helper"></i>
@@ -197,11 +217,17 @@ const Schedule = () => {
                         >
                           <label className="form-check-label">
                             <input
+                              key={ind}
                               type="checkbox"
                               className="form-check-input"
-                              name={opt.name}
-                              onChange={(e) => handleOnChange(e)}
-                              checked={opt.selected}
+                              placeholder="days"
+                              value={opt.name}
+                              {...register("days", {
+                                required: {
+                                  value: true,
+                                  message: "Please select days",
+                                },
+                              })}
                             />
                             {opt.name.substring(0, 3)}
                             <i className="input-helper"></i>
@@ -210,7 +236,18 @@ const Schedule = () => {
                       );
                     })}
                   </div>
+                  {!!errors && hasDaysError && (
+                    <div
+                      className="invalid-feedback"
+                      style={{ marginTop: "-10px" }}
+                    >
+                      {errors.days.message}
+                    </div>
+                  )}
                 </div>
+                {/* {!!errors && errors.days && (
+                  <div class="invalid-feedback">{errors.days}</div>
+                )} */}
               </div>
               <div className="col-lg-3">
                 <DateTimePickerField

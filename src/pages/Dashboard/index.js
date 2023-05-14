@@ -4,6 +4,7 @@ import { Card } from "../../components";
 import ListFilters from "./ListFilters";
 import ListWidget from "./ListWidget";
 import { AppointmentContext } from "../../context/Appointment";
+import moment from "moment";
 
 function Dashboard(props) {
   const [state, actions] = useContext(AppointmentContext);
@@ -39,12 +40,34 @@ function Dashboard(props) {
     );
   };
 
+  const getGreetingTime = (m) => {
+    var g = null; //return g
+
+    if (!m || !m.isValid()) {
+      return;
+    } //if we can't find a valid or filled moment, we return.
+
+    var split_afternoon = 12; //24hr time to split the afternoon
+    var split_evening = 17; //24hr time to split the evening
+    var currentHour = parseFloat(m.format("HH"));
+
+    if (currentHour >= split_afternoon && currentHour <= split_evening) {
+      g = "Afternoon";
+    } else if (currentHour >= split_evening) {
+      g = "Evening";
+    } else {
+      g = "Morning";
+    }
+
+    return g;
+  };
+
   return (
     <div>
       <div className="row">
         <div className="col-12 col-xl-5 mb-4 mb-xl-0 grid-margin">
           <p className="card-description">
-            Hi, Good Morning! <b>Dr. Uday</b>
+            Hi, Good {getGreetingTime(moment())}! <b>Dr. Uday</b>
           </p>
         </div>
       </div>
