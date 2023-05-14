@@ -110,20 +110,12 @@ const Schedule = () => {
     setDays(newDays);
   };
 
-  const checkIsSelected = (name, selected) => {
-    let newSelectedVal = selected;
-    if (daysVal.includes(name)) {
-      newSelectedVal = true;
-    }
-    return newSelectedVal;
-  };
-
   useEffect(() => {
-    if (!!daysVal && daysVal.length > 0) {
+    if (!!daysVal) {
       let newDays = [...days];
       newDays = newDays.map((opt) => ({
         ...opt,
-        selected: checkIsSelected(opt.name, opt.selected),
+        selected: daysVal.includes(opt.name),
       }));
       setDays(newDays);
     }

@@ -121,6 +121,9 @@ const ListWidget = () => {
                         {item.patient_first_name} {item.patient_last_name}
                       </button>
                     </td>
+                    <td className={`${classes.td}`} width="130px">
+                      {item.reason}
+                    </td>
                     <td
                       className={`font-weight-bold text-center ${classes.td}`}
                       width="26px"
