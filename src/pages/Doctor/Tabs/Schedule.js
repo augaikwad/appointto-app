@@ -77,6 +77,7 @@ const Schedule = () => {
     register,
     watch,
     setValue,
+    trigger,
     formState: { errors },
   } = form;
 
@@ -99,15 +100,19 @@ const Schedule = () => {
     const { checked } = e.target;
     let newDays = [...days];
     newDays = newDays.map((opt) => ({ ...opt, selected: checked }));
+    setDays(newDays);
 
+    let daysValue = [];
     if (!checked) {
-      setValue("days", []);
+      daysValue = [];
     } else {
       let daysStringArray = [];
       newDays.forEach((day) => daysStringArray.push(day.name));
-      setValue("days", daysStringArray);
+      daysValue = daysStringArray;
     }
-    setDays(newDays);
+
+    setValue("days", daysValue);
+    trigger("days");
   };
 
   useEffect(() => {
