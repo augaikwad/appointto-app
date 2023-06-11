@@ -128,7 +128,7 @@ const ListWidget = () => {
                       className={`font-weight-bold text-center ${classes.td}`}
                       width="26px"
                     >
-                      {item.queue_type === 0 && (
+                      {item.queue_type === 1 && (
                         <Tooltip text="Has Appointment" placement="top">
                           <FontAwesomeIcon
                             icon={faCalendarDays}
@@ -136,7 +136,7 @@ const ListWidget = () => {
                           />
                         </Tooltip>
                       )}
-                      {item.queue_type === 1 && (
+                      {item.queue_type === 0 && (
                         <Tooltip text="Walk in" placement="top">
                           <i
                             className="mdi mdi-walk"
