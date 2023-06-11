@@ -108,6 +108,9 @@ const ListWidget = () => {
             )}
             {appointmentList.length > 0 &&
               appointmentList.map((item, ind) => {
+                if (item.appointment_status === "Cancelled") {
+                  return true;
+                }
                 return (
                   <tr key={item.id_appointment} className={classes.tr}>
                     <td className={`text-center ${classes.td}`} width="30px">
@@ -236,8 +239,18 @@ const ListWidget = () => {
                           >
                             Edit
                           </Dropdown.Item>
-                          <Dropdown.Item>Delete</Dropdown.Item>
-                          <Dropdown.Item>Add Vitals</Dropdown.Item>
+                          <Dropdown.Item
+                            onClick={() => {
+                              let req = { ...item };
+                              req.appointment_status = "Cancelled";
+                              updateAppointment(req);
+                            }}
+                          >
+                            Delete
+                          </Dropdown.Item>
+                          <Dropdown.Item disabled={true}>
+                            Add Vitals
+                          </Dropdown.Item>
                         </Dropdown.Menu>
                       </Dropdown>
                     </td>
