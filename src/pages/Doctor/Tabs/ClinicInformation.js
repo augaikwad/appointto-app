@@ -33,7 +33,7 @@ const ClinicInformation = () => {
     const formData = { ...data };
     formData.id_clinic = 0;
     formData.is_schedule = !data.is_schedule ? 0 : 1;
-    formData.id_city = data?.city?.id_city;
+    formData.id_city = data?.id_city?.id_city;
     formData.created_date = moment(new Date()).toISOString();
     formData.created_by = 0;
     formData.updated_date = moment(new Date()).toISOString();
@@ -98,7 +98,7 @@ const ClinicInformation = () => {
           <div className="col-lg-4">
             <ReactSelectField
               label="City"
-              name="city"
+              name="id_city"
               labelField="city_name"
               valueField="id_city"
               options={cities}
