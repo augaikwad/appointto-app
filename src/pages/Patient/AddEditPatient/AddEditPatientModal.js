@@ -66,7 +66,7 @@ const AddEditPatientModal = ({ isAdd = true }) => {
     req.date = new Date(currentDate);
     req.day = moment(currentDate).format("dddd");
     req.reason = "Consultation";
-
+    req.id_doctor = localStorage.getItem("id_doctor");
     aptActions.createAppointment(req, () => {
       if (["/dashboard", "/"].includes(location.pathname)) {
         aptActions.getAppointmentByDoctor();
