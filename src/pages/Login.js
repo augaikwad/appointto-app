@@ -10,13 +10,17 @@ import { DoctorContext } from "../context/Doctor";
 
 const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
   const [state, actions] = useContext(DoctorContext);
-  const { otpData, verifyOTPData } = state;
-  const form = useForm();
+  const { forgetPasswordStep, otpData, verifyOTPData } = state;
+  const form = useForm({
+    defaultValues: {
+      mobile_no: "",
+    },
+  });
   const { handleSubmit, getValues, watch, reset } = form;
 
   const onSubmit = (data) => {
     let req = { ...data };
-    if (otpData === null) {
+    if (forgetPasswordStep === 1) {
       actions.getOTPForResetPassword({
         ...req,
         country_code: "91",
@@ -52,8 +56,9 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
     };
 
     actions.resetPassword(req, () => {
+      reset({ mobile_no: "" });
+      actions.resetOTPData();
       onHide();
-      reset();
     });
   };
 
@@ -61,12 +66,16 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
     <Modal
       title="Forgot Password"
       show={show}
-      onHide={() => onHide()}
+      onHide={() => {
+        reset({ mobile_no: "" });
+        actions.resetOTPData();
+        onHide();
+      }}
       size="sm"
     >
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {otpData === null && (
+          {forgetPasswordStep === 1 && (
             <>
               <TextFieldWithIcon
                 label="Mobile Number"
@@ -93,7 +102,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
               </Button>
             </>
           )}
-          {!!otpData && verifyOTPData === null && (
+          {forgetPasswordStep === 2 && (
             <>
               <TextField
                 label="An OTP has been sent on your mobile number"
@@ -129,7 +138,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
               </Button>
             </>
           )}
-          {!!verifyOTPData && (
+          {forgetPasswordStep === 3 && (
             <>
               <TextField
                 label="New Password"

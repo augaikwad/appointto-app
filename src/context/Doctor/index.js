@@ -48,16 +48,30 @@ const initialState = {
   clinicInfo: null,
   appointmentsByDoctor: [],
   doctorsByClinicId: [],
+  forgetPasswordStep: 1,
 };
 
 export const reducer = (globalState) => (state, action) => {
   switch (action.type) {
     case actionTypes.GET_OTP_SUCCESS:
-      return { ...state, otpData: action.payload };
+      return {
+        ...state,
+        otpData: action.payload,
+        forgetPasswordStep: state.forgetPasswordStep + 1,
+      };
     case actionTypes.VERIFY_OTP_SUCCESS:
-      return { ...state, verifyOTPData: action.payload };
+      return {
+        ...state,
+        verifyOTPData: action.payload,
+        forgetPasswordStep: state.forgetPasswordStep + 1,
+      };
     case actionTypes.RESET_PASSWORD_SUCCESS:
-      return { ...state, otpData: null, verifyOTPData: null };
+      return {
+        ...state,
+        otpData: initialState.otpData,
+        verifyOTPData: initialState.verifyOTPData,
+        forgetPasswordStep: initialState.forgetPasswordStep,
+      };
     case actionTypes.SIGNUP_USER_SUCCESS:
       return { ...state, signupUserData: action.payload };
     case actionTypes.SET_REGISTRATION_ACTIVE_TAB:
@@ -109,10 +123,11 @@ export const useActions = (state, dispatch) => ({
   resetOTPData: () => {
     dispatch({
       type: actionTypes.RESET_OTP_DATA,
-      request: {
+      payload: {
         otpData: initialState.otpData,
         verifyOTPData: initialState.verifyOTPData,
         signupUserData: initialState.signupUserData,
+        forgetPasswordStep: 1,
       },
     });
   },
