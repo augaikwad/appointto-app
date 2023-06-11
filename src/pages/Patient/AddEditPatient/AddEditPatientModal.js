@@ -89,6 +89,7 @@ const AddEditPatientModal = ({ isAdd = true }) => {
     } else {
       addToQueue({ id_patient: patient.id_patient });
     }
+    actions.getGlobalList();
   };
 
   const handleAddAppointment = (data) => {
@@ -106,6 +107,7 @@ const AddEditPatientModal = ({ isAdd = true }) => {
     } else {
       aptActions.setAppointmentModal({ show: true });
     }
+    actions.getGlobalList();
   };
 
   const onSubmit = (data, e) => {
@@ -170,6 +172,7 @@ const AddEditPatientModal = ({ isAdd = true }) => {
                   actions.setActiveTab(0);
                   actions.addEditPatientFormReset();
                   actions.setPatientModalOpen(false);
+                  actions.getGlobalList();
                   if (!isAdd) {
                     actions.getPatientById(patient.id_patient);
                   }
