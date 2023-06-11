@@ -9,11 +9,14 @@ export const actionTypes = {
   FAILURE: "GLOBAL/FAILURE",
   CLEAR_GENERIC_RESPONSE: "GLOBAL/CLEAR_GENERIC_RESPONSE",
   SET_LOADING_INDICATOR: "GLOBAL/SET_LOADING_INDICATOR",
+  GET_CITIES: "GET_CITIES",
+  GET_CITIES_SUCCESS: "GET_CITIES_SUCCESS",
 };
 
 const initialState = {
   loading: false,
   error: null,
+  cities: [],
 };
 
 export const reducer = (state = initialState, action) => {
@@ -26,6 +29,8 @@ export const reducer = (state = initialState, action) => {
       return { ...state, loading: false, error: action.error };
     case actionTypes.SUCCESS:
       return { ...state, loading: false, successMessage: action.message };
+    case actionTypes.GET_CITIES_SUCCESS:
+      return { ...state, cities: action.payload };
     default:
       return state;
   }
@@ -53,6 +58,12 @@ export const useActions = (state, dispatch) => ({
   clearGenericResponse: () => {
     dispatch({
       type: actionTypes.CLEAR_GENERIC_RESPONSE,
+    });
+  },
+  getCities: (keyword) => {
+    dispatch({
+      type: actionTypes.GET_CITIES,
+      searchParam: keyword,
     });
   },
 });

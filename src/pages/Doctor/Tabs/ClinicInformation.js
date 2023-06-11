@@ -2,17 +2,25 @@ import React, { useContext } from "react";
 import moment from "moment";
 // import { InputField, CheckBoxField } from "../../../components";
 import TextField from "../../../components/Forms/TextField";
-import CheckBoxField from "../../../components/Forms/CheckBoxField";
+import ReactSelectField from "../../../components/Forms/ReactSelectField";
 import { Button } from "react-bootstrap";
 import { useForm, FormProvider } from "react-hook-form";
 import { DoctorContext } from "../../../context/Doctor";
+import { GlobalContext } from "../../../context/Global";
 
 const ClinicInformation = () => {
   const [states, actions] = useContext(DoctorContext);
 
   const { registrationActiveTab } = states;
 
-  const form = useForm();
+  const [globalState, globalActions] = useContext(GlobalContext);
+  const { cities } = globalState;
+
+  const form = useForm({
+    defaultValues: {
+      state: "Maharashtra",
+    },
+  });
 
   const {
     register,
@@ -25,8 +33,7 @@ const ClinicInformation = () => {
     const formData = { ...data };
     formData.id_clinic = 0;
     formData.is_schedule = !data.is_schedule ? 0 : 1;
-    formData.id_city = 1;
-    formData.consultation_fee = 200;
+    formData.id_city = data?.city?.id_city;
     formData.created_date = moment(new Date()).toISOString();
     formData.created_by = 0;
     formData.updated_date = moment(new Date()).toISOString();
@@ -89,18 +96,34 @@ const ClinicInformation = () => {
           </div>
           <div className="col-lg-4"></div>
           <div className="col-lg-4">
-            <TextField
+            <ReactSelectField
+              label="City"
+              name="city"
+              labelField="city_name"
+              valueField="id_city"
+              options={cities}
+              onInputChange={(val) => {
+                if (val && val.length >= 2) {
+                  globalActions.getCities(val);
+                }
+              }}
+              rules={{
+                required: "Please select City",
+              }}
+            />
+            {/* <TextField
               label="City"
               name="city"
               rules={{
                 required: "Please Enter City",
               }}
-            />
+            /> */}
           </div>
           <div className="col-lg-4">
             <TextField
               label="State"
               name="state"
+              disabled={true}
               rules={{
                 required: "Please Enter State",
               }}
