@@ -37,7 +37,7 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
             id_doctor: localStorage.getItem("id_doctor"),
             type: "Advice",
           };
-          actions.saveUpdateTag("advice", req, (res) => {
+          actions.saveUpdateTag(name, req, (res) => {
             actions.getAdvices();
 
             let val = getValues(name) || [];

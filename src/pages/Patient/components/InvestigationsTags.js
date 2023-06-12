@@ -37,7 +37,7 @@ const InvestigationsTags = ({ name = "lstinvestigations" }) => {
             id_doctor: localStorage.getItem("id_doctor"),
             type: "Investigations",
           };
-          actions.saveUpdateTag("investigations", req, (res) => {
+          actions.saveUpdateTag(name, req, (res) => {
             actions.getInvestigations();
 
             let val = getValues(name) || [];

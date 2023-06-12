@@ -1,8 +1,8 @@
 export const tagsCategory = {
-  complaints: "Complaints",
-  observations: "Observations",
-  diagnosis: "Diagnosis",
-  workdone: "WorkDone",
-  advice: "Advice",
-  investigations: "Investigations",
+  lstcomplaints: "Complaints",
+  lstobservations: "Observations",
+  lstdiagnosis: "Diagnosis",
+  lstworkDone: "WorkDone",
+  lstadvice: "Advice",
+  lstinvestigations: "Investigations",
 };
