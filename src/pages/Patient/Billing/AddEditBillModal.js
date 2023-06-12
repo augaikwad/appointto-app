@@ -55,6 +55,7 @@ const AddEditBillModal = () => {
     let formData = { ...data };
     if (formData.bill_id === 0) {
       formData.id_patient = patientData.id_patient;
+      formData.id_doctor = localStorage.getItem("id_doctor");
       actions.createBill(formData, submitCallback);
     } else {
       actions.updateBill(formData, submitCallback);

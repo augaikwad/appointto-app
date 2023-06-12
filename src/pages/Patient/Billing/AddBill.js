@@ -87,7 +87,7 @@ const AddBill = () => {
   useEffect(() => {
     if (patientData !== null && allBillData.length === 0) {
       actions.getAllBillData({
-        id_doctor: localStorage.getItem("id_doctor"),
+        id_doctor: parseInt(localStorage.getItem("id_doctor")),
         id_patient: patientData.id_patient,
       });
     }

@@ -369,7 +369,12 @@ const MedicinesTable = ({ rxGroupData, control }) => {
         </table>
       </div>
       <div className={classes.tableFooter}>
-        <button className={`btn btn-sm btn-link ${classes.btn}`}>
+        <button
+          className={`btn btn-sm btn-link ${classes.btn}`}
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+        >
           Save Rx Group
         </button>
         <button
@@ -381,7 +386,12 @@ const MedicinesTable = ({ rxGroupData, control }) => {
         >
           Rx Group <i className="fa fa-angle-down"></i>
         </button>
-        <button className={`btn btn-sm btn-link ${classes.btn}`}>
+        <button
+          className={`btn btn-sm btn-link ${classes.btn}`}
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+        >
           Prev. Rx Group
         </button>
       </div>
