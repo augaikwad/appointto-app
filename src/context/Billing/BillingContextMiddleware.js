@@ -43,6 +43,11 @@ export const applyBillingContextMiddleware =
                   type: actionTypes.GET_ALL_BILL_DATA_LIST_SUCCESS,
                   payload: data.payload,
                 });
+              } else {
+                dispatch({
+                  type: actionTypes.GET_ALL_BILL_DATA_LIST_SUCCESS,
+                  payload: [],
+                });
               }
               globalActions.setLoadingIndicator(false);
             })
