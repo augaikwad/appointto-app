@@ -5,6 +5,7 @@ import {
   DatePickerField,
   SelectField,
   ReactSelectField,
+  CreatableReactSelect,
 } from "../../../components/Forms";
 import { FormProvider, useForm } from "react-hook-form";
 import { Form, Button } from "react-bootstrap";
@@ -55,7 +56,7 @@ const AddEditBillModal = () => {
     let formData = { ...data };
     if (formData.bill_id === 0) {
       formData.id_patient = patientData.id_patient;
-      formData.id_doctor = localStorage.getItem("id_doctor");
+      formData.id_doctor = parseInt(localStorage.getItem("id_doctor"));
       actions.createBill(formData, submitCallback);
     } else {
       actions.updateBill(formData, submitCallback);
@@ -124,7 +125,35 @@ const AddEditBillModal = () => {
               />
             </div>
             <div className="col-lg-6">
-              <ReactSelectField
+              <CreatableReactSelect
+                label="Name of Treatment"
+                name="treatment"
+                labelField="treatment_name"
+                valueField="treatment_id"
+                options={treatmentList}
+                getNewOptionData={(value, label) => {
+                  return {
+                    treatment_name: label,
+                    treatment_id: value,
+                  };
+                }}
+                onCreateOption={(val) => {
+                  let req = {
+                    treatment_name: val,
+                    treatment_id: 0,
+                    id_doctor: parseInt(localStorage.getItem("id_doctor")),
+                  };
+                  actions.saveTreatment(req, (response) => {
+                    setValue("treatment", response);
+                    actions.getTreatmentList();
+                  });
+                }}
+                rules={{
+                  required: "Please select Treatment",
+                }}
+                isMulti={false}
+              />
+              {/* <ReactSelectField
                 label="Name of Treatment"
                 name="treatment"
                 labelField="treatment_name"
@@ -133,7 +162,7 @@ const AddEditBillModal = () => {
                 rules={{
                   required: "Please select Treatment",
                 }}
-              />
+              /> */}
             </div>
             <div className="col-lg-6">
               <div className="row">

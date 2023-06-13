@@ -23,6 +23,7 @@ export const actionTypes = {
   ADD_PAYMENT: "ADD_PAYMENT",
   SET_PAYMENT_MODAL_OPEN: "SET_PAYMENT_MODAL_OPEN",
   SET_PAYMENT_MODAL_FORM: "SET_PAYMENT_MODAL_FORM",
+  SAVE_TREATMENT: "SAVE_TREATMENT",
 };
 
 const initialState = {
@@ -139,6 +140,13 @@ export const useActions = (state, dispatch) => ({
   addPayment: (req, callback) => {
     dispatch({
       type: actionTypes.ADD_PAYMENT,
+      request: req,
+      callback: callback,
+    });
+  },
+  saveTreatment: (req, callback) => {
+    dispatch({
+      type: actionTypes.SAVE_TREATMENT,
       request: req,
       callback: callback,
     });

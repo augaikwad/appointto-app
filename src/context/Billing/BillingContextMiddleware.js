@@ -138,6 +138,20 @@ export const applyBillingContextMiddleware =
             .catch((error) => {
               console.log("Service error === ", error);
             });
+        case actionTypes.SAVE_TREATMENT:
+          return service
+            .post(baseUrl + "Doctor/add_treatment", action.request)
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                if (action.callback) {
+                  action.callback(data.payload);
+                }
+              }
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+            });
         default:
           dispatch(action);
       }
