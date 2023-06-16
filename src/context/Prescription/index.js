@@ -35,6 +35,9 @@ export const actionTypes = {
   SAVE_PRESCRIPTION: "SAVE_PRESCRIPTION",
   GET_PRESCRIPTIONS: "GET_PRESCRIPTIONS",
   GET_PRESCRIPTIONS_SUCCESS: "GET_PRESCRIPTIONS_SUCCESS",
+  SAVE_RX_GROUP: "SAVE_RX_GROUP",
+  GET_RX_GROUPS: "GET_RX_GROUPS",
+  GET_RX_GROUPS_SUCCESS: "GET_RX_GROUPS_SUCCESS",
 };
 
 const initialState = {
@@ -64,6 +67,7 @@ const initialState = {
     nextVisitDate: new Date(),
   },
   allPrescriptions: [],
+  rxGroups: [],
 };
 
 export const reducer = (globalState) => (state, action) => {
@@ -100,6 +104,9 @@ export const reducer = (globalState) => (state, action) => {
     }
     case actionTypes.GET_PRESCRIPTIONS_SUCCESS: {
       return { ...state, allPrescriptions: action.payload };
+    }
+    case actionTypes.GET_RX_GROUPS_SUCCESS: {
+      return { ...state, rxGroups: action.payload };
     }
     default:
       return state;
@@ -192,6 +199,19 @@ export const useActions = (state, dispatch) => ({
     dispatch({
       type: actionTypes.GET_PRESCRIPTIONS,
       request: req,
+    });
+  },
+  saveRxGroup: (req, callback) => {
+    dispatch({
+      type: actionTypes.SAVE_RX_GROUP,
+      request: req,
+      callback: callback,
+    });
+  },
+  getRxGroups: (callback) => {
+    dispatch({
+      type: actionTypes.GET_RX_GROUPS,
+      callback: callback,
     });
   },
 });

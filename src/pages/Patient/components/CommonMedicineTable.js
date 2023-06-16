@@ -39,9 +39,19 @@ const CommonMedicineTable = ({ columns, data }) => {
               <tr key={ind}>
                 {columns &&
                   columns.map((col, i) => {
+                    const { formatter } = col;
+                    if (col.field === "sr") {
+                      return (
+                        <td key={i} className={classes.td}>
+                          {ind + 1}
+                        </td>
+                      );
+                    }
                     return (
                       <td key={i} className={classes.td}>
-                        {med[col.field]}
+                        {formatter && typeof formatter === "function"
+                          ? formatter(med, med[col.field])
+                          : med[col.field]}
                       </td>
                     );
                   })}

@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { createUseStyles } from "react-jss";
+import { Button, Form } from "react-bootstrap";
 import { useFieldArray, useFormContext, Controller } from "react-hook-form";
 import { AutocompleteField, Modal } from "../../../components";
 import { ReactSelectField } from "../../../components/Forms";
 import InputMask from "react-input-mask";
 import MedicineNameField from "./MedicineNameField";
 import CommonMedicineTable from "./CommonMedicineTable";
+import { PrescriptionContext } from "../../../context/Prescription";
 
 const useStyles = createUseStyles({
   tableContainer: {},
@@ -150,9 +152,79 @@ const headerColumns = [
   { field: "note", label: "Notes" },
 ];
 
+const selectModalHeaderColumns = [
+  { field: "sr", label: "#", width: "20px" },
+  { field: "type", label: "Type", width: "60px" },
+  {
+    field: "medicineName",
+    label: "Medicine",
+    width: "30%",
+    formatter: (rowData, cellValue) => {
+      return (
+        <div>
+          <div>{cellValue.medicineName}</div>
+          <div>{cellValue.composition}</div>
+        </div>
+      );
+    },
+  },
+  { field: "dose", label: "Dose", width: "80px" },
+  { field: "unit", label: "Unit", width: "80px" },
+  { field: "timing", label: "Timing", width: "120px" },
+  { field: "duration", label: "Duration", width: "120px" },
+  { field: "note", label: "Notes" },
+];
+
+const CreateGroupModal = ({
+  open = false,
+  onCreateGroup = () => {},
+  onHide = () => {},
+}) => {
+  const [groupName, setGroupName] = useState("");
+
+  const callback = () => {
+    setGroupName("");
+    onHide();
+  };
+
+  const FooterActions = () => {
+    return (
+      <div className="text-right">
+        <Button
+          disabled={groupName.length === 0}
+          className="btn btn-sm btn-primary"
+          onClick={() => onCreateGroup(groupName, callback)}
+        >
+          Create
+        </Button>
+      </div>
+    );
+  };
+  return (
+    <Modal
+      title="Create Group"
+      show={open}
+      onHide={onHide}
+      size="sm"
+      footerActions={<FooterActions />}
+    >
+      <Form.Group>
+        <label>Group Name</label>
+        <Form.Control
+          type="text"
+          placeholder="Enter Group Name"
+          onChange={(e) => setGroupName(e.target.value)}
+        />
+      </Form.Group>
+    </Modal>
+  );
+};
+
 const MedicinesTable = ({ rxGroupData, control }) => {
   const classes = useStyles();
 
+  const [state, actions] = useContext(PrescriptionContext);
+  const { rxGroups } = state;
   const [durationData, setDurationData] = useState([
     "Days",
     "Weeks",
@@ -160,12 +232,13 @@ const MedicinesTable = ({ rxGroupData, control }) => {
     "Years",
   ]);
 
-  const { setValue, register } = useFormContext();
-
+  const { setValue, register, watch } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "prescribedMedicines",
   });
+
+  const [open, setOpen] = useState(false);
 
   const getInputs = (key, obj, ind, isFilled) => {
     let name = `prescribedMedicines[${ind}].${key}`;
@@ -328,7 +401,7 @@ const MedicinesTable = ({ rxGroupData, control }) => {
                   >
                     {ind + 1}
                   </td>
-                  {Object.keys(field).length > 0 &&
+                  {Object.keys(field).length &&
                     Object.keys(field).map((objKey, objInd) => {
                       let isFilled = false;
                       if (objKey === "medicineName" && !!field[objKey]) {
@@ -369,10 +442,48 @@ const MedicinesTable = ({ rxGroupData, control }) => {
         </table>
       </div>
       <div className={classes.tableFooter}>
+        <CreateGroupModal
+          open={open}
+          onCreateGroup={(groupName, callback) => {
+            const medicinesArray = watch("prescribedMedicines");
+            const slicedArray = medicinesArray.slice(0, -1);
+
+            let request = {
+              id_doctor: parseInt(localStorage.getItem("id_doctor")),
+              rxGroupName: groupName,
+            };
+            let group = [];
+            slicedArray.forEach((item) => {
+              const { duration, note, timing, dose, unit, type } = item;
+              const { medicineName, composition, medicineId } =
+                item.medicineName;
+              let groupItem = {
+                medicineName: medicineName,
+                composition: composition,
+                medicineId: medicineId,
+                unit: unit.value,
+                type: type.value,
+                dose,
+                timing: timing.value,
+                duration,
+                note,
+              };
+              group.push(groupItem);
+            });
+            request.RxGroupPrescribedMedicine = group;
+            actions.saveRxGroup(request, () => {
+              if (callback && typeof callback === "function") {
+                callback();
+              }
+            });
+          }}
+          onHide={() => setOpen(false)}
+        />
         <button
           className={`btn btn-sm btn-link ${classes.btn}`}
           onClick={(e) => {
             e.preventDefault();
+            setOpen(true);
           }}
         >
           Save Rx Group
@@ -381,7 +492,9 @@ const MedicinesTable = ({ rxGroupData, control }) => {
           className={`btn btn-sm btn-link ${classes.btn}`}
           onClick={(e) => {
             e.preventDefault();
-            setRxGroupModalShow(true);
+            actions.getRxGroups(() => {
+              setRxGroupModalShow(true);
+            });
           }}
         >
           Rx Group <i className="fa fa-angle-down"></i>
@@ -395,6 +508,7 @@ const MedicinesTable = ({ rxGroupData, control }) => {
           Prev. Rx Group
         </button>
       </div>
+
       <Modal
         id="SelectRxGroupModal"
         title="Select Rx Group"
@@ -402,22 +516,32 @@ const MedicinesTable = ({ rxGroupData, control }) => {
         show={rxGroupModalShow}
         onHide={() => setRxGroupModalShow(false)}
       >
-        {rxGroupData.length > 0 &&
-          rxGroupData.map((group, ind) => {
+        {rxGroups.length > 0 &&
+          rxGroups.map((group, ind) => {
             return (
-              <div key={ind} className={classes.groups}>
+              <div key={group.rxGroupId} className={classes.groups}>
                 <div className="groupsHeader">
-                  <span>Rx Group {ind + 1}</span>
+                  <span>{group.rxGroupName}</span>
                   <button
                     className={`btn btn-sm btn-link ${classes.btn}`}
                     onClick={(e) => {
                       e.preventDefault();
-                      // const mergedTags = [].concat(
-                      //   tags,
-                      //   group.items
-                      // );
+                      const formattedValue = [];
+                      group.rxGroupPrescribedMedicine.forEach((med) => {
+                        formattedValue.push({
+                          type: med.type,
+                          medicineName: med.medicineName,
+                          dose: med.dose,
+                          unit: med.unit,
+                          timing: med.timing,
+                          duration: med.duration,
+                          note: med.note,
+                        });
+                      });
 
-                      // setTags(mergedTags);
+                      formattedValue.push(initFields);
+                      setValue("prescribedMedicines", formattedValue);
+                      setRxGroupModalShow(false);
                     }}
                   >
                     Select
@@ -425,8 +549,8 @@ const MedicinesTable = ({ rxGroupData, control }) => {
                 </div>
                 <div className="groupsBody">
                   <CommonMedicineTable
-                    columns={headerColumns}
-                    data={group.medicines}
+                    columns={selectModalHeaderColumns}
+                    data={group.rxGroupPrescribedMedicine}
                   />
                 </div>
               </div>

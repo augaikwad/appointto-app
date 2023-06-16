@@ -312,6 +312,48 @@ export const applyPrescriptionContextMiddleware =
               console.log("Service error === ", error);
               globalActions.setLoadingIndicator(false);
             });
+        case actionTypes.SAVE_RX_GROUP:
+          globalActions.setLoadingIndicator(true);
+          return service
+            .post(baseUrl + "Prescription/SaveRxGroup", action.request)
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                if (action.callback && typeof action.callback === "function") {
+                  action.callback();
+                }
+              }
+              globalActions.setLoadingIndicator(false);
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+              globalActions.setLoadingIndicator(false);
+            });
+        case actionTypes.GET_RX_GROUPS:
+          globalActions.setLoadingIndicator(true);
+          return service
+            .post(
+              baseUrl +
+                "Prescription/GetRxGroup?DoctorId=" +
+                localStorage.getItem("id_doctor")
+            )
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                dispatch({
+                  type: actionTypes.GET_RX_GROUPS_SUCCESS,
+                  payload: data.payload,
+                });
+                if (action.callback && typeof action.callback === "function") {
+                  action.callback();
+                }
+              }
+              globalActions.setLoadingIndicator(false);
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+              globalActions.setLoadingIndicator(false);
+            });
         default:
           dispatch(action);
       }
