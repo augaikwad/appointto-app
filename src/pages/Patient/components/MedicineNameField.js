@@ -19,6 +19,7 @@ const useStyles = createUseStyles({
     display: "block",
     marginTop: "-3px",
     position: "relative",
+    textAlign: "left",
   },
   reactSelect: {
     "& > div": { border: "none", boxShadow: "none" },
@@ -59,14 +60,21 @@ const MedicineNameField = ({
   const [state, actions] = useContext(PrescriptionContext);
   const { doctorMedicines, medicines } = state;
 
-  const { getValues } = useFormContext();
+  const [composition, setComposition] = useState(null);
+  const [medicineName, setMedicineName] = useState("");
+
+  const { watch } = useFormContext();
+  const medicineWatch = watch(name);
+
+  useEffect(() => {
+    if (composition == null || composition !== medicineWatch.composition) {
+      setComposition(medicineWatch.composition);
+    }
+  }, [composition]);
 
   useEffect(() => {
     actions.getDoctorMedicines();
   }, []);
-
-  const [composition, setComposition] = useState(null);
-  const [medicineName, setMedicineName] = useState("");
 
   const getTitle = () => {
     return (
@@ -132,11 +140,11 @@ const MedicineNameField = ({
           IndicatorSeparator: () => null,
         }}
       />
-      {isFilled && (
+      {medicineWatch && Object.keys(medicineWatch).length && (
         <>
-          {!!composition && (
+          {!!medicineWatch.composition && (
             <span className={`${classes.comosition} compositionName`}>
-              ({composition || ""})
+              ({medicineWatch.composition || ""})
             </span>
           )}
           <button
@@ -148,23 +156,23 @@ const MedicineNameField = ({
           >
             <i className="fa fa-pencil"></i>
           </button>
+          <Modal
+            title={getTitle()}
+            size="md"
+            show={show}
+            onHide={() => setShow(false)}
+            footerActions={<FooterActions />}
+          >
+            <InputField
+              name="genericName"
+              value={composition}
+              onChange={(e) => {
+                setComposition(e.target.value);
+              }}
+            />
+          </Modal>
         </>
       )}
-      <Modal
-        title={getTitle()}
-        size="md"
-        show={show}
-        onHide={() => setShow(false)}
-        footerActions={<FooterActions />}
-      >
-        <InputField
-          name="genericName"
-          value={composition}
-          onChange={(e) => {
-            setComposition(e.target.value);
-          }}
-        />
-      </Modal>
     </>
   );
 };

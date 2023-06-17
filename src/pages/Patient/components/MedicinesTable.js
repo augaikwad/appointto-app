@@ -1,13 +1,14 @@
-import React, { useState, useContext } from "react";
-import { createUseStyles } from "react-jss";
+import React, { useContext, useState } from "react";
+import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { Button, Form } from "react-bootstrap";
-import { useFieldArray, useFormContext, Controller } from "react-hook-form";
-import { AutocompleteField, Modal } from "../../../components";
+import { createUseStyles } from "react-jss";
 import { ReactSelectField } from "../../../components/Forms";
 import InputMask from "react-input-mask";
 import MedicineNameField from "./MedicineNameField";
 import CommonMedicineTable from "./CommonMedicineTable";
+import { AutocompleteField, Modal } from "../../../components";
 import { PrescriptionContext } from "../../../context/Prescription";
+import { typeOptions, unitOptions } from "../../../utils/constants";
 
 const useStyles = createUseStyles({
   tableContainer: {},
@@ -90,47 +91,6 @@ const useStyles = createUseStyles({
   textCenter: { textAlign: "center" },
 });
 
-const unitOptions = [
-  { label: "mg", value: "mg" },
-  { label: "mcg", value: "mcg" },
-  { label: "ml", value: "ml" },
-  { label: "IU", value: "IU" },
-  { label: "g", value: "g" },
-  { label: "ug", value: "ug" },
-  { label: "tsp", value: "tsp" },
-  { label: "drps", value: "drps" },
-  { label: "units", value: "units" },
-  { label: "tab", value: "tab" },
-  { label: "cap", value: "cap" },
-  { label: "puffs", value: "puffs" },
-];
-
-const typeOptions = [
-  { label: "TAB", value: "TAB" },
-  { label: "SYP", value: "SYP" },
-  { label: "CRM", value: "CRM" },
-  { label: "POW", value: "POW" },
-  { label: "INJ", value: "INJ" },
-  { label: "CAP", value: "CAP" },
-  { label: "DRP", value: "DRP" },
-  { label: "SUS", value: "SUS" },
-  { label: "LIQ", value: "LIQ" },
-  { label: "SAC", value: "SAC" },
-  { label: "EXP", value: "EXP" },
-  { label: "OIN", value: "OIN" },
-  { label: "GEN", value: "GEN" },
-  { label: "LOT", value: "LOT" },
-  { label: "GEL", value: "GEL" },
-  { label: "GRA", value: "GRA" },
-  { label: "SOAP", value: "SOAP" },
-  { label: "SOL", value: "SOL" },
-  { label: "VAC", value: "VAC" },
-  { label: "PAS", value: "PAS" },
-  { label: "INH", value: "INH" },
-  { label: "OTH", value: "OTH" },
-  { label: "SPR", value: "SPR" },
-];
-
 const initFields = {
   type: "",
   medicineName: "",
@@ -140,17 +100,6 @@ const initFields = {
   duration: "",
   notes: "",
 };
-
-const headerColumns = [
-  { field: "sr", label: "#", width: "20px" },
-  { field: "type", label: "Type", width: "60px" },
-  { field: "medicineName", label: "Medicine", width: "30%" },
-  { field: "dose", label: "Dose", width: "80px" },
-  { field: "unit", label: "Unit", width: "80px" },
-  { field: "timing", label: "Timing", width: "120px" },
-  { field: "duration", label: "Duration", width: "120px" },
-  { field: "note", label: "Notes" },
-];
 
 const selectModalHeaderColumns = [
   { field: "sr", label: "#", width: "20px" },
@@ -220,11 +169,25 @@ const CreateGroupModal = ({
   );
 };
 
-const MedicinesTable = ({ rxGroupData, control }) => {
+const timingOptions = [
+  {
+    value: "Beforefood",
+    label: "Before Food",
+  },
+  {
+    value: "Afterfood",
+    label: "After Food",
+  },
+];
+
+const NewMedTable = ({ control, setValue }) => {
   const classes = useStyles();
+  const [open, setOpen] = useState(false);
+  const [rxGroupModalShow, setRxGroupModalShow] = useState(false);
 
   const [state, actions] = useContext(PrescriptionContext);
   const { rxGroups } = state;
+
   const [durationData, setDurationData] = useState([
     "Days",
     "Weeks",
@@ -232,144 +195,182 @@ const MedicinesTable = ({ rxGroupData, control }) => {
     "Years",
   ]);
 
-  const { setValue, register, watch } = useFormContext();
-  const { fields, append, remove } = useFieldArray({
+  const { register, watch, getValues } = useFormContext();
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "prescribedMedicines",
   });
 
-  const [open, setOpen] = useState(false);
-
-  const getInputs = (key, obj, ind, isFilled) => {
-    let name = `prescribedMedicines[${ind}].${key}`;
-    if (key === "type") {
-      return (
-        <ReactSelectField
-          name={name}
-          options={typeOptions}
-          menuPortalTarget={document.body}
-          className={classes.reactSelect}
-          placeholder=""
-          components={{
-            DropdownIndicator: () => null,
-            IndicatorSeparator: () => null,
-          }}
-        />
-      );
-    } else if (key === "medicineName") {
-      const props = {
-        objKey: key,
-        ind,
-        name,
-        obj,
-        isFilled,
-        control,
-        setValue,
-      };
-      return (
-        <MedicineNameField
-          {...props}
-          onChange={(val) => {
-            setValue(name, val);
-            if (fields.length - 1 === ind) {
-              append(initFields);
-            }
-          }}
-        />
-      );
-    } else if (key === "dose") {
-      return (
-        <Controller
-          control={control}
-          name={name}
-          render={({ field }) => (
-            <InputMask
-              {...field}
-              mask="9-9-9"
-              className="form-control no-border"
-            />
-          )}
-        />
-      );
-    } else if (key === "unit") {
-      return (
-        <ReactSelectField
-          name={name}
-          options={unitOptions}
-          menuPortalTarget={document.body}
-          className={classes.reactSelect}
-          components={{
-            DropdownIndicator: () => null,
-            IndicatorSeparator: () => null,
-          }}
-        />
-      );
-    } else if (key === "timing") {
-      return (
-        <ReactSelectField
-          name={name}
-          options={[
-            {
-              value: "Beforefood",
-              label: "Before Food",
-            },
-            {
-              value: "Afterfood",
-              label: "After Food",
-            },
-          ]}
-          menuPortalTarget={document.body}
-          className={classes.reactSelect}
-          components={{
-            DropdownIndicator: () => null,
-            IndicatorSeparator: () => null,
-          }}
-        />
-      );
-    } else if (key === "duration") {
-      return (
-        <AutocompleteField
-          id="DurationAutocomplete"
-          name={name}
-          control={control}
-          className="medicinesAutocomplete"
-          data={durationData}
-          minLength={1}
-          inputProps={{ name: name }}
-          onChange={(val) => setValue(name, val[0])}
-          onInputChange={(val) => {
-            if (!isNaN(val)) {
-              let tempDur = [...durationData].map((data) => {
-                let splitedText = data.trim().split(" ");
-                let text = splitedText[splitedText.length - 1];
-                let elem = val + " " + text;
-                return elem;
-              });
-              setDurationData(tempDur);
-            }
-          }}
-          onKeyDown={(e) => {
-            const key = e.key;
-            if (key == "Backspace") {
-              console.log("onKeyDown if", key);
-              setValue(name, "");
-            }
-          }}
-        />
-      );
-    } else {
-      return (
-        <input
-          type="text"
-          className="form-control no-border"
-          name={name}
-          {...register(name)}
-        />
-      );
-    }
+  const typeFormatter = ({ name }) => {
+    return (
+      <ReactSelectField
+        name={name}
+        options={typeOptions}
+        menuPortalTarget={document.body}
+        className={classes.reactSelect}
+        placeholder=""
+        components={{
+          DropdownIndicator: () => null,
+          IndicatorSeparator: () => null,
+        }}
+      />
+    );
   };
 
-  const [rxGroupModalShow, setRxGroupModalShow] = useState(false);
+  const medicineNameFormatter = ({ name, index, key, field }) => {
+    let isFilled = false;
+    if (!!field[key]) {
+      isFilled = true;
+    }
+
+    const props = {
+      objKey: key,
+      index,
+      name,
+      obj: field,
+      isFilled,
+      control,
+      setValue,
+    };
+    return (
+      <MedicineNameField
+        {...props}
+        onChange={(val) => {
+          setValue(name, val);
+          if (fields.length - 1 === index) {
+            append(initFields);
+          }
+        }}
+      />
+    );
+  };
+
+  const doseFormatter = ({ name }) => {
+    return (
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <InputMask
+            {...field}
+            mask="9-9-9"
+            className="form-control no-border"
+          />
+        )}
+      />
+    );
+  };
+
+  const unitFormatter = ({ name }) => {
+    return (
+      <ReactSelectField
+        name={name}
+        options={unitOptions}
+        menuPortalTarget={document.body}
+        className={classes.reactSelect}
+        components={{
+          DropdownIndicator: () => null,
+          IndicatorSeparator: () => null,
+        }}
+      />
+    );
+  };
+
+  const timingFormatter = ({ name }) => {
+    return (
+      <ReactSelectField
+        name={name}
+        options={timingOptions}
+        menuPortalTarget={document.body}
+        className={classes.reactSelect}
+        components={{
+          DropdownIndicator: () => null,
+          IndicatorSeparator: () => null,
+        }}
+      />
+    );
+  };
+
+  const durationFormatter = ({ name }) => {
+    return (
+      <AutocompleteField
+        id="DurationAutocomplete"
+        name={name}
+        control={control}
+        className="medicinesAutocomplete"
+        data={durationData}
+        minLength={1}
+        inputProps={{ name: name }}
+        onChange={(val) => setValue(name, val[0])}
+        onInputChange={(val) => {
+          if (!isNaN(val)) {
+            let tempDur = [...durationData].map((data) => {
+              let splitedText = data.trim().split(" ");
+              let text = splitedText[splitedText.length - 1];
+              let elem = val + " " + text;
+              return elem;
+            });
+            setDurationData(tempDur);
+          }
+        }}
+        onKeyDown={(e) => {
+          const key = e.key;
+          if (key == "Backspace") {
+            setValue(name, "");
+          }
+        }}
+      />
+    );
+  };
+
+  const noteFormatter = ({ name }) => {
+    return (
+      <input
+        type="text"
+        className="form-control no-border"
+        name={name}
+        {...register(name)}
+      />
+    );
+  };
+
+  const headerColumns = [
+    {
+      field: "sr",
+      label: "#",
+      width: "20px",
+      formatter: ({ index }) => {
+        return index + 1;
+      },
+    },
+    {
+      field: "type",
+      label: "Type",
+      width: "60px",
+      formatter: typeFormatter,
+    },
+    {
+      field: "medicineName",
+      label: "Medicine",
+      width: "30%",
+      formatter: medicineNameFormatter,
+    },
+    { field: "dose", label: "Dose", width: "80px", formatter: doseFormatter },
+    { field: "unit", label: "Unit", width: "80px", formatter: unitFormatter },
+    {
+      field: "timing",
+      label: "Timing",
+      width: "120px",
+      formatter: timingFormatter,
+    },
+    {
+      field: "duration",
+      label: "Duration",
+      width: "120px",
+      formatter: durationFormatter,
+    },
+    { field: "note", label: "Notes", formatter: noteFormatter },
+  ];
 
   return (
     <>
@@ -392,44 +393,48 @@ const MedicinesTable = ({ rxGroupData, control }) => {
             </tr>
           </thead>
           <tbody>
-            {fields.map((field, ind) => {
+            {fields.map((field, index) => {
               return (
-                <tr key={ind}>
-                  <td
-                    key={`sr-${ind}`}
-                    className={`${classes.td} ${classes.textCenter}`}
-                  >
-                    {ind + 1}
-                  </td>
-                  {Object.keys(field).length &&
-                    Object.keys(field).map((objKey, objInd) => {
+                <tr
+                  key={`${field.id}`}
+                  className={`${classes.td} ${classes.textCenter}`}
+                >
+                  {headerColumns &&
+                    headerColumns.map((col, ind) => {
+                      const { formatter } = col;
+                      const name = `prescribedMedicines[${index}].${col.field}`;
+
                       let isFilled = false;
-                      if (objKey === "medicineName" && !!field[objKey]) {
+                      if (col.field === "medicineName" && !!field[col.field]) {
                         isFilled = true;
                       }
+
                       return (
-                        <>
-                          {objKey !== "id" && (
-                            <td
-                              key={objKey}
-                              className={`${classes.td} ${
-                                isFilled ? "nameFilled" : ""
-                              }`}
-                            >
-                              {getInputs(objKey, field, ind, isFilled)}
-                            </td>
-                          )}
-                        </>
+                        <td
+                          key={col.field}
+                          className={`${classes.td} ${
+                            isFilled ? "nameFilled" : ""
+                          }`}
+                        >
+                          {formatter && typeof formatter === "function"
+                            ? formatter({
+                                name,
+                                index,
+                                key: col.field,
+                                field,
+                              })
+                            : col.field}
+                        </td>
                       );
                     })}
-                  {fields.length > 0 && ind !== fields.length - 1 && (
+                  {fields.length > 0 && index !== fields.length - 1 && (
                     <td
-                      key={`action-${ind}`}
+                      key={`action-${index}`}
                       className={`${classes.td} no-border`}
                     >
                       <button
                         className={`btn btn-sm btn-link ${classes.removeBtn}`}
-                        onClick={() => remove(ind)}
+                        onClick={() => remove(index)}
                       >
                         <i className="fa fa-trash"></i>
                       </button>
@@ -527,13 +532,27 @@ const MedicinesTable = ({ rxGroupData, control }) => {
                     onClick={(e) => {
                       e.preventDefault();
                       const formattedValue = [];
-                      group.rxGroupPrescribedMedicine.forEach((med) => {
+                      group.rxGroupPrescribedMedicine.forEach((med, index) => {
+                        // const name = `prescribedMedicines[${index}].`;
+                        // console.log("name == ", `${name}type`);
+                        // setValue(`${name}type`, {
+                        //   label: med.type,
+                        //   value: med.type,
+                        // });
                         formattedValue.push({
-                          type: med.type,
+                          type: {
+                            label: med.type,
+                            value: med.type,
+                          },
                           medicineName: med.medicineName,
                           dose: med.dose,
-                          unit: med.unit,
-                          timing: med.timing,
+                          unit: {
+                            label: med.unit,
+                            value: med.unit,
+                          },
+                          timing: timingOptions.filter(
+                            (item) => item.value === med.timing
+                          )[0],
                           duration: med.duration,
                           note: med.note,
                         });
@@ -561,4 +580,4 @@ const MedicinesTable = ({ rxGroupData, control }) => {
   );
 };
 
-export default MedicinesTable;
+export default NewMedTable;

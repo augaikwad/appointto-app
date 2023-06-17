@@ -195,7 +195,6 @@ export const useActions = (state, dispatch) => ({
     });
   },
   getPrescriptions: (req) => {
-    console.log("getPrescriptions ==== ", req);
     dispatch({
       type: actionTypes.GET_PRESCRIPTIONS,
       request: req,

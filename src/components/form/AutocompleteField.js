@@ -1,6 +1,6 @@
 import React from "react";
 import Field from "./Field";
-import { Typeahead} from "react-bootstrap-typeahead";
+import { Typeahead } from "react-bootstrap-typeahead";
 import { Controller } from "react-hook-form";
 
 const AutocompleteField = ({
@@ -34,6 +34,7 @@ const AutocompleteField = ({
           return (
             <Typeahead
               {...field}
+              defaultInputValue={field.value}
               id={id}
               labelKey={labelKey}
               flip={flip}

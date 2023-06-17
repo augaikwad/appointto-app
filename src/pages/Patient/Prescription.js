@@ -25,104 +25,8 @@ import { PatientContext } from "../../context/Patient";
 import cogoToast from "cogo-toast";
 import PrescriptionPrint from "./components/PrescriptionPrint";
 import { useReactToPrint } from "react-to-print";
-import NewMedTable from "./components/NewMedTable";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
-
-const lastVisitsData = [
-  {
-    date: new Date(),
-    by: "Dr. Uday Bondre",
-    complaints: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    observations: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    diagnosis: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    workDone: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    advice: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    investigations: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    medicines: [
-      {
-        type: "Tab",
-        name: "Azithral 500",
-        dose: "1-0-1",
-        timing: "After Food",
-        duration: "1 Week",
-        notes: "-",
-      },
-      {
-        type: "Cap",
-        name: "Betacap TR 40",
-        dose: "1-1-1",
-        timing: "After Food",
-        duration: "1 Week",
-        notes: "-",
-      },
-    ],
-  },
-  {
-    date: new Date("06/08/2022"),
-    by: "Dr. Uday Bondre",
-    complaints: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    observations: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    diagnosis: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    workDone: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    advice: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    investigations: [
-      { id: 1, name: "Abc" },
-      { id: 2, name: "Efg" },
-    ],
-    medicines: [
-      {
-        type: "Tab",
-        name: "Azithral 500",
-        dose: "1-0-1",
-        timing: "After Food",
-        duration: "1 Week",
-        notes: "-",
-      },
-      {
-        type: "Cap",
-        name: "Betacap TR 40",
-        dose: "1-1-1",
-        timing: "After Food",
-        duration: "1 Week",
-        notes: "-",
-      },
-    ],
-  },
-];
 
 const Prescription = () => {
   const history = useHistory();
@@ -153,7 +57,7 @@ const Prescription = () => {
     },
   });
 
-  const { handleSubmit, reset, control } = form;
+  const { handleSubmit, reset, control, setValue } = form;
 
   useEffect(() => {
     if (patientData !== null) {
@@ -283,7 +187,10 @@ const Prescription = () => {
                 <button
                   className="btn btn-sm btn-primary btn-icon"
                   style={{ height: 32, width: 32 }}
-                  onClick={() => setShow(true)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShow(true);
+                  }}
                 >
                   <i className="fa fa-plus"></i>
                 </button>
@@ -335,8 +242,7 @@ const Prescription = () => {
           <div className="row">
             <div className="col-lg-12">
               <h6>Medicines</h6>
-              <NewMedTable />
-              {/* <MedicinesTable rxGroupData={lastVisitsData} control={control} /> */}
+              <MedicinesTable {...{ control, setValue }} />
             </div>
           </div>
           <div className="row">
