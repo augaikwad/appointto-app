@@ -25,6 +25,7 @@ import { PatientContext } from "../../context/Patient";
 import cogoToast from "cogo-toast";
 import PrescriptionPrint from "./components/PrescriptionPrint";
 import { useReactToPrint } from "react-to-print";
+import NewMedTable from "./components/NewMedTable";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
@@ -334,7 +335,8 @@ const Prescription = () => {
           <div className="row">
             <div className="col-lg-12">
               <h6>Medicines</h6>
-              <MedicinesTable rxGroupData={lastVisitsData} control={control} />
+              <NewMedTable />
+              {/* <MedicinesTable rxGroupData={lastVisitsData} control={control} /> */}
             </div>
           </div>
           <div className="row">
