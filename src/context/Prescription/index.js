@@ -5,6 +5,7 @@ import withContext from "../../hoc/withContext";
 import { GlobalContext } from "../Global";
 import { applyPrescriptionContextMiddleware } from "./PrescriptionContextMiddleware";
 import { tagsCategory } from "../../utils/constants";
+import moment from "moment";
 
 export const PrescriptionContext = createContext();
 
@@ -65,7 +66,7 @@ const initialState = {
     lstinvestigations: [],
     nextVisitAfter: 7,
     nextVisitUnit: "Days",
-    nextVisitDate: new Date(),
+    nextVisitDate: new Date(moment().add(7, "days")),
   },
   allPrescriptions: [],
   rxGroups: [],

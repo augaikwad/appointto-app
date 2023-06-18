@@ -25,6 +25,8 @@ import { PatientContext } from "../../context/Patient";
 import cogoToast from "cogo-toast";
 import PrescriptionPrint from "./components/PrescriptionPrint";
 import { useReactToPrint } from "react-to-print";
+import { allowOnlyNumbers } from "../../utils/common";
+import moment from "moment";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
@@ -57,7 +59,7 @@ const Prescription = () => {
     },
   });
 
-  const { handleSubmit, reset, control, setValue } = form;
+  const { handleSubmit, reset, control, setValue, watch } = form;
 
   useEffect(() => {
     if (patientData !== null) {
@@ -210,7 +212,7 @@ const Prescription = () => {
               <ObservationTags />
             </div>
             <div className="col-lg-2">
-              <div style={{ marginTop: 17 }}>
+              {/* <div style={{ marginTop: 17 }}>
                 <button
                   className="btn btn-sm btn-link"
                   onClick={() => setToothChartShow(true)}
@@ -221,7 +223,7 @@ const Prescription = () => {
                   show={toothChartShow}
                   onHide={() => setToothChartShow(false)}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
           <div className="row">
@@ -232,11 +234,11 @@ const Prescription = () => {
               <WorkDoneTags />
             </div>
             <div className="col-lg-2">
-              <div style={{ marginTop: 17 }}>
+              {/* <div style={{ marginTop: 17 }}>
                 <button className="btn btn-sm btn-link">
                   <FontAwesomeIcon icon={faTooth} /> Chart
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
           <div className="row">
@@ -273,7 +275,20 @@ const Prescription = () => {
                   </label>
                   <div className="row">
                     <div className="col-lg-5">
-                      <TextField name="nextVisitAfter" placeholder="7" />
+                      <TextField
+                        name="nextVisitAfter"
+                        placeholder="7"
+                        onKeyPress={allowOnlyNumbers}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (!isNaN(value) && value > 0) {
+                            setValue(
+                              "nextVisitDate",
+                              new Date(moment().add(value, "days"))
+                            );
+                          }
+                        }}
+                      />
                     </div>
                     <div className="col-lg-7">
                       <SelectField
@@ -284,6 +299,18 @@ const Prescription = () => {
                           { label: "Months", value: "Months" },
                         ]}
                         placeholder="Select"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const nextVisit = watch("nextVisitAfter");
+                          if (!isNaN(nextVisit) && nextVisit > 0) {
+                            setValue(
+                              "nextVisitDate",
+                              new Date(
+                                moment().add(nextVisit, value.toLowerCase())
+                              )
+                            );
+                          }
+                        }}
                       />
                     </div>
                   </div>

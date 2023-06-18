@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { Button, Form } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
@@ -190,6 +190,10 @@ const NewMedTable = ({ control, setValue }) => {
 
   const [state, actions] = useContext(PrescriptionContext);
   const { rxGroups } = state;
+
+  useEffect(() => {
+    actions.getRxGroups();
+  }, []);
 
   const [durationData, setDurationData] = useState([
     "Days",
@@ -524,9 +528,7 @@ const NewMedTable = ({ control, setValue }) => {
           className={`btn btn-sm btn-link ${classes.btn}`}
           onClick={(e) => {
             e.preventDefault();
-            actions.getRxGroups(() => {
-              setRxGroupModalShow(true);
-            });
+            setRxGroupModalShow(true);
           }}
         >
           Rx Group <i className="fa fa-angle-down"></i>
