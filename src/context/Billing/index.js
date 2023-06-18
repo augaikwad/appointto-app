@@ -13,8 +13,6 @@ export const actionTypes = {
   GET_TREATMENT_LIST_SUCCESS: "GET_TREATMENT_LIST_SUCCESS",
   GET_ALL_BILL_DATA_LIST: "GET_ALL_BILL_DATA_LIST",
   GET_ALL_BILL_DATA_LIST_SUCCESS: "GET_ALL_BILL_DATA_LIST_SUCCESS",
-  SET_BILL_MODAL_OPEN: "SET_BILL_MODAL_OPEN",
-  SET_BILL_FORM_DATA: "SET_BILL_FORM_DATA",
   CREATE_BILL: "CREATE_BILL",
   UPDATE_BILL: "UPDATE_BILL",
   DELETE_BILL: "DELETE_BILL",
@@ -24,17 +22,21 @@ export const actionTypes = {
   SET_PAYMENT_MODAL_OPEN: "SET_PAYMENT_MODAL_OPEN",
   SET_PAYMENT_MODAL_FORM: "SET_PAYMENT_MODAL_FORM",
   SAVE_TREATMENT: "SAVE_TREATMENT",
+  SET_BILL_MODAL: "SET_BILL_MODAL",
 };
 
-const initialState = {
-  isBillModalOpen: false,
-  billForm: {
-    bill_id: 0,
-    id_doctor: localStorage.getItem("id_doctor"),
-    bill_date: new Date(),
-    quantity: 1,
-    discount_type: 0,
-    payment_mode: "cash",
+export const initialState = {
+  billModal: {
+    open: false,
+    isAdd: true,
+    formValue: {
+      bill_id: 0,
+      id_doctor: localStorage.getItem("id_doctor"),
+      bill_date: new Date(),
+      quantity: 1,
+      discount_type: 0,
+      payment_mode: "cash",
+    },
   },
   isPaymentModalOpen: false,
   paymentModalForm: {
@@ -59,32 +61,29 @@ export const reducer = (globalState) => (state, action) => {
       return { ...state, treatmentList: action.payload };
     case actionTypes.GET_ALL_BILL_DATA_LIST_SUCCESS:
       return { ...state, allBillData: action.payload };
-    case actionTypes.SET_BILL_MODAL_OPEN:
-      return { ...state, isBillModalOpen: action.open };
-    case actionTypes.SET_BILL_FORM_DATA:
-      return { ...state, billForm: action.formData };
     case actionTypes.SET_PAYMENT_MODAL_OPEN:
       return { ...state, isPaymentModalOpen: action.open };
     case actionTypes.SET_PAYMENT_MODAL_FORM:
       return { ...state, paymentModalForm: action.formData };
     case actionTypes.GET_BILL_SUMMARY_SUCCESS:
       return { ...state, billSummary: action.payload };
+    case actionTypes.SET_BILL_MODAL:
+      const { open } = action.billModal;
+      let billModalData = action.billModal;
+      if (!open) {
+        billModalData = initialState.billModal;
+      }
+      return { ...state, billModal: billModalData };
     default:
       return state;
   }
 };
 
 export const useActions = (state, dispatch) => ({
-  setBillModalOpen: (open) => {
+  setBillModal: (modal) => {
     dispatch({
-      type: actionTypes.SET_BILL_MODAL_OPEN,
-      open: open,
-    });
-  },
-  setBillForm: (formData) => {
-    dispatch({
-      type: actionTypes.SET_BILL_FORM_DATA,
-      formData: formData,
+      type: actionTypes.SET_BILL_MODAL,
+      billModal: { ...state.billModal, ...modal },
     });
   },
   setPaymentModalOpen: (open) => {

@@ -38,6 +38,7 @@ export const actionTypes = {
   SAVE_RX_GROUP: "SAVE_RX_GROUP",
   GET_RX_GROUPS: "GET_RX_GROUPS",
   GET_RX_GROUPS_SUCCESS: "GET_RX_GROUPS_SUCCESS",
+  SET_PREVIOUS_PRESCRIPTION: "SET_PREVIOUS_PRESCRIPTION",
 };
 
 const initialState = {
@@ -210,6 +211,13 @@ export const useActions = (state, dispatch) => ({
   getRxGroups: (callback) => {
     dispatch({
       type: actionTypes.GET_RX_GROUPS,
+      callback: callback,
+    });
+  },
+  setPreviousPrescription: (rxGroupId, callback) => {
+    dispatch({
+      type: actionTypes.SET_PREVIOUS_PRESCRIPTION,
+      rxGroupId,
       callback: callback,
     });
   },

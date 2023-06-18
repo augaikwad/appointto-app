@@ -9,19 +9,17 @@ import {
 } from "../../../components/Forms";
 import { FormProvider, useForm } from "react-hook-form";
 import { Form, Button } from "react-bootstrap";
-import { BillingContext } from "../../../context/Billing";
+import { BillingContext, initialState } from "../../../context/Billing";
 import { PatientContext } from "../../../context/Patient";
 
 const AddEditBillModal = () => {
   const [state, actions] = useContext(BillingContext);
-  const { isBillModalOpen, billForm, treatmentList } = state;
-
+  const { treatmentList, billModal } = state;
+  const { open, isAdd, formValue } = billModal;
   const [patientState, patientActions] = useContext(PatientContext);
   const { patientData } = patientState;
 
-  const form = useForm({
-    defaultValues: billForm,
-  });
+  const form = useForm();
 
   const { handleSubmit, watch, setValue, register, reset } = form;
   const watchDiscountType = watch("discount_type");
@@ -31,15 +29,17 @@ const AddEditBillModal = () => {
   }, []);
 
   useEffect(() => {
-    if (billForm.bill_id > 0) {
-      let formData = { ...billForm };
-      formData.bill_date = new Date(billForm.bill_date);
+    if (formValue.bill_id > 0) {
+      let formData = { ...formValue };
+      formData.bill_date = new Date(formValue.bill_date);
       reset(formData);
+    } else {
+      reset(formValue);
     }
-  }, [billForm]);
+  }, [formValue]);
 
   const submitCallback = (res) => {
-    reset();
+    reset(initialState.billModal.formValue);
     actions.getAllBillData({
       id_doctor: res.id_doctor,
       id_patient: res.id_patient,
@@ -49,7 +49,7 @@ const AddEditBillModal = () => {
       id_patient: res.id_patient,
       id_clinic: localStorage.getItem("id_clinic"),
     });
-    actions.setBillModalOpen(false);
+    actions.setBillModal({ open: false });
   };
 
   const onSubmit = (data) => {
@@ -65,8 +65,8 @@ const AddEditBillModal = () => {
   };
 
   const onHide = () => {
-    reset();
-    actions.setBillModalOpen(false);
+    reset(initialState.billModal.formValue);
+    actions.setBillModal({ open: false });
   };
 
   const FooterAction = () => {
@@ -104,8 +104,8 @@ const AddEditBillModal = () => {
 
   return (
     <Modal
-      title={"Add Bill"}
-      show={isBillModalOpen}
+      title={`${isAdd ? "Add" : "Edit"} Bill`}
+      show={open}
       size="md"
       onHide={onHide}
       footerActions={<FooterAction />}

@@ -354,6 +354,29 @@ export const applyPrescriptionContextMiddleware =
               console.log("Service error === ", error);
               globalActions.setLoadingIndicator(false);
             });
+        case actionTypes.SET_PREVIOUS_PRESCRIPTION:
+          globalActions.setLoadingIndicator(true);
+          const params = {
+            RxGroupId: action.rxGroupId,
+            id_doctor: parseInt(localStorage.getItem("id_doctor")),
+          };
+          const queryString = new URLSearchParams(params).toString();
+
+          return service
+            .post(baseUrl + "Prescription/setprevious?" + queryString)
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                if (action.callback && typeof action.callback === "function") {
+                  action.callback();
+                }
+              }
+              globalActions.setLoadingIndicator(false);
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+              globalActions.setLoadingIndicator(false);
+            });
         default:
           dispatch(action);
       }

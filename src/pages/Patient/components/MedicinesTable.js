@@ -9,6 +9,9 @@ import CommonMedicineTable from "./CommonMedicineTable";
 import { AutocompleteField, Modal } from "../../../components";
 import { PrescriptionContext } from "../../../context/Prescription";
 import { typeOptions, unitOptions } from "../../../utils/constants";
+import cogoToast from "cogo-toast";
+
+const toastOption = { hideAfter: 5, position: "top-right" };
 
 const useStyles = createUseStyles({
   tableContainer: {},
@@ -195,8 +198,8 @@ const NewMedTable = ({ control, setValue }) => {
     "Years",
   ]);
 
-  const { register, watch, getValues } = useFormContext();
-  const { fields, append, remove, replace } = useFieldArray({
+  const { register, watch } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "prescribedMedicines",
   });
@@ -372,6 +375,30 @@ const NewMedTable = ({ control, setValue }) => {
     { field: "note", label: "Notes", formatter: noteFormatter },
   ];
 
+  const setGroupToForm = (group) => {
+    const formattedValue = [];
+    group.rxGroupPrescribedMedicine.forEach((med, index) => {
+      formattedValue.push({
+        type: {
+          label: med.type,
+          value: med.type,
+        },
+        medicineName: med.medicineName,
+        dose: med.dose,
+        unit: {
+          label: med.unit,
+          value: med.unit,
+        },
+        timing: timingOptions.filter((item) => item.value === med.timing)[0],
+        duration: med.duration,
+        note: med.note,
+      });
+    });
+
+    formattedValue.push(initFields);
+    setValue("prescribedMedicines", formattedValue);
+  };
+
   return (
     <>
       <div className={`table-responsive ${classes.tableContainer}`}>
@@ -508,6 +535,12 @@ const NewMedTable = ({ control, setValue }) => {
           className={`btn btn-sm btn-link ${classes.btn}`}
           onClick={(e) => {
             e.preventDefault();
+            const isPreviousGroup = rxGroups.filter((item) => item.isPrevious);
+            if (isPreviousGroup && isPreviousGroup.length) {
+              setGroupToForm(isPreviousGroup[0]);
+            } else {
+              cogoToast.warn("No Previos Rx. Group found", toastOption);
+            }
           }}
         >
           Prev. Rx Group
@@ -531,36 +564,11 @@ const NewMedTable = ({ control, setValue }) => {
                     className={`btn btn-sm btn-link ${classes.btn}`}
                     onClick={(e) => {
                       e.preventDefault();
-                      const formattedValue = [];
-                      group.rxGroupPrescribedMedicine.forEach((med, index) => {
-                        // const name = `prescribedMedicines[${index}].`;
-                        // console.log("name == ", `${name}type`);
-                        // setValue(`${name}type`, {
-                        //   label: med.type,
-                        //   value: med.type,
-                        // });
-                        formattedValue.push({
-                          type: {
-                            label: med.type,
-                            value: med.type,
-                          },
-                          medicineName: med.medicineName,
-                          dose: med.dose,
-                          unit: {
-                            label: med.unit,
-                            value: med.unit,
-                          },
-                          timing: timingOptions.filter(
-                            (item) => item.value === med.timing
-                          )[0],
-                          duration: med.duration,
-                          note: med.note,
-                        });
-                      });
-
-                      formattedValue.push(initFields);
-                      setValue("prescribedMedicines", formattedValue);
+                      setGroupToForm(group);
                       setRxGroupModalShow(false);
+                      actions.setPreviousPrescription(group.rxGroupId, () => {
+                        actions.getRxGroups();
+                      });
                     }}
                   >
                     Select

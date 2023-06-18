@@ -144,8 +144,11 @@ const AddBill = () => {
             size="sm"
             className={`${classes.listActionBtn} btn-inverse-info btn-icon`}
             onClick={() => {
-              actions.setBillForm(row);
-              actions.setBillModalOpen(true);
+              actions.setBillModal({
+                open: true,
+                isAdd: false,
+                formValue: row,
+              });
             }}
           >
             <i className="fa fa-pencil"></i>
@@ -270,7 +273,9 @@ const AddBill = () => {
                 <button
                   className={`btn btn-sm btn-primary`}
                   onClick={() => {
-                    actions.setBillModalOpen(true);
+                    actions.setBillModal({
+                      open: true,
+                    });
                   }}
                 >
                   Add New Bill
