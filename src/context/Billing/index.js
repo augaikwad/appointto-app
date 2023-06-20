@@ -19,10 +19,11 @@ export const actionTypes = {
   GET_BILL_SUMMARY: "GET_BILL_SUMMARY",
   GET_BILL_SUMMARY_SUCCESS: "GET_BILL_SUMMARY_SUCCESS",
   ADD_PAYMENT: "ADD_PAYMENT",
-  SET_PAYMENT_MODAL_OPEN: "SET_PAYMENT_MODAL_OPEN",
-  SET_PAYMENT_MODAL_FORM: "SET_PAYMENT_MODAL_FORM",
   SAVE_TREATMENT: "SAVE_TREATMENT",
   SET_BILL_MODAL: "SET_BILL_MODAL",
+  SET_PAYMENT_MODAL: "SET_PAYMENT_MODAL",
+  GET_TRANSACTION_SUMMARY: "GET_TRANSACTION_SUMMARY",
+  GET_TRANSACTION_SUMMARY_SUCCESS: "GET_TRANSACTION_SUMMARY_SUCCESS",
 };
 
 export const initialState = {
@@ -33,16 +34,24 @@ export const initialState = {
       bill_id: 0,
       id_doctor: localStorage.getItem("id_doctor"),
       bill_date: new Date(),
+      doctor_name: "",
+      treatment: "",
       quantity: 1,
+      rate: "",
+      gross_amount: "",
       discount_type: 0,
+      amount_received: "",
       payment_mode: "cash",
     },
   },
-  isPaymentModalOpen: false,
-  paymentModalForm: {
-    bill_transaction_id: 0,
-    amount: "",
-    payment_mode: "cash",
+  paymentModal: {
+    open: false,
+    isAdd: true,
+    formValue: {
+      bill_transaction_id: 0,
+      amount: "",
+      payment_mode: "cash",
+    },
   },
   treatmentList: [],
   allBillData: [],
@@ -53,6 +62,7 @@ export const initialState = {
     totalBillAmount: 0,
     balanceBillAmount: 0,
   },
+  transactionSummary: [],
 };
 
 export const reducer = (globalState) => (state, action) => {
@@ -61,19 +71,22 @@ export const reducer = (globalState) => (state, action) => {
       return { ...state, treatmentList: action.payload };
     case actionTypes.GET_ALL_BILL_DATA_LIST_SUCCESS:
       return { ...state, allBillData: action.payload };
-    case actionTypes.SET_PAYMENT_MODAL_OPEN:
-      return { ...state, isPaymentModalOpen: action.open };
-    case actionTypes.SET_PAYMENT_MODAL_FORM:
-      return { ...state, paymentModalForm: action.formData };
     case actionTypes.GET_BILL_SUMMARY_SUCCESS:
       return { ...state, billSummary: action.payload };
     case actionTypes.SET_BILL_MODAL:
-      const { open } = action.billModal;
       let billModalData = action.billModal;
-      if (!open) {
+      if (!action.billModal.open) {
         billModalData = initialState.billModal;
       }
       return { ...state, billModal: billModalData };
+    case actionTypes.SET_PAYMENT_MODAL:
+      let modalData = action.modal;
+      if (!action.modal.open) {
+        modalData = initialState.paymentModal;
+      }
+      return { ...state, paymentModal: modalData };
+    case actionTypes.GET_TRANSACTION_SUMMARY_SUCCESS:
+      return { ...state, transactionSummary: action.payload };
     default:
       return state;
   }
@@ -86,16 +99,10 @@ export const useActions = (state, dispatch) => ({
       billModal: { ...state.billModal, ...modal },
     });
   },
-  setPaymentModalOpen: (open) => {
+  setPaymentModal: (modal) => {
     dispatch({
-      type: actionTypes.SET_PAYMENT_MODAL_OPEN,
-      open: open,
-    });
-  },
-  setPaymentModalForm: (formData) => {
-    dispatch({
-      type: actionTypes.SET_PAYMENT_MODAL_FORM,
-      formData: { ...state.paymentModalForm, ...formData },
+      type: actionTypes.SET_PAYMENT_MODAL,
+      modal: { ...state.paymentModal, ...modal },
     });
   },
   getTreatmentList: () => {
@@ -148,6 +155,12 @@ export const useActions = (state, dispatch) => ({
       type: actionTypes.SAVE_TREATMENT,
       request: req,
       callback: callback,
+    });
+  },
+  getTransactionSummary: (req) => {
+    dispatch({
+      type: actionTypes.GET_TRANSACTION_SUMMARY,
+      request: req,
     });
   },
 });

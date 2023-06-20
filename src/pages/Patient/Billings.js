@@ -4,6 +4,8 @@ import AddBill from "./Billing/AddBill";
 import PaymentReceived from "./Billing/PaymentReceived";
 import Bills from "./Billing/Bills";
 import { createUseStyles } from "react-jss";
+import AddEditPaymentModal from "./Billing/AddEditPaymentModal";
+import AddEditBillModal from "./Billing/AddEditBillModal";
 
 const useStyles = createUseStyles({
   navItem: {
@@ -43,6 +45,8 @@ const Billings = () => {
 
   return (
     <>
+      <AddEditPaymentModal />
+      <AddEditBillModal />
       <div className="row">
         <div className="col-lg-12">
           <div className="tab-pills-horizontal">

@@ -3,8 +3,6 @@ import { Tooltip } from "../../../components";
 import { Form, Alert, Button } from "react-bootstrap";
 import { format } from "date-fns";
 import CommonBillingList from "./CommonBillingList";
-import AddEditBillModal from "./AddEditBillModal";
-import AddEditPaymentModal from "./AddEditPaymentModal";
 import { createUseStyles } from "react-jss";
 import { BillingContext } from "../../../context/Billing";
 import { PatientContext } from "../../../context/Patient";
@@ -132,8 +130,11 @@ const AddBill = () => {
             className={`${classes.listActionBtn} btn btn-inverse-info btn-icon`}
             disabled={row.is_Completed === 1}
             onClick={() => {
-              actions.setPaymentModalForm({ bill_id: row.bill_id });
-              actions.setPaymentModalOpen(true);
+              actions.setPaymentModal({
+                open: true,
+                isAdd: true,
+                formValue: { bill_id: row.bill_id },
+              });
             }}
           >
             <i className="fa fa-plus"></i>
@@ -172,6 +173,11 @@ const AddBill = () => {
                 actions.getAllBillData({
                   id_doctor: row.id_doctor,
                   id_patient: row.id_patient,
+                });
+                actions.getBillSummary({
+                  id_doctor: parseInt(localStorage.getItem("id_doctor")),
+                  id_patient: patientData.id_patient,
+                  id_clinic: patientData.id_clinic,
                 });
               });
             }}
@@ -231,7 +237,7 @@ const AddBill = () => {
       },
     },
     {
-      dataField: "amount_received",
+      dataField: "net_amount",
       text: "Amount",
       headerAlign: "center",
       formatter: getAmountFormatter,
@@ -262,68 +268,64 @@ const AddBill = () => {
   ];
 
   return (
-    <>
-      <AddEditPaymentModal />
-      <AddEditBillModal />
-      <div className="row">
-        <div className="col-lg-12">
-          <Alert variant="info" className={classes.cardContent}>
-            <div className={`row`}>
-              <div className={`col-lg-6 text-center`}>
-                <button
-                  className={`btn btn-sm btn-primary`}
-                  onClick={() => {
-                    actions.setBillModal({
-                      open: true,
-                    });
-                  }}
-                >
-                  Add New Bill
-                </button>
-              </div>
-              <div className={`col-lg-6 field borderLeft`}>
-                <div className="table-responsive" style={{ width: 170 }}>
-                  <table className="table">
-                    <tbody>
-                      <tr>
-                        <th className={`${classes.th} noBorder`}>Total Fees</th>
-                        <td className={`${classes.td} noBorder text-right`}>
-                          <AmountWithCurrancy
-                            amount={billSummary.totalBillAmount}
-                          />
-                        </td>
-                      </tr>
-                      <tr>
-                        <th className={classes.th}>Balance</th>
-                        <td className={`${classes.td} text-right balance`}>
+    <div className="row">
+      <div className="col-lg-12">
+        <Alert variant="info" className={classes.cardContent}>
+          <div className={`row`}>
+            <div className={`col-lg-6 text-center`}>
+              <button
+                className={`btn btn-sm btn-primary`}
+                onClick={() => {
+                  actions.setBillModal({
+                    open: true,
+                  });
+                }}
+              >
+                Add New Bill
+              </button>
+            </div>
+            <div className={`col-lg-6 field borderLeft`}>
+              <div className="table-responsive" style={{ width: 170 }}>
+                <table className="table">
+                  <tbody>
+                    <tr>
+                      <th className={`${classes.th} noBorder`}>Total Fees</th>
+                      <td className={`${classes.td} noBorder text-right`}>
+                        <AmountWithCurrancy
+                          amount={billSummary.totalBillAmount}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th className={classes.th}>Balance</th>
+                      <td className={`${classes.td} text-right balance`}>
+                        <AmountWithCurrancy
+                          amount={billSummary.balanceBillAmount}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th className={classes.th}></th>
+                      <td className={`${classes.td} text-right`}>
+                        <button className="btn btn-sm btn-primary">
+                          Pay{" "}
                           <AmountWithCurrancy
                             amount={billSummary.balanceBillAmount}
                           />
-                        </td>
-                      </tr>
-                      <tr>
-                        <th className={classes.th}></th>
-                        <td className={`${classes.td} text-right`}>
-                          <button className="btn btn-sm btn-primary">
-                            Pay{" "}
-                            <AmountWithCurrancy
-                              amount={billSummary.balanceBillAmount}
-                            />
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-          </Alert>
-        </div>
-        <div className="col-lg-12 pt-4">
-          <CommonBillingList columns={columns} data={allBillData} />
-        </div>
+          </div>
+        </Alert>
       </div>
-    </>
+      <div className="col-lg-12 pt-4">
+        <CommonBillingList columns={columns} data={allBillData} />
+      </div>
+    </div>
   );
 };
 

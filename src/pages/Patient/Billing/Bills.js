@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Form } from "react-bootstrap";
 import { Tooltip } from "../../../components";
-import { format } from "date-fns";
 import CommonBillingList from "./CommonBillingList";
 import { createUseStyles } from "react-jss";
+import { BillingContext } from "../../../context/Billing";
+import { PatientContext } from "../../../context/Patient";
+import { format } from "date-fns";
 
 const useStyles = createUseStyles({
   th: {
@@ -70,47 +72,23 @@ const useStyles = createUseStyles({
   },
 });
 
-const data = [
-  {
-    id: 1,
-    date: "2022/06/10",
-    drName: "Doctor Name",
-    treatmentName: "Tratment Name",
-    status: true,
-    rate: 2500,
-    qty: 1,
-    discount: 0,
-    amount: 2000,
-    balance: 1000,
-  },
-  {
-    id: 2,
-    date: "2022/06/9",
-    drName: "Doctor Name",
-    treatmentName: "Tratment Name",
-    status: false,
-    rate: 1000,
-    qty: 1,
-    discount: 0,
-    amount: 500,
-    balance: 500,
-  },
-  {
-    id: 3,
-    date: "2022/06/8",
-    drName: "Doctor Name",
-    treatmentName: "Tratment Name",
-    status: true,
-    rate: 1500,
-    qty: 1,
-    discount: 0,
-    amount: 1000,
-    balance: 500,
-  },
-];
-
 const Bills = () => {
   const classes = useStyles();
+
+  const [state, actions] = useContext(BillingContext);
+  const { allBillData, billSummary } = state;
+
+  const [patientState, patientActions] = useContext(PatientContext);
+  const { patientData } = patientState;
+
+  useEffect(() => {
+    if (patientData !== null && allBillData.length === 0) {
+      actions.getAllBillData({
+        id_doctor: parseInt(localStorage.getItem("id_doctor")),
+        id_patient: patientData.id_patient,
+      });
+    }
+  }, [patientData]);
 
   const getDateFormatted = (cell, row) => {
     return format(new Date(cell), "dd/MM/yyyy");
@@ -120,19 +98,17 @@ const Bills = () => {
     return <div className="text-right">{`Rs ${cell}`}</div>;
   };
 
-  const [val, setVal] = useState(false);
-
   const getStatusFormatter = (cell, row) => {
     return (
       <Form.Check
         type="switch"
         id="custom-switch"
         label=""
-        checked={val}
+        checked={cell === 1 ? true : false}
         className={classes.switch}
-        onChange={(e) => {
-          setVal(e.target.checked);
-        }}
+        disabled={true}
+        onChange={(e) => e.preventDefault()}
+        onClick={(e) => e.preventDefault()}
       />
     );
   };
@@ -142,16 +118,29 @@ const Bills = () => {
       <div>
         <Tooltip text="Add Payment" placement="top">
           <button
-            type="button"
             className={`${classes.listActionBtn} btn btn-inverse-info btn-icon `}
+            disabled={row.is_Completed === 1}
+            onClick={() => {
+              actions.setPaymentModal({
+                open: true,
+                isAdd: true,
+                formValue: { bill_id: row.bill_id },
+              });
+            }}
           >
             <i className="fa fa-plus"></i>
           </button>
         </Tooltip>
         <Tooltip text="Edit Bill" placement="top">
           <button
-            type="button"
             className={`${classes.listActionBtn} btn btn-inverse-info btn-icon `}
+            onClick={() => {
+              actions.setBillModal({
+                open: true,
+                isAdd: false,
+                formValue: row,
+              });
+            }}
           >
             <i className="fa fa-pencil"></i>
           </button>
@@ -168,6 +157,20 @@ const Bills = () => {
           <button
             type="button"
             className={`${classes.listActionBtn} btn btn-inverse-danger btn-icon`}
+            onClick={() => {
+              let req = { bill_id: row.bill_id };
+              actions.deleteBill(req, () => {
+                actions.getAllBillData({
+                  id_doctor: row.id_doctor,
+                  id_patient: row.id_patient,
+                });
+                actions.getBillSummary({
+                  id_doctor: parseInt(localStorage.getItem("id_doctor")),
+                  id_patient: patientData.id_patient,
+                  id_clinic: patientData.id_clinic,
+                });
+              });
+            }}
           >
             <i className="fa fa-trash"></i>
           </button>
@@ -196,17 +199,17 @@ const Bills = () => {
 
   const columns = [
     {
-      dataField: "date",
+      dataField: "bill_date",
       text: "Date",
       headerAttrs: {
         width: 90,
       },
       formatter: getDateFormatted,
     },
-    { dataField: "drName", text: "Dr. Name" },
-    { dataField: "treatmentName", text: "Treatment Name" },
+    { dataField: "doctor_name", text: "Dr. Name" },
+    { dataField: "treatment.treatment_name", text: "Treatment Name" },
     {
-      dataField: "status",
+      dataField: "is_Completed",
       text: "Completed",
       headerAlign: "center",
       formatter: getStatusFormatter,
@@ -220,16 +223,21 @@ const Bills = () => {
       formatter: getAmountFormatter,
       align: "right",
     },
-    { dataField: "qty", text: "Qty", headerAlign: "center", align: "center" },
     {
-      dataField: "discount",
+      dataField: "quantity",
+      text: "Qty",
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      dataField: "discount_value",
       text: "Discount",
       headerAlign: "center",
       formatter: getAmountFormatter,
       align: "right",
     },
     {
-      dataField: "amount",
+      dataField: "net_amount",
       text: "Amount",
       headerAlign: "center",
       formatter: getAmountFormatter,
@@ -247,7 +255,7 @@ const Bills = () => {
   return (
     <CommonBillingList
       columns={columns}
-      data={data}
+      data={allBillData}
       selectRow={{
         mode: "checkbox",
         clickToSelect: false,

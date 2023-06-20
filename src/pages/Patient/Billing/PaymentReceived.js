@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Form } from "react-bootstrap";
 import { Tooltip } from "../../../components";
 import { format } from "date-fns";
 import CommonBillingList from "./CommonBillingList";
 import { createUseStyles } from "react-jss";
+import { BillingContext } from "../../../context/Billing";
+import { PatientContext } from "../../../context/Patient";
 
 const useStyles = createUseStyles({
   th: {
@@ -70,47 +72,23 @@ const useStyles = createUseStyles({
   },
 });
 
-const data = [
-  {
-    id: 1,
-    date: "2022/06/10",
-    drName: "Doctor Name",
-    treatmentName: "Tratment Name",
-    status: true,
-    rate: 2500,
-    qty: 1,
-    discount: 0,
-    amount: 2000,
-    balance: 1000,
-  },
-  {
-    id: 2,
-    date: "2022/06/9",
-    drName: "Doctor Name",
-    treatmentName: "Tratment Name",
-    status: false,
-    rate: 1000,
-    qty: 1,
-    discount: 0,
-    amount: 500,
-    balance: 500,
-  },
-  {
-    id: 3,
-    date: "2022/06/8",
-    drName: "Doctor Name",
-    treatmentName: "Tratment Name",
-    status: true,
-    rate: 1500,
-    qty: 1,
-    discount: 0,
-    amount: 1000,
-    balance: 500,
-  },
-];
-
 const PaymentReceived = () => {
   const classes = useStyles();
+
+  const [state, actions] = useContext(BillingContext);
+  const { transactionSummary } = state;
+
+  const [patientState, patientActions] = useContext(PatientContext);
+  const { patientData } = patientState;
+
+  useEffect(() => {
+    if (patientData !== null && transactionSummary.length === 0) {
+      actions.getTransactionSummary({
+        id_doctor: parseInt(localStorage.getItem("id_doctor")),
+        id_patient: patientData.id_patient,
+      });
+    }
+  }, [patientData]);
 
   const getDateFormatted = (cell, row) => {
     return format(new Date(cell), "dd/MM/yyyy");
@@ -123,18 +101,26 @@ const PaymentReceived = () => {
   const getActionFormatter = (cell, row) => {
     return (
       <div>
-        <Tooltip text="Add Payment" placement="top">
+        {/* <Tooltip text="Add Payment" placement="top">
           <button
             type="button"
             className={`${classes.listActionBtn} btn btn-inverse-info btn-icon `}
           >
             <i className="fa fa-plus"></i>
           </button>
-        </Tooltip>
+        </Tooltip> */}
         <Tooltip text="Edit Payment" placement="top">
           <button
             type="button"
             className={`${classes.listActionBtn} btn btn-inverse-info btn-icon `}
+            onClick={(e) => {
+              e.preventDefault();
+              actions.setPaymentModal({
+                open: true,
+                isAdd: false,
+                formValue: row,
+              });
+            }}
           >
             <i className="fa fa-pencil"></i>
           </button>
@@ -153,43 +139,12 @@ const PaymentReceived = () => {
 
   const columns = [
     {
-      dataField: "date",
+      dataField: "created_date",
       text: "Date",
       headerAttrs: {
         width: 90,
       },
       formatter: getDateFormatted,
-    },
-    { dataField: "drName", text: "Dr. Name" },
-    { dataField: "treatmentName", text: "Treatment Name" },
-    {
-      dataField: "rate",
-      text: "Rate",
-      headerAlign: "center",
-      formatter: getAmountFormatter,
-      align: "right",
-      headerAttrs: {
-        width: 100,
-      },
-    },
-    {
-      dataField: "qty",
-      text: "Qty",
-      headerAlign: "center",
-      align: "center",
-      headerAttrs: {
-        width: 50,
-      },
-    },
-    {
-      dataField: "discount",
-      text: "Discount",
-      headerAlign: "center",
-      formatter: getAmountFormatter,
-      align: "right",
-      headerAttrs: {
-        width: 100,
-      },
     },
     {
       dataField: "amount",
@@ -202,16 +157,25 @@ const PaymentReceived = () => {
       },
     },
     {
-      dataField: "id",
-      text: "",
-      formatter: getActionFormatter,
-      align: "right",
+      dataField: "payment_mode",
+      text: "Payment Mode",
+      headerAlign: "center",
+      align: "center",
       headerAttrs: {
-        width: 100,
+        width: 200,
       },
     },
+    // {
+    //   dataField: "id",
+    //   text: "",
+    //   formatter: getActionFormatter,
+    //   align: "right",
+    //   headerAttrs: {
+    //     width: 100,
+    //   },
+    // },
   ];
-  return <CommonBillingList columns={columns} data={data} />;
+  return <CommonBillingList columns={columns} data={transactionSummary} />;
 };
 
 export default PaymentReceived;

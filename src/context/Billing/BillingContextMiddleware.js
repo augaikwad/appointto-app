@@ -152,6 +152,21 @@ export const applyBillingContextMiddleware =
             .catch((error) => {
               console.log("Service error === ", error);
             });
+        case actionTypes.GET_TRANSACTION_SUMMARY:
+          return service
+            .post(baseUrl + "Bill/GetTransactionSummary", action.request)
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                dispatch({
+                  type: actionTypes.GET_TRANSACTION_SUMMARY_SUCCESS,
+                  payload: data.payload,
+                });
+              }
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+            });
         default:
           dispatch(action);
       }

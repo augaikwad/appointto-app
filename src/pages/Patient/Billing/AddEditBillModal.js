@@ -19,7 +19,9 @@ const AddEditBillModal = () => {
   const [patientState, patientActions] = useContext(PatientContext);
   const { patientData } = patientState;
 
-  const form = useForm();
+  const form = useForm({
+    defaultValues: formValue,
+  });
 
   const { handleSubmit, watch, setValue, register, reset } = form;
   const watchDiscountType = watch("discount_type");
@@ -29,14 +31,14 @@ const AddEditBillModal = () => {
   }, []);
 
   useEffect(() => {
-    if (formValue.bill_id > 0) {
+    if (!isAdd) {
       let formData = { ...formValue };
       formData.bill_date = new Date(formValue.bill_date);
       reset(formData);
     } else {
-      reset(formValue);
+      reset(initialState.billModal.formValue);
     }
-  }, [formValue]);
+  }, [isAdd]);
 
   const submitCallback = (res) => {
     reset(initialState.billModal.formValue);

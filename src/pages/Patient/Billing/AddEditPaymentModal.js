@@ -8,25 +8,26 @@ import { PatientContext } from "../../../context/Patient";
 
 const AddEditPaymentModal = () => {
   const [state, actions] = useContext(BillingContext);
-  const { isPaymentModalOpen, paymentModalForm, treatmentList } = state;
+  const { paymentModal } = state;
+  const { open, isAdd, formValue } = paymentModal;
 
   const [patientState, patientActions] = useContext(PatientContext);
   const { patientData } = patientState;
 
   const form = useForm({
-    defaultValues: paymentModalForm,
+    defaultValues: formValue,
   });
   const { handleSubmit, reset } = form;
 
   useEffect(() => {
-    if (isPaymentModalOpen) {
-      reset(paymentModalForm);
+    if (open) {
+      reset(formValue);
     }
-  }, [isPaymentModalOpen]);
+  }, [open]);
 
   const onHide = () => {
     reset();
-    actions.setPaymentModalOpen(false);
+    actions.setPaymentModal({ open: false });
   };
 
   const onSubmit = (data) => {
@@ -63,8 +64,8 @@ const AddEditPaymentModal = () => {
 
   return (
     <Modal
-      title={"Add Payment"}
-      show={isPaymentModalOpen}
+      title={`${isAdd ? "Add" : "Edit"} Payment`}
+      show={open}
       size="md"
       onHide={onHide}
       footerActions={<FooterAction />}
