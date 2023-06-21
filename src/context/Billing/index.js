@@ -42,6 +42,7 @@ export const initialState = {
       discount_type: 0,
       amount_received: "",
       payment_mode: "cash",
+      discount_value: 0,
     },
   },
   paymentModal: {

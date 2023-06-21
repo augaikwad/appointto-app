@@ -96,7 +96,7 @@ const AddEditBillModal = () => {
         }`}
         onClick={() => {
           setValue("discount_type", value);
-          setValue("discount_value", "");
+          setValue("discount_value", 0);
         }}
       >
         <i className={`fa ${icon}`}></i>
