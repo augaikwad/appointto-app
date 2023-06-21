@@ -55,9 +55,9 @@ const initialState = {
   medicines: [],
   prescriptionForm: {
     prescriptionId: 0,
-    bp: "",
-    tempratureInFahrenhiet: "",
-    oxizenSaturation: "",
+    bp: null,
+    tempratureInFahrenhiet: null,
+    oxizenSaturation: null,
     lstcomplaints: [],
     lstobservations: [],
     lstdiagnosis: [],

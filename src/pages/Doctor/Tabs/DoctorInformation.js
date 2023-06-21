@@ -26,6 +26,7 @@ const DoctorInformation = () => {
     defaultValues: {
       gender: "male",
       role: "Admin",
+      cunsultationFee: null,
     },
   });
 
@@ -52,7 +53,8 @@ const DoctorInformation = () => {
     const formData = { ...data };
     formData.dob = moment(new Date(data.dob)).format("YYYY-MM-DD");
     formData.id_speciality = parseInt(data.id_speciality);
-    formData.cunsultationFee = parseInt(data.cunsultationFee);
+    formData.cunsultationFee =
+      data.cunsultationFee === null ? null : parseInt(data.cunsultationFee);
     formData.id_doctor = 0;
     formData.userId = "";
 

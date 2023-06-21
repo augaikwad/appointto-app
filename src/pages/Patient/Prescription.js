@@ -146,7 +146,7 @@ const Prescription = () => {
               <div className="row">
                 <div className="col-lg-3">
                   <TextField
-                    label="BP/BP"
+                    label="BP"
                     name="bp"
                     inline={true}
                     labelWidth="60px"
@@ -158,9 +158,9 @@ const Prescription = () => {
                     name="tempratureInFahrenhiet"
                     inline={true}
                     labelWidth="60px"
-                    rules={{
-                      required: true,
-                    }}
+                    // rules={{
+                    //   required: true,
+                    // }}
                   />
                 </div>
                 <div className="col-lg-3">
@@ -169,9 +169,9 @@ const Prescription = () => {
                     name="oxizenSaturation"
                     inline={true}
                     labelWidth="60px"
-                    rules={{
-                      required: true,
-                    }}
+                    // rules={{
+                    //   required: true,
+                    // }}
                   />
                 </div>
                 <div className="col-lg-3">
