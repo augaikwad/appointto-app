@@ -202,12 +202,12 @@ function Documents(props) {
             </div>
           </div>
           <div className={`col-lg-7 ${classes.uploadedFilesListContainer}`}>
-            {images.length > 0 &&
+            {/* {images.length > 0 &&
               images.map((img, ind) => (
                 <div key={ind}>
                   <img src={img.url} />
                 </div>
-              ))}
+              ))} */}
           </div>
         </div>
       </form>

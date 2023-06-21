@@ -28,6 +28,31 @@ export const getValueFromArray = (data) => {
   return val;
 };
 
+export const arrayToArrayOfObject = (array) => {
+  let arrayOfObject = [];
+  if (Array.isArray(array)) {
+    arrayOfObject = array.map((element) => {
+      return { [element]: element };
+    });
+  }
+  return arrayOfObject;
+};
+
+export const stringToArrayOfObject = (string) => {
+  let arrayOfObjects = [];
+  arrayOfObjects = string.split(",").map((item) => {
+    const trimedItem = item.trim();
+    return { label: trimedItem, value: trimedItem };
+  });
+  return arrayOfObjects;
+};
+
+export const stringToArray = (string) => {
+  let array = [];
+  array = string.split(",").map((item) => item.trim());
+  return array;
+};
+
 export const getArrayFromValue = (val) => {
   let array = "";
   if (!!val) {
@@ -53,12 +78,12 @@ export const getFormattedValueForRequest = (data) => {
 
 export const formattedObjForSetForm = (data) => {
   let obj = { ...data };
-  obj.dob = data.dob === "" ? data.dob : new Date(data.dob);
-  obj.medicalPrecondition = getArrayFromValue(data.medicalPrecondition);
+  obj.dob = data.dob === null ? data.dob : new Date(data.dob);
+  obj.medicalPrecondition = stringToArray(data.medicalPrecondition);
   obj.allergies = valueToArrayOfObject(data.allergies);
-  obj.current_medicine = valueToArrayOfObject(data.current_medicine);
+  obj.current_medicine = stringToArrayOfObject(data.current_medicine);
 
-  obj.habbits = getArrayFromValue(data.habbits);
+  obj.habbits = valueToArrayOfObject(data.habbits);
   obj.otherInfo = valueToArrayOfObject(data.otherInfo);
   return obj;
 };

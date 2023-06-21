@@ -21,43 +21,56 @@ export const actionTypes = {
   SET_APPOINTMENT_FORM_DATA: "SET_APPOINTMENT_FORM_DATA",
   CREATE_APPOINTMENT: "CREATE_APPOINTMENT",
   UPDATE_APPOINTMENT: "UPDATE_APPOINTMENT",
-  ADD_EDIT_PATIENT_FORM_RESET: "ADD_EDIT_PATIENT_FORM_RESET",
   GET_PATIENT_BY_ID: "GET_PATIENT_BY_ID",
   GET_PATIENT_BY_ID_SUCESS: "GET_PATIENT_BY_ID_SUCESS",
-  SET_PATIENT_MODAL_OPEN: "SET_PATIENT_MODAL_OPEN",
   SET_PATIENT_ID_FOR_CREATE_APPOINTMENT:
     "SET_PATIENT_ID_FOR_CREATE_APPOINTMENT",
   GET_GLOBAL_LIST: "GET_GLOBAL_LIST",
   GET_GLOBAL_LIST_SUCCESS: "GET_GLOBAL_LIST_SUCCESS",
-  SET_PATIENT_FORM: "SET_PATIENT_FORM",
+  SET_PATIENT_MODAL: "SET_PATIENT_MODAL",
+  SET_TERMS_OPTIONS: "SET_TERMS_OPTIONS",
 };
 
 const initialState = {
   activeTab: 0,
   profileActiveTab: 0,
-  patient: {
-    gender: "Male",
-    blood_group: "A+ve",
-    id_patient: 0,
-    first_name: "",
-    last_name: "",
-    ageType: "Years",
-    mobile_number: "",
-    email_id: "",
-    dob: "",
-    address: "",
-    area: "",
-    city: "",
-    pincode: "",
-    reffered_by: "",
-    emergency_contact: "",
-    diet: "veg",
-    current_medicine: "",
-    medicalPrecondition: "",
-    habbits: "",
-    otherInfo: "",
-    document_url: "",
+  patientModal: {
+    open: false,
+    isAdd: true,
+    formValue: {
+      gender: "Male",
+      blood_group: "A+ve",
+      id_patient: 0,
+      first_name: "",
+      last_name: "",
+      age: "",
+      ageType: "Years",
+      mobile_number: "",
+      email_id: "",
+      dob: null,
+      address: "",
+      area: "",
+      city: "",
+      state: "",
+      pincode: "",
+      reffered_by: "",
+      emergency_contact: "",
+      diet: "veg",
+      current_medicine: "",
+      medicalPrecondition: "lowBP",
+      habbits: "",
+      otherInfo: "",
+      document_url: "",
+    },
   },
+  termsOptions: [
+    { label: "High BP", value: "highBP" },
+    { label: "Low BP", value: "lowBP" },
+    { label: "TB", value: "tb" },
+    { label: "Asthma", value: "asthma" },
+    { label: "Diabetes", value: "diabetes" },
+    { label: "Allergies", value: "allergies" },
+  ],
   appointmentForm: {
     id_appointment: 0,
     id_patient: 0,
@@ -66,7 +79,6 @@ const initialState = {
   },
   patientData: null,
   isAptModalOpen: false,
-  isPatientModalOpen: false,
   patientDocuments: null,
   globalPatientList: [],
 };
@@ -79,22 +91,15 @@ export const reducer = (globalState) => (state, action) => {
       return { ...state, profileActiveTab: action.tab };
     case actionTypes.ADD_PATIENT_GENERAL_INFO_SUCCESS:
     case actionTypes.UPDATE_PATIENT_GENERAL_INFO_SUCCESS:
-      return { ...state, patient: action.payload };
+      const patientModal = { ...state.patientModal };
+      patientModal.formValue = action.payload;
+      return { ...state, patientModal: patientModal };
     case actionTypes.SET_APT_MODAL_OPEN:
       return { ...state, isAptModalOpen: action.open };
     case actionTypes.SET_APPOINTMENT_FORM_DATA:
       return { ...state, appointmentForm: action.payload };
     case actionTypes.ADD_DOCUMENTS_SUCCESS:
       return { ...state, patientDocuments: action.documents };
-    case actionTypes.ADD_EDIT_PATIENT_FORM_RESET: {
-      return {
-        ...state,
-        patient: formattedObjForSetForm(initialState.patient),
-      };
-    }
-    case actionTypes.SET_PATIENT_MODAL_OPEN: {
-      return { ...state, isPatientModalOpen: action.open };
-    }
     case actionTypes.GET_PATIENT_BY_ID_SUCESS: {
       return { ...state, patientData: action.payload, patient: action.payload };
     }
@@ -106,15 +111,31 @@ export const reducer = (globalState) => (state, action) => {
     case actionTypes.GET_GLOBAL_LIST_SUCCESS: {
       return { ...state, globalPatientList: action.payload };
     }
-    case actionTypes.SET_PATIENT_FORM: {
-      return { ...state, patient: action.payload };
+    case actionTypes.SET_PATIENT_MODAL: {
+      if (!action.modalData.open) {
+        return {
+          ...state,
+          patientModal: initialState.patientModal,
+          termsOptions: initialState.termsOptions,
+        };
+      }
+      return { ...state, patientModal: action.modalData };
     }
-    default:
+    case actionTypes.SET_TERMS_OPTIONS: {
+      return { ...state, termsOptions: action.options };
+    }
+    case actionTypes.default:
       return state;
   }
 };
 
 export const useActions = (state, dispatch) => ({
+  setPatientModal: (modal) => {
+    dispatch({
+      type: actionTypes.SET_PATIENT_MODAL,
+      modalData: { ...state.patientModal, ...modal },
+    });
+  },
   setActiveTab: (tab) => {
     dispatch({
       type: actionTypes.SET_ACTIVE_TAB,
@@ -130,18 +151,6 @@ export const useActions = (state, dispatch) => ({
   setAptModalOpen: (open) => {
     dispatch({
       type: actionTypes.SET_APT_MODAL_OPEN,
-      open: open,
-    });
-  },
-  setPatientForm: (obj) => {
-    dispatch({
-      type: actionTypes.SET_PATIENT_FORM,
-      payload: { ...state.patient, ...obj },
-    });
-  },
-  setPatientModalOpen: (open) => {
-    dispatch({
-      type: actionTypes.SET_PATIENT_MODAL_OPEN,
       open: open,
     });
   },
@@ -181,11 +190,6 @@ export const useActions = (state, dispatch) => ({
       callback: callback,
     });
   },
-  addEditPatientFormReset: () => {
-    dispatch({
-      type: actionTypes.ADD_EDIT_PATIENT_FORM_RESET,
-    });
-  },
   getPatientById: (id, callback) => {
     dispatch({
       type: actionTypes.GET_PATIENT_BY_ID,
@@ -202,6 +206,12 @@ export const useActions = (state, dispatch) => ({
   getGlobalList: () => {
     dispatch({
       type: actionTypes.GET_GLOBAL_LIST,
+    });
+  },
+  setTermsOptions: (options) => {
+    dispatch({
+      type: actionTypes.SET_TERMS_OPTIONS,
+      options: options,
     });
   },
 });

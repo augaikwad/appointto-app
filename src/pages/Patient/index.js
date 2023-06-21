@@ -110,7 +110,6 @@ const Patient = () => {
 
   return (
     <div>
-      <AddEditPatientModal isAdd={false} />
       <Card>
         {patientData !== null && (
           <div className={classes.header}>
@@ -158,6 +157,7 @@ const Patient = () => {
               <Col xs={12}>
                 <Tab.Content style={{ padding: "1rem 1rem" }}>
                   {tabs.map((tab, ind) => {
+                    if (activeTab !== ind) return true;
                     return (
                       <Tab.Pane key={`tab+${ind}`} eventKey={ind}>
                         {tab.component}

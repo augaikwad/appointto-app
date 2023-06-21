@@ -69,7 +69,11 @@ const Profile = () => {
                   className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
                   onClick={() => {
                     actions.setActiveTab(0);
-                    actions.setPatientModalOpen(true);
+                    actions.setPatientModal({
+                      open: true,
+                      isAdd: false,
+                      formValue: patientData,
+                    });
                   }}
                 >
                   <i className="fa fa-pencil"></i>
@@ -169,7 +173,11 @@ const Profile = () => {
                   className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
                   onClick={() => {
                     actions.setActiveTab(1);
-                    actions.setPatientModalOpen(true);
+                    actions.setPatientModal({
+                      open: true,
+                      isAdd: false,
+                      formValue: patientData,
+                    });
                   }}
                 >
                   <i className="fa fa-pencil"></i>
@@ -212,7 +220,11 @@ const Profile = () => {
                   className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
                   onClick={() => {
                     actions.setActiveTab(2);
-                    actions.setPatientModalOpen(true);
+                    actions.setPatientModal({
+                      open: true,
+                      isAdd: false,
+                      formValue: patientData,
+                    });
                   }}
                 >
                   <i className="fa fa-pencil"></i>

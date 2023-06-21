@@ -101,7 +101,7 @@ const NavbarSearch = () => {
             type="button"
             className="btn btn-primary btn-icon-text"
             onClick={() => {
-              actions.setPatientModalOpen(true);
+              actions.setPatientModal({ open: true });
             }}
           >
             <i

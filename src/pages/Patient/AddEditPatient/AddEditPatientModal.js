@@ -25,23 +25,24 @@ const useStyles = createUseStyles({
   },
 });
 
-const AddEditPatientModal = ({ isAdd = true }) => {
+const AddEditPatientModal = () => {
   const classes = useStyles();
   const location = useLocation();
   const [state, actions] = useContext(PatientContext);
-  const { patient, activeTab, isPatientModalOpen } = state;
+  const { activeTab, patientModal } = state;
+  const { open, isAdd, formValue } = patientModal;
 
   const [aptState, aptActions] = useContext(AppointmentContext);
   const { appointmentForm } = aptState;
   const form = useForm({
-    defaultValues: patient,
+    defaultValues: formattedObjForSetForm(formValue),
   });
 
   const { handleSubmit, reset } = form;
 
   useEffect(() => {
-    reset(formattedObjForSetForm(patient));
-  }, [patient]);
+    reset(formattedObjForSetForm(formValue));
+  }, [formValue]);
 
   const callback = (response) => {
     reset(formattedObjForSetForm(response));
@@ -53,7 +54,7 @@ const AddEditPatientModal = ({ isAdd = true }) => {
     formData = getFormattedValueForRequest(data);
     formData.id_clinic = localStorage.getItem("id_clinic");
 
-    if (patient.id_patient === 0) {
+    if (formValue.id_patient === 0) {
       actions.addPatientGeneralInfo(formData, callback);
     } else {
       actions.updatePatientGeneralInfo(formData, callback);
@@ -78,16 +79,19 @@ const AddEditPatientModal = ({ isAdd = true }) => {
     let formData = { ...data };
     formData = getFormattedValueForRequest(data);
     formData.id_clinic = localStorage.getItem("id_clinic");
-    if (patient.id_patient === 0) {
+    if (formValue.id_patient === 0) {
       actions.addPatientGeneralInfo(formData, (response) => {
-        actions.setPatientForm(formattedObjForSetForm(response));
+        actions.setPatientModal({
+          ...patientModal,
+          formValue: response,
+        });
         aptActions.setAppointmentForm({
           id_patient: response.id_patient,
         });
         addToQueue({ id_patient: response.id_patient });
       });
     } else {
-      addToQueue({ id_patient: patient.id_patient });
+      addToQueue({ id_patient: formValue.id_patient });
     }
     actions.getGlobalList();
   };
@@ -96,9 +100,12 @@ const AddEditPatientModal = ({ isAdd = true }) => {
     let formData = { ...data };
     formData = getFormattedValueForRequest(data);
     formData.id_clinic = localStorage.getItem("id_clinic");
-    if (patient.id_patient === 0) {
+    if (formValue.id_patient === 0) {
       actions.addPatientGeneralInfo(formData, (response) => {
-        actions.setPatientForm(formattedObjForSetForm(response));
+        actions.setPatientModal({
+          ...patientModal,
+          formValue: response,
+        });
         aptActions.setAppointmentForm({
           id_patient: response.id_patient,
         });
@@ -170,11 +177,10 @@ const AddEditPatientModal = ({ isAdd = true }) => {
                 className={classes.buttonMinWidth}
                 onClick={() => {
                   actions.setActiveTab(0);
-                  actions.addEditPatientFormReset();
-                  actions.setPatientModalOpen(false);
+                  actions.setPatientModal({ open: false });
                   actions.getGlobalList();
                   if (!isAdd) {
-                    actions.getPatientById(patient.id_patient);
+                    actions.getPatientById(formValue.id_patient);
                   }
                   if (["/dashboard", "/"].includes(location.pathname)) {
                     aptActions.getAppointmentByDoctor();
@@ -201,13 +207,12 @@ const AddEditPatientModal = ({ isAdd = true }) => {
     <>
       <Modal
         title={`${isAdd ? "Add" : "Update"} Patient`}
-        show={isPatientModalOpen}
+        show={open}
         onHide={() => {
           actions.setActiveTab(0);
-          actions.addEditPatientFormReset();
-          actions.setPatientModalOpen(false);
+          actions.setPatientModal({ open: false });
           if (!isAdd) {
-            actions.getPatientById(patient.id_patient);
+            actions.getPatientById(formValue.id_patient);
           }
         }}
         dialogClassName="modal-1030px"
