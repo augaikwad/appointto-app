@@ -42,11 +42,7 @@ const AddEditBillModal = () => {
 
   const submitCallback = (res) => {
     reset(initialState.billModal.formValue);
-    actions.getAllBillData({
-      id_doctor: res.id_doctor,
-      id_patient: res.id_patient,
-    });
-    actions.getBillSummary({
+    actions.getAllBillingDataAction({
       id_doctor: res.id_doctor,
       id_patient: res.id_patient,
       id_clinic: localStorage.getItem("id_clinic"),

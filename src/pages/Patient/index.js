@@ -1,14 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Tab, Row, Col, Nav } from "react-bootstrap";
 import { Card } from "../../components";
-import Profile from "./Profile";
-import Prescription from "./Prescription";
-import Billings from "./Billings";
+import { Profile, Prescription, Billings } from "./DetailsTab";
 import { createUseStyles } from "react-jss";
 import { useLocation } from "react-router-dom";
 import { PatientContext } from "../../context/Patient";
 import { BillingContext } from "../../context/Billing";
-import AddEditPatientModal from "../Patient/AddEditPatient/AddEditPatientModal";
 import AmountWithCurrancy from "../../components/AmountWithCurrancy";
 
 const useStyles = createUseStyles({
@@ -89,14 +86,11 @@ const Patient = () => {
   useEffect(() => {
     if (patientData === null) {
       actions.getPatientById(location.pathname.split("/")[2], (res) => {
-        let req = {
-          id_doctor: localStorage.getItem("id_doctor"),
+        billActions.getAllBillingDataAction({
+          id_doctor: parseInt(localStorage.getItem("id_doctor")),
           id_patient: res.id_patient,
           id_clinic: res.id_clinic,
-          totalBillAmount: 0,
-          balanceBillAmount: 0,
-        };
-        billActions.getBillSummary(req);
+        });
       });
     }
   }, [patientData]);

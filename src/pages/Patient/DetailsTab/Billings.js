@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Tab, Row, Col, Nav } from "react-bootstrap";
-import AddBill from "./Billing/AddBill";
-import PaymentReceived from "./Billing/PaymentReceived";
-import Bills from "./Billing/Bills";
+import { Tab, Nav } from "react-bootstrap";
+import AddBill from "../Billing/AddBill";
+import PaymentReceived from "../Billing/PaymentReceived";
+import Bills from "../Billing/Bills";
 import { createUseStyles } from "react-jss";
-import AddEditPaymentModal from "./Billing/AddEditPaymentModal";
-import AddEditBillModal from "./Billing/AddEditBillModal";
+import AddEditPaymentModal from "../Billing/AddEditPaymentModal";
+import AddEditBillModal from "../Billing/AddEditBillModal";
 
 const useStyles = createUseStyles({
   navItem: {

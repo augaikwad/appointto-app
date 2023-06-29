@@ -73,7 +73,11 @@ export const reducer = (globalState) => (state, action) => {
     case actionTypes.GET_ALL_BILL_DATA_LIST_SUCCESS:
       return { ...state, allBillData: action.payload };
     case actionTypes.GET_BILL_SUMMARY_SUCCESS:
-      return { ...state, billSummary: action.payload };
+      return {
+        ...state,
+        billSummary:
+          action.payload === null ? initialState.billSummary : action.payload,
+      };
     case actionTypes.SET_BILL_MODAL:
       let billModalData = action.billModal;
       if (!action.billModal.open) {
@@ -87,7 +91,10 @@ export const reducer = (globalState) => (state, action) => {
       }
       return { ...state, paymentModal: modalData };
     case actionTypes.GET_TRANSACTION_SUMMARY_SUCCESS:
-      return { ...state, transactionSummary: action.payload };
+      return {
+        ...state,
+        transactionSummary: action.payload === null ? [] : action.payload,
+      };
     default:
       return state;
   }
@@ -162,6 +169,35 @@ export const useActions = (state, dispatch) => ({
     dispatch({
       type: actionTypes.GET_TRANSACTION_SUMMARY,
       request: req,
+    });
+  },
+  getAllBillingDataAction: (req) => {
+    //calling Bill Summary
+    dispatch({
+      type: actionTypes.GET_BILL_SUMMARY,
+      request: {
+        id_doctor: req.id_doctor,
+        id_patient: req.id_patient,
+        id_clinic: req.id_clinic,
+      },
+    });
+
+    //Get All Bills
+    dispatch({
+      type: actionTypes.GET_ALL_BILL_DATA_LIST,
+      request: {
+        id_doctor: req.id_doctor,
+        id_patient: req.id_patient,
+      },
+    });
+
+    //Get Transaction summary
+    dispatch({
+      type: actionTypes.GET_TRANSACTION_SUMMARY,
+      request: {
+        id_doctor: req.id_doctor,
+        id_patient: req.id_patient,
+      },
     });
   },
 });

@@ -32,11 +32,7 @@ const AddEditPaymentModal = () => {
 
   const onSubmit = (data) => {
     actions.addPayment(data, () => {
-      actions.getAllBillData({
-        id_doctor: parseInt(localStorage.getItem("id_doctor")),
-        id_patient: patientData.id_patient,
-      });
-      actions.getBillSummary({
+      actions.getAllBillingDataAction({
         id_doctor: parseInt(localStorage.getItem("id_doctor")),
         id_patient: patientData.id_patient,
         id_clinic: patientData.id_clinic,

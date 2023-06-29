@@ -76,19 +76,10 @@ const Bills = () => {
   const classes = useStyles();
 
   const [state, actions] = useContext(BillingContext);
-  const { allBillData, billSummary } = state;
+  const { allBillData } = state;
 
   const [patientState, patientActions] = useContext(PatientContext);
   const { patientData } = patientState;
-
-  useEffect(() => {
-    if (patientData !== null && allBillData.length === 0) {
-      actions.getAllBillData({
-        id_doctor: parseInt(localStorage.getItem("id_doctor")),
-        id_patient: patientData.id_patient,
-      });
-    }
-  }, [patientData]);
 
   const getDateFormatted = (cell, row) => {
     return format(new Date(cell), "dd/MM/yyyy");

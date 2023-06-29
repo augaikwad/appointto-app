@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { createUseStyles } from "react-jss";
-import { PatientContext } from "../../context/Patient";
+import { PatientContext } from "../../../context/Patient";
 import moment from "moment";
 
 const useStyles = createUseStyles({

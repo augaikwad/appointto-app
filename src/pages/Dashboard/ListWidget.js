@@ -13,6 +13,7 @@ import { useHistory } from "react-router-dom";
 import { Tooltip } from "../../components";
 import { AppointmentContext } from "../../context/Appointment";
 import { PatientContext } from "../../context/Patient";
+import { BillingContext } from "../../context/Billing";
 
 const useStyles = createUseStyles({
   tr: {
@@ -50,6 +51,8 @@ const ListWidget = () => {
   const { appointmentList, appointmentStatusList } = state;
   const [patientState, patientActions] = useContext(PatientContext);
 
+  const [billState, billActions] = useContext(BillingContext);
+
   useEffect(() => {
     if (appointmentStatusList.length === 0) {
       actions.getAppointmentStatusList();
@@ -63,7 +66,12 @@ const ListWidget = () => {
   };
 
   const handleButtonClick = (patientId, tab) => {
-    patientActions.getPatientById(patientId, () => {
+    patientActions.getPatientById(patientId, (res) => {
+      billActions.getAllBillingDataAction({
+        id_doctor: parseInt(localStorage.getItem("id_doctor")),
+        id_patient: res.id_patient,
+        id_clinic: res.id_clinic,
+      });
       history.push({
         pathname: "/patient/" + patientId,
         state: {

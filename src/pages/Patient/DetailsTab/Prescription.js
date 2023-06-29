@@ -1,31 +1,31 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { Tooltip } from "../../components";
+import { Tooltip } from "../../../components";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Alert } from "react-bootstrap";
-import ComplaintsTags from "./components/ComplaintsTags";
-import ObservationTags from "./components/ObservationTags";
-import DiagnosisTags from "./components/DiagnosisTags";
-import WorkDoneTags from "./components/WorkDoneTags";
-import MedicinesTable from "./components/MedicinesTable";
-import InvestigationsTags from "./components/InvestigationsTags";
-import AdvicesTags from "./components/AdvicesTags";
-import LastVisits from "./components/LastVisits";
+import ComplaintsTags from "../components/ComplaintsTags";
+import ObservationTags from "../components/ObservationTags";
+import DiagnosisTags from "../components/DiagnosisTags";
+import WorkDoneTags from "../components/WorkDoneTags";
+import MedicinesTable from "../components/MedicinesTable";
+import InvestigationsTags from "../components/InvestigationsTags";
+import AdvicesTags from "../components/AdvicesTags";
+import LastVisits from "../components/LastVisits";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTooth } from "@fortawesome/free-solid-svg-icons";
-import AddNewVitalModal from "./components/AddNewVitalModal";
-import ToothChartModal from "./components/ToothChartModal";
+import AddNewVitalModal from "../components/AddNewVitalModal";
+import ToothChartModal from "../components/ToothChartModal";
 import {
   TextField,
   SelectField,
   DatePickerField,
-} from "../../components/Forms";
+} from "../../../components/Forms";
 import { useHistory } from "react-router-dom";
-import { PrescriptionContext } from "../../context/Prescription";
-import { PatientContext } from "../../context/Patient";
+import { PrescriptionContext } from "../../../context/Prescription";
+import { PatientContext } from "../../../context/Patient";
 import cogoToast from "cogo-toast";
-import PrescriptionPrint from "./components/PrescriptionPrint";
+import PrescriptionPrint from "../components/PrescriptionPrint";
 import { useReactToPrint } from "react-to-print";
-import { allowOnlyNumbers } from "../../utils/common";
+import { allowOnlyNumbers } from "../../../utils/common";
 import moment from "moment";
 
 const toastOption = { hideAfter: 5, position: "top-right" };

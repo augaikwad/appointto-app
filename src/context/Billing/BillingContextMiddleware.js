@@ -114,12 +114,14 @@ export const applyBillingContextMiddleware =
             .post(baseUrl + "Bill/GetBillSummary", action.request)
             .then((res) => {
               const { data } = res;
+              let payload = null;
               if (data.response_code === 2000) {
-                dispatch({
-                  type: actionTypes.GET_BILL_SUMMARY_SUCCESS,
-                  payload: data.payload,
-                });
+                payload = data.payload;
               }
+              dispatch({
+                type: actionTypes.GET_BILL_SUMMARY_SUCCESS,
+                payload: payload,
+              });
             })
             .catch((error) => {
               console.log("Service error === ", error);
@@ -157,12 +159,14 @@ export const applyBillingContextMiddleware =
             .post(baseUrl + "Bill/GetTransactionSummary", action.request)
             .then((res) => {
               const { data } = res;
+              let payload = [];
               if (data.response_code === 2000) {
-                dispatch({
-                  type: actionTypes.GET_TRANSACTION_SUMMARY_SUCCESS,
-                  payload: data.payload,
-                });
+                payload = data.payload;
               }
+              dispatch({
+                type: actionTypes.GET_TRANSACTION_SUMMARY_SUCCESS,
+                payload: payload,
+              });
             })
             .catch((error) => {
               console.log("Service error === ", error);
