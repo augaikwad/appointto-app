@@ -79,7 +79,7 @@ function Dashboard(props) {
   };
 
   return (
-    <div>
+    <div style={{ flex: 1 }}>
       <div className="row">
         <div className="col-12 col-xl-5 mb-4 mb-xl-0 grid-margin">
           <p className="card-description">

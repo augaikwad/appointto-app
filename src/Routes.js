@@ -8,10 +8,11 @@ const Signup = lazy(() => import("./pages/Doctor/Signup"));
 const Registration = lazy(() => import("./pages/Doctor/Registration"));
 const Dashboard = lazy(() => import("./pages/Dashboard/index"));
 const Patient = lazy(() => import("./pages/Patient/index"));
-const PatientsList = lazy(() => import("./pages/Patient/PatientsList"));
+const PatientsList = lazy(() => import("./pages/PatientList/index"));
 const AppointmentsList = lazy(() =>
   import("./pages/Appointment/AppointmentsList")
 );
+const Settings = lazy(() => import("./pages/Settings"));
 
 function Routes({ setIsFullPageLayout }) {
   const location = useLocation();
@@ -38,6 +39,7 @@ function Routes({ setIsFullPageLayout }) {
       <RouteGuard exact path="/patient/:id" component={Patient} />
       <RouteGuard exact path="/patients" component={PatientsList} />
       <RouteGuard exact path="/appointments" component={AppointmentsList} />
+      <RouteGuard exact path="/settings" component={Settings} />
       <Redirect to="/dashboard" />
     </Switch>
   );

@@ -1,12 +1,9 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Tab, Row, Col, Nav } from "react-bootstrap";
 import { Card } from "../../components";
-import { Profile, Prescription, Billings } from "./DetailsTab";
+import { PrescriptionSetting, Users } from "./Tabs";
 import { createUseStyles } from "react-jss";
-import { useLocation } from "react-router-dom";
-import { PatientContext } from "../../context/Patient";
-import { BillingContext } from "../../context/Billing";
-import AmountWithCurrancy from "../../components/AmountWithCurrancy";
+import { SettingsContext } from "../../context/Settings";
 
 const useStyles = createUseStyles({
   tabContent: {
@@ -59,68 +56,25 @@ const useStyles = createUseStyles({
   },
 });
 
-const History = () => {
-  return "History";
-};
+const Index = () => {
+  const [activeTab, setActiveTab] = useState(0);
 
-const Patient = () => {
   const classes = useStyles();
 
-  const [state, actions] = useContext(PatientContext);
-  const { patientData, profileActiveTab } = state;
-
-  const [billState, billActions] = useContext(BillingContext);
-  const { billSummary } = billState;
-
-  const location = useLocation();
-  const { selectedTab } = location.state;
-
-  const [activeTab, setActiveTab] = useState(selectedTab);
+  const [state, actions] = useContext(SettingsContext);
 
   useEffect(() => {
-    if (activeTab !== selectedTab) {
-      setActiveTab(selectedTab);
-    }
-  }, [selectedTab]);
-
-  useEffect(() => {
-    if (patientData === null) {
-      actions.getPatientById(location.pathname.split("/")[2], (res) => {
-        billActions.getAllBillingDataAction({
-          id_doctor: parseInt(localStorage.getItem("id_doctor")),
-          id_patient: res.id_patient,
-          id_clinic: res.id_clinic,
-        });
-      });
-    }
-  }, [patientData]);
-
+    actions.getPrintingSetting();
+  }, []);
+  console.log("state === ", state);
   const tabs = [
-    { name: "Profile", component: <Profile /> },
-    { name: "Prescription", component: <Prescription /> },
-    { name: "Billing", component: <Billings /> },
-    { name: "History", component: <History /> },
+    { name: "Users", component: <Users /> },
+    { name: "Prescription", component: <PrescriptionSetting /> },
   ];
 
   return (
     <div style={{ flex: 1 }}>
       <Card>
-        {patientData !== null && (
-          <div className={classes.header}>
-            <span className="pl-0 name">
-              {patientData.first_name} {patientData.last_name}
-            </span>
-            <span className="gender">{patientData.gender}</span>
-            <span className="age">{patientData.age}</span>
-            <span className="outstandingAmt no-border">
-              O/s Amount:{" "}
-              <b>
-                <AmountWithCurrancy amount={billSummary.balanceBillAmount} />
-              </b>
-            </span>
-          </div>
-        )}
-
         <div className="tab-pills-horizontal">
           <Tab.Container id="top-tabs-example" activeKey={activeTab}>
             <Row>
@@ -137,9 +91,7 @@ const Patient = () => {
                       >
                         <Nav.Link
                           eventKey={ind}
-                          className={`${classes.navLink} ${
-                            ind < activeTab ? "step-done" : ""
-                          }`}
+                          className={`${classes.navLink}`}
                         >
                           {tab.name}
                         </Nav.Link>
@@ -168,4 +120,4 @@ const Patient = () => {
   );
 };
 
-export default Patient;
+export default Index;

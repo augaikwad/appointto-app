@@ -29,6 +29,8 @@ export const actionTypes = {
   GET_GLOBAL_LIST_SUCCESS: "GET_GLOBAL_LIST_SUCCESS",
   SET_PATIENT_MODAL: "SET_PATIENT_MODAL",
   SET_TERMS_OPTIONS: "SET_TERMS_OPTIONS",
+  GET_PATIENTS_LIST: "GET_PATIENTS_LIST",
+  GET_PATIENTS_LIST_SUCCESS: "GET_PATIENTS_LIST_SUCCESS",
 };
 
 const initialState = {
@@ -81,6 +83,10 @@ const initialState = {
   isAptModalOpen: false,
   patientDocuments: null,
   globalPatientList: [],
+  patientListFilter: {
+    id_clinic: parseInt(localStorage.getItem("id_clinic")),
+  },
+  patientList: [],
 };
 
 export const reducer = (globalState) => (state, action) => {
@@ -123,6 +129,12 @@ export const reducer = (globalState) => (state, action) => {
     }
     case actionTypes.SET_TERMS_OPTIONS: {
       return { ...state, termsOptions: action.options };
+    }
+    case actionTypes.GET_PATIENTS_LIST_SUCCESS: {
+      return {
+        ...state,
+        patientList: action.payload === null ? [] : action.payload,
+      };
     }
     case actionTypes.default:
       return state;
@@ -212,6 +224,12 @@ export const useActions = (state, dispatch) => ({
     dispatch({
       type: actionTypes.SET_TERMS_OPTIONS,
       options: options,
+    });
+  },
+  getPatientsList: () => {
+    dispatch({
+      type: actionTypes.GET_PATIENTS_LIST,
+      filters: state.patientListFilter,
     });
   },
 });

@@ -7,10 +7,15 @@ const useStyles = createUseStyles({
   },
 });
 
-const Card = ({ title = null, titleClasses = "", children }) => {
+const Card = ({
+  title = null,
+  titleClasses = "",
+  className = "",
+  children,
+}) => {
   const classes = useStyles();
   return (
-    <div className={`card ${classes.card}`}>
+    <div className={`card ${classes.card} ${className}`}>
       <div className="card-body">
         {title !== null && (
           <p className={`card-title ${titleClasses}`}>{title}</p>

@@ -4,6 +4,7 @@ import { withRouter } from "react-router-dom";
 import withContext from "../../hoc/withContext";
 import { GlobalContext } from "../Global";
 import { applyAppointmentContextMiddleware } from "./AppointmentContextMiddleware";
+import { calendarDataFormatter } from "../../utils/common";
 
 export const AppointmentContext = createContext();
 
@@ -18,6 +19,9 @@ export const actionTypes = {
   GET_APPOINTMENT_STATUS_LIST: "GET_APPOINTMENT_STATUS_LIST",
   GET_APPOINTMENT_STATUS_LIST_SUCCESS: "GET_APPOINTMENT_STATUS_LIST_SUCCESS",
   SET_CAN_RESET_SEARCH_BOX: "SET_CAN_RESET_SEARCH_BOX",
+  GET_APPOINTMENTS_FOR_CALENDAR: "GET_APPOINTMENTS_FOR_CALENDAR",
+  GET_APPOINTMENTS_FOR_CALENDAR_SUCCESS:
+    "GET_APPOINTMENTS_FOR_CALENDAR_SUCCESS",
 };
 
 const initialState = {
@@ -49,6 +53,7 @@ const initialState = {
     appointment_status: "",
   },
   canResetSearchBox: false,
+  calendarList: [],
 };
 
 export const reducer = (globalState) => (state, action) => {
@@ -65,6 +70,8 @@ export const reducer = (globalState) => (state, action) => {
       return { ...state, appointmentStatusList: action.payload };
     case actionTypes.SET_CAN_RESET_SEARCH_BOX:
       return { ...state, canResetSearchBox: action.payload };
+    case actionTypes.GET_APPOINTMENTS_FOR_CALENDAR_SUCCESS:
+      return { ...state, calendarList: calendarDataFormatter(action.payload) };
     default:
       return state;
   }
@@ -128,6 +135,15 @@ export const useActions = (state, dispatch) => ({
     dispatch({
       type: actionTypes.SET_CAN_RESET_SEARCH_BOX,
       payload: val,
+    });
+  },
+  getAppointmentsForCalendar: (req) => {
+    dispatch({
+      type: actionTypes.GET_APPOINTMENTS_FOR_CALENDAR,
+      request: {
+        ...req,
+        id_doctor: parseInt(localStorage.getItem("id_doctor")),
+      },
     });
   },
 });

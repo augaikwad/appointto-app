@@ -22,6 +22,7 @@ import {
 import { useHistory } from "react-router-dom";
 import { PrescriptionContext } from "../../../context/Prescription";
 import { PatientContext } from "../../../context/Patient";
+import { SettingsContext } from "../../../context/Settings";
 import cogoToast from "cogo-toast";
 import PrescriptionPrint from "../components/PrescriptionPrint";
 import { useReactToPrint } from "react-to-print";
@@ -41,6 +42,12 @@ const Prescription = () => {
 
   const [patientState, patientActions] = useContext(PatientContext);
   const { patientData } = patientState;
+
+  const [settingsState, settingsActions] = useContext(SettingsContext);
+
+  useEffect(() => {
+    settingsActions.getPrintingSetting();
+  }, []);
 
   const form = useForm({
     defaultValues: {

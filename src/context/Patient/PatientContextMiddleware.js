@@ -190,6 +190,22 @@ export const applyPatientContextMiddleware =
             .catch((error) => {
               console.log("Service error === ", error);
             });
+        case actionTypes.GET_PATIENTS_LIST:
+          let queryString = new URLSearchParams(action.filters).toString();
+          return service
+            .get(baseUrl + "Patient/get-patient-list?" + queryString)
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                dispatch({
+                  type: actionTypes.GET_PATIENTS_LIST_SUCCESS,
+                  payload: data.payload,
+                });
+              }
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+            });
         default:
           dispatch(action);
       }

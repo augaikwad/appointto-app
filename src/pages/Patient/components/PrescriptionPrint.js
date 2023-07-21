@@ -3,12 +3,19 @@ import { PatientContext } from "../../../context/Patient";
 import { createUseStyles } from "react-jss";
 import moment from "moment";
 import RXImg from "../../../content/images/rx.png";
+import { SettingsContext } from "../../../context/Settings";
 
 const useStyles = createUseStyles({
   container: {
     background: "#fff",
     padding: "50px 70px",
     fontSize: 18,
+    "@media print": {
+      marginTop: (props) => `${props.hearder_margin}in`,
+      marginBottom: (props) => `${props.footer_margin}in`,
+      marginLeft: (props) => `${props.left_margin}in`,
+      marginRight: (props) => `${props.right_margin}in`,
+    },
   },
   header: {
     background: "#ebebeb",
@@ -73,7 +80,10 @@ const useStyles = createUseStyles({
 });
 
 const PrescriptionPrint = React.forwardRef(({ data }, ref) => {
-  const classes = useStyles();
+  const [settingsState, settingsActions] = useContext(SettingsContext);
+  const { prescriptionMargins } = settingsState;
+
+  const classes = useStyles(prescriptionMargins);
 
   const [patientState, patientActions] = useContext(PatientContext);
   const { patientData } = patientState;

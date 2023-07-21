@@ -10,6 +10,7 @@ import AuthContextProvider from "./context/Auth";
 import AppointmentContextProvider from "./context/Appointment";
 import PrescriptionContextProvider from "./context/Prescription";
 import BillingContextProvider from "./context/Billing";
+import SettingsContextProvider from "./context/Settings";
 
 import { setAuthToken } from "./helpers/setAuthToken";
 
@@ -41,21 +42,23 @@ function App(props) {
         )}
       </GlobalContext.Consumer>
       <AuthContextProvider>
-        <DoctorContextProvider>
-          <PatientContextProvider>
-            <AppointmentContextProvider>
-              <PrescriptionContextProvider>
-                <BillingContextProvider>
-                  <Suspense fallback={<Loader open={true} />}>
-                    <Layout isFullPageLayout={isFullPageLayout}>
-                      <Routes setIsFullPageLayout={setIsFullPageLayout} />
-                    </Layout>
-                  </Suspense>
-                </BillingContextProvider>
-              </PrescriptionContextProvider>
-            </AppointmentContextProvider>
-          </PatientContextProvider>
-        </DoctorContextProvider>
+        <SettingsContextProvider>
+          <DoctorContextProvider>
+            <PatientContextProvider>
+              <AppointmentContextProvider>
+                <PrescriptionContextProvider>
+                  <BillingContextProvider>
+                    <Suspense fallback={<Loader open={true} />}>
+                      <Layout isFullPageLayout={isFullPageLayout}>
+                        <Routes setIsFullPageLayout={setIsFullPageLayout} />
+                      </Layout>
+                    </Suspense>
+                  </BillingContextProvider>
+                </PrescriptionContextProvider>
+              </AppointmentContextProvider>
+            </PatientContextProvider>
+          </DoctorContextProvider>
+        </SettingsContextProvider>
       </AuthContextProvider>
     </GlobalContextProvider>
   );

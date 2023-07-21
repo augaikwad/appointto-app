@@ -129,7 +129,7 @@ class Sidebar extends Component {
               this.isPathActive("/settings") ? "nav-item active" : "nav-item"
             }
           >
-            <Link className="nav-link" to="/widgets">
+            <Link className="nav-link" to="/settings">
               {/* <img src={Setting} className="menu-icon" /> */}
               <i className="fa fa-cog menu-font-icon"></i>
               <span className="menu-title">Settings</span>

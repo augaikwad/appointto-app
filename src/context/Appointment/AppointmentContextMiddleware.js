@@ -103,6 +103,24 @@ export const applyAppointmentContextMiddleware =
             .catch((error) => {
               console.log("Service error === ", error);
             });
+        case actionTypes.GET_APPOINTMENTS_FOR_CALENDAR:
+          return service
+            .post(
+              baseUrl + "Appointment/get-appointment-for-calendar",
+              action.request
+            )
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                dispatch({
+                  type: actionTypes.GET_APPOINTMENTS_FOR_CALENDAR_SUCCESS,
+                  payload: data.payload,
+                });
+              }
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+            });
         default:
           dispatch(action);
       }
