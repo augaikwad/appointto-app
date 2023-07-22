@@ -26,12 +26,16 @@ export const applyAuthContextMiddleware =
                 if (action.request.keepMeSignIn) {
                 }
                 //set JWT token to local
-                localStorage.setItem("token", data.payload.token);
-                localStorage.setItem("id_doctor", data.payload.id_doctor);
-                localStorage.setItem("id_clinic", data.payload.id_clinic);
+                const { token, id_doctor, id_clinic, user_name, id_user } =
+                  data.payload;
+                localStorage.setItem("token", token);
+                localStorage.setItem("id_doctor", id_doctor);
+                localStorage.setItem("id_clinic", id_clinic);
+                localStorage.setItem("user_name", user_name);
+                localStorage.setItem("id_user", id_user);
 
                 //set token to axios common header
-                setAuthToken(data.payload.token);
+                setAuthToken(token);
                 history.push("/dashboard");
                 globalActions.setLoadingIndicator(false);
               } else {

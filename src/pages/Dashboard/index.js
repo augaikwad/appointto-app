@@ -22,6 +22,8 @@ function Dashboard(props) {
 
   const [doctorName, setDoctorName] = useState(null);
 
+  const id_doctor = parseInt(localStorage.getItem("id_doctor"));
+
   const counts = [
     { title: "Today's Queue", count: queueCount, icon: "ti-menu-alt" },
     {
@@ -46,15 +48,15 @@ function Dashboard(props) {
     );
   };
 
-  useEffect(() => {
-    if (doctorName === null && doctorsByClinicId.length > 0) {
-      let filteredList = doctorsByClinicId.filter(
-        (item) => parseInt(localStorage.getItem("id_doctor")) === item.id_doctor
-      );
-      const doctor = filteredList[0];
-      setDoctorName(`${doctor.first_name} ${doctor.last_name}`);
-    }
-  }, [doctorsByClinicId, doctorName]);
+  // useEffect(() => {
+  //   if (doctorName === null && doctorsByClinicId.length > 0) {
+  //     let filteredList = doctorsByClinicId.filter(
+  //       (item) => parseInt(localStorage.getItem("id_doctor")) === item.id_doctor
+  //     );
+  //     const doctor = filteredList[0];
+  //     setDoctorName(`${doctor.first_name} ${doctor.last_name}`);
+  //   }
+  // }, [doctorsByClinicId, doctorName]);
 
   const getGreetingTime = (m) => {
     var g = null; //return g
@@ -84,7 +86,10 @@ function Dashboard(props) {
         <div className="col-12 col-xl-5 mb-4 mb-xl-0 grid-margin">
           <p className="card-description">
             Hi, Good {getGreetingTime(moment())}!{" "}
-            <b>Dr. {!!doctorName && doctorName}</b>
+            <b>
+              {`${id_doctor !== 0 ? "Dr." : ""}`}
+              {localStorage.getItem("user_name")}
+            </b>
           </p>
         </div>
       </div>

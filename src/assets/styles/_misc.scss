@@ -18,11 +18,23 @@ body {
 .page-body-wrapper {
   min-height: calc(100vh - #{$navbar-height});
   padding-top: $navbar-height;
-  position: relative;
   @include display-flex();
   @include flex-direction(row);
   padding-left: 0;
   padding-right: 0;
+
+  &.app-page-wrapper{
+    position: relative;
+    .main-panel{
+      margin-left: 120px;
+      .content-wrapper{
+        display: flex;
+      }
+     }
+    .sidebar{
+      position: fixed;
+    }
+  }
 
   &.full-page-wrapper {
     min-height: 100vh;
@@ -44,7 +56,6 @@ body {
   transition: width $action-transition-duration $action-transition-timing-function, margin $action-transition-duration $action-transition-timing-function;
   // width: calc(100% - #{$sidebar-width-lg});
   width: calc(100% - 120px);
-  margin-left: 120px;
   min-height: calc(100vh - #{$navbar-height});
   @include display-flex();
   @include flex-direction(column);
@@ -61,7 +72,6 @@ body {
   background: $content-bg;
   padding: 2.68rem 2.5rem;
   width: 100%;
-  display: flex;
   @include flex-grow(1);
   @media(max-width: 767px) {
     padding: 1.5rem 1.5rem;

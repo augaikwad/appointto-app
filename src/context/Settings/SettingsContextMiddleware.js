@@ -77,6 +77,21 @@ export const applySettingsContextMiddleware =
               console.log("Service error === ", error);
               globalActions.setLoadingIndicator(false);
             });
+        case actionTypes.GET_USER_ROLES:
+          return service
+            .post(baseUrl + "Registration/get_roles")
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                dispatch({
+                  type: actionTypes.GET_USER_ROLES_SUCCESS,
+                  payload: data.payload,
+                });
+              }
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+            });
         default:
           dispatch(action);
       }

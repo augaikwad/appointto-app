@@ -43,8 +43,12 @@ const ListFilters = () => {
 
   useEffect(() => {
     drActions.getDoctorsByClinicId(localStorage.getItem("id_clinic"), () => {
-      setValue("id_doctor", localStorage.getItem("id_doctor"));
-      actions.setFilters({ id_doctor: localStorage.getItem("id_doctor") });
+      let idDoctor = parseInt(localStorage.getItem("id_doctor"));
+      if (parseInt(localStorage.getItem("id_doctor")) === 0) {
+        idDoctor = doctorsByClinicId[0].id_doctor;
+      }
+      setValue("id_doctor", idDoctor);
+      actions.setFilters({ id_doctor: idDoctor });
     });
   }, []);
 

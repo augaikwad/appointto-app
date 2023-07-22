@@ -83,11 +83,15 @@ const PatientList = () => {
 
   const [, actions] = useContext(AppointmentContext);
   const [patientState, patientActions] = useContext(PatientContext);
-  const { patientList } = patientState;
+  const { patientList, patientListFilter } = patientState;
   const [, billActions] = useContext(BillingContext);
-  console.log("patientList == ", patientList);
+  console.log("patientList == ", patientList, patientListFilter);
+
   useEffect(() => {
-    patientActions.getPatientsList();
+    patientActions.getPatientsList({
+      ...patientListFilter,
+      id_clinic: parseInt(localStorage.getItem("id_clinic")),
+    });
   }, []);
 
   const handleButtonClick = (patientId, tab) => {

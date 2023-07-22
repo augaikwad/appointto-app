@@ -31,6 +31,7 @@ export const actionTypes = {
   SET_TERMS_OPTIONS: "SET_TERMS_OPTIONS",
   GET_PATIENTS_LIST: "GET_PATIENTS_LIST",
   GET_PATIENTS_LIST_SUCCESS: "GET_PATIENTS_LIST_SUCCESS",
+  SET_PATIENTS_LIST_FILTERS: "SET_PATIENTS_LIST_FILTERS",
 };
 
 const initialState = {
@@ -136,6 +137,12 @@ export const reducer = (globalState) => (state, action) => {
         patientList: action.payload === null ? [] : action.payload,
       };
     }
+    case actionTypes.SET_PATIENTS_LIST_FILTERS: {
+      return {
+        ...state,
+        patientListFilter: action.filters,
+      };
+    }
     case actionTypes.default:
       return state;
   }
@@ -226,10 +233,14 @@ export const useActions = (state, dispatch) => ({
       options: options,
     });
   },
-  getPatientsList: () => {
+  getPatientsList: (filters) => {
     dispatch({
       type: actionTypes.GET_PATIENTS_LIST,
-      filters: state.patientListFilter,
+      filters: filters,
+    });
+    dispatch({
+      type: actionTypes.SET_PATIENTS_LIST_FILTERS,
+      filters: filters,
     });
   },
 });

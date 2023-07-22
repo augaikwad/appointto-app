@@ -7,11 +7,15 @@ function Layout({ isFullPageLayout = false, children }) {
   let sidebarComponent = !isFullPageLayout ? <Sidebar /> : "";
 
   return (
-    <div className="container-scroller">
+    <div
+      className={`container-scroller ${
+        isFullPageLayout ? "full-page-container" : "app-page-container"
+      }`}
+    >
       {navbarComponent}
       <div
         className={`container-fluid page-body-wrapper ${
-          isFullPageLayout ? "full-page-wrapper" : ""
+          isFullPageLayout ? "full-page-wrapper" : "app-page-wrapper"
         }`}
       >
         {sidebarComponent}

@@ -12,6 +12,9 @@ export const actionTypes = {
   GET_PRINTING_SETTING_SUCCESS: "GET_PRINTING_SETTING_SUCCESS",
   ADD_PRINTING_SETTING: "ADD_PRINTING_SETTING",
   UPDATE_PRINTING_SETTING: "UPDATE_PRINTING_SETTING",
+  SET_ADD_EDIT_USER_MODAL: "SET_ADD_EDIT_USER_MODAL",
+  GET_USER_ROLES: "GET_USER_ROLES",
+  GET_USER_ROLES_SUCCESS: "GET_USER_ROLES_SUCCESS",
 };
 
 const initialState = {
@@ -21,6 +24,13 @@ const initialState = {
     left_margin: 0,
     right_margin: 0,
   },
+  addEditUserModal: {
+    isAdd: true,
+    formData: {},
+    open: false,
+    step: 0,
+  },
+  userRoles: [],
 };
 
 export const reducer = (globalState) => (state, action) => {
@@ -29,6 +39,21 @@ export const reducer = (globalState) => (state, action) => {
       return {
         ...state,
         prescriptionMargins: action.payload,
+      };
+    }
+    case actionTypes.SET_ADD_EDIT_USER_MODAL: {
+      if (!action.modalData.open) {
+        return {
+          ...state,
+          addEditUserModal: initialState.addEditUserModal,
+        };
+      }
+      return { ...state, addEditUserModal: action.modalData };
+    }
+    case actionTypes.GET_USER_ROLES_SUCCESS: {
+      return {
+        ...state,
+        userRoles: action.payload,
       };
     }
     default:
@@ -54,6 +79,17 @@ export const useActions = (state, dispatch) => ({
       type: actionTypes.UPDATE_PRINTING_SETTING,
       request: req,
       callback: callback,
+    });
+  },
+  setAddEditUserModal: (opt) => {
+    dispatch({
+      type: actionTypes.SET_ADD_EDIT_USER_MODAL,
+      modalData: { ...state.addEditUserModal, ...opt },
+    });
+  },
+  getUserRoles: () => {
+    dispatch({
+      type: actionTypes.GET_USER_ROLES,
     });
   },
 });
