@@ -92,6 +92,28 @@ export const applySettingsContextMiddleware =
             .catch((error) => {
               console.log("Service error === ", error);
             });
+        case actionTypes.GET_USERS:
+          globalActions.setLoadingIndicator(true);
+          return service
+            .get(
+              baseUrl +
+                "Doctor/get_clinic_user_list?id_clinic=" +
+                parseInt(localStorage.getItem("id_clinic"))
+            )
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                dispatch({
+                  type: actionTypes.GET_USERS_SUCCESS,
+                  payload: data.payload,
+                });
+              }
+              globalActions.setLoadingIndicator(false);
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+              globalActions.setLoadingIndicator(false);
+            });
         default:
           dispatch(action);
       }

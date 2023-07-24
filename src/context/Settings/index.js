@@ -15,6 +15,8 @@ export const actionTypes = {
   SET_ADD_EDIT_USER_MODAL: "SET_ADD_EDIT_USER_MODAL",
   GET_USER_ROLES: "GET_USER_ROLES",
   GET_USER_ROLES_SUCCESS: "GET_USER_ROLES_SUCCESS",
+  GET_USERS: "GET_USERS",
+  GET_USERS_SUCCESS: "GET_USERS_SUCCESS",
 };
 
 const initialState = {
@@ -26,7 +28,9 @@ const initialState = {
   },
   addEditUserModal: {
     isAdd: true,
-    formData: {},
+    formData: {
+      userType: "staff",
+    },
     open: false,
     step: 0,
   },
@@ -90,6 +94,11 @@ export const useActions = (state, dispatch) => ({
   getUserRoles: () => {
     dispatch({
       type: actionTypes.GET_USER_ROLES,
+    });
+  },
+  getUsers: () => {
+    dispatch({
+      type: actionTypes.GET_USERS,
     });
   },
 });

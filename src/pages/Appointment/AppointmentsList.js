@@ -18,6 +18,14 @@ const useStyles = createUseStyles({
       flexDirection: "column",
     },
   },
+  rbcToolbarButton: {
+    "&.btn-primary": {
+      background: "#248afd !important",
+      color: "#fff !important",
+      backgroundColor: "#0276f8 !important",
+      borderColor: "#0270ec !important",
+    },
+  },
 });
 
 const AppointmentsList = () => {
@@ -28,7 +36,7 @@ const AppointmentsList = () => {
 
   const [calendarView, setCalendarView] = useState("month");
   const [calendarDate, setCalendarDate] = useState(new Date());
-  console.log("calendarList == ", calendarList);
+  console.log("calendarList == ", calendarList, calendarView, calendarDate);
 
   const getDateRange = (view, date) => {
     let range = "";
@@ -71,6 +79,13 @@ const AppointmentsList = () => {
     );
   };
 
+  const viewButtons = [{ name: "Month" }, { name: "Week" }, { name: "Day" }];
+  const navigationButtons = [
+    { name: "Today" },
+    { name: "Prev" },
+    { name: "Next" },
+  ];
+
   const CustomToolbar = ({ label, onNavigate, onView }) => {
     const handleCustomButtonClick = () => {
       // Handle custom button click event
@@ -79,24 +94,59 @@ const AppointmentsList = () => {
 
     return (
       <div className="rbc-toolbar">
-        <div className="rbc-btn-group">
-          <button type="button" onClick={handleCustomButtonClick}>
+        {/* <div className="rbc-btn-group">
+          <button
+            type="button"
+            className={`btn btn-sm`}
+            onClick={handleCustomButtonClick}
+          >
             Custom Button
           </button>
-        </div>
-        <div className="rbc-btn-group">
-          <button type="button" onClick={() => onNavigate("TODAY")}>
-            Today
-          </button>
-          <button type="button" onClick={() => onNavigate("PREV")}>
-            Prev
-          </button>
-          <button type="button" onClick={() => onNavigate("NEXT")}>
-            Next
-          </button>
+        </div> */}
+        <div
+          className={`rbc-btn-group btn-group`}
+          role="group"
+          aria-label="Navigation buttons"
+        >
+          {navigationButtons.map((btn, ind) => {
+            const btnName = btn.name.toUpperCase();
+            return (
+              <button
+                key={ind}
+                type="button"
+                className={`btn btn-sm`}
+                onClick={() => onNavigate(btnName)}
+              >
+                {btn.name}
+              </button>
+            );
+          })}
         </div>
         <div className="rbc-toolbar-label">{label}</div>
-        <div className="rbc-btn-group">
+        <div
+          className={`rbc-btn-group btn-group`}
+          role="group"
+          aria-label="View buttons"
+        >
+          {viewButtons.map((btn, ind) => {
+            const btnName = btn.name.toLowerCase();
+            return (
+              <button
+                key={ind}
+                type="button"
+                className={`btn btn-sm ${classes.rbcToolbarButton} ${
+                  btnName === calendarView
+                    ? "btn-primary"
+                    : "btn-outline-secondary"
+                }`}
+                onClick={() => onView(btnName)}
+              >
+                {btn.name}
+              </button>
+            );
+          })}
+        </div>
+        {/* <div className="rbc-btn-group">
           <button type="button" onClick={() => onView("month")}>
             Month
           </button>
@@ -106,7 +156,7 @@ const AppointmentsList = () => {
           <button type="button" onClick={() => onView("day")}>
             Day
           </button>
-        </div>
+        </div> */}
       </div>
     );
   };

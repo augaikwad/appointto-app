@@ -66,7 +66,7 @@ const Index = () => {
   useEffect(() => {
     actions.getPrintingSetting();
   }, []);
-  console.log("state === ", state);
+
   const tabs = [
     { name: "Users", component: <Users /> },
     { name: "Prescription", component: <PrescriptionSetting /> },

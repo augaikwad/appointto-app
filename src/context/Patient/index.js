@@ -86,8 +86,14 @@ const initialState = {
   globalPatientList: [],
   patientListFilter: {
     id_clinic: parseInt(localStorage.getItem("id_clinic")),
+    Keywords: "",
+    start_record: 1,
+    end_record: 10,
   },
-  patientList: [],
+  patientList: {
+    count: 0,
+    item: [],
+  },
 };
 
 export const reducer = (globalState) => (state, action) => {
@@ -116,7 +122,7 @@ export const reducer = (globalState) => (state, action) => {
       return { ...state, appointmentForm: appointmentForm };
     }
     case actionTypes.GET_GLOBAL_LIST_SUCCESS: {
-      return { ...state, globalPatientList: action.payload };
+      return { ...state, globalPatientList: action.payload.item };
     }
     case actionTypes.SET_PATIENT_MODAL: {
       if (!action.modalData.open) {
@@ -222,9 +228,10 @@ export const useActions = (state, dispatch) => ({
       payload: formData,
     });
   },
-  getGlobalList: () => {
+  getGlobalList: (Keyword) => {
     dispatch({
       type: actionTypes.GET_GLOBAL_LIST,
+      Keyword: Keyword,
     });
   },
   setTermsOptions: (options) => {

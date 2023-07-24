@@ -172,12 +172,15 @@ export const applyPatientContextMiddleware =
               globalActions.setLoadingIndicator(false);
             });
         case actionTypes.GET_GLOBAL_LIST:
+          const params = {
+            id_clinic: localStorage.getItem("id_clinic"),
+            Keywords: action.Keyword,
+            start_record: 1,
+            end_record: 10,
+          };
+          let getPatientQueryString = new URLSearchParams(params).toString();
           return service
-            .get(
-              baseUrl +
-                "Patient/get-patient-list?id_clinic=" +
-                localStorage.getItem("id_clinic")
-            )
+            .get(baseUrl + "Patient/get-patient-list?" + getPatientQueryString)
             .then((res) => {
               const { data } = res;
               if (data.response_code === 2000) {
@@ -191,6 +194,7 @@ export const applyPatientContextMiddleware =
               console.log("Service error === ", error);
             });
         case actionTypes.GET_PATIENTS_LIST:
+          globalActions.setLoadingIndicator(true);
           let queryString = new URLSearchParams(action.filters).toString();
           return service
             .get(baseUrl + "Patient/get-patient-list?" + queryString)
@@ -202,9 +206,11 @@ export const applyPatientContextMiddleware =
                   payload: data.payload,
                 });
               }
+              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
+              globalActions.setLoadingIndicator(false);
             });
         default:
           dispatch(action);

@@ -85,11 +85,16 @@ const PatientList = () => {
   const [patientState, patientActions] = useContext(PatientContext);
   const { patientList, patientListFilter } = patientState;
   const [, billActions] = useContext(BillingContext);
-  console.log("patientList == ", patientList, patientListFilter);
 
-  useEffect(() => {
+  const handleGetPatientList = (opt) => {
     patientActions.getPatientsList({
       ...patientListFilter,
+      ...opt,
+    });
+  };
+
+  useEffect(() => {
+    handleGetPatientList({
       id_clinic: parseInt(localStorage.getItem("id_clinic")),
     });
   }, []);
@@ -131,7 +136,8 @@ const PatientList = () => {
   };
 
   const handleDebounceChange = debounce((e) => {
-    console.log("handleDebounceChange === ", e.target.value);
+    const { name, value } = e.target;
+    handleGetPatientList({ [name]: value });
   }, 1000);
 
   return (
@@ -141,21 +147,11 @@ const PatientList = () => {
           <FormProvider {...form}>
             <form onSubmit={handleSubmit(filterList)}>
               <Row>
-                <Col lg={2}>
+                <Col lg={3}>
                   <TextField
-                    name="patientName"
-                    label="Patient Name"
-                    onChange={handleDebounceChange}
-                  />
-                </Col>
-                <Col lg={2}>
-                  <TextField name="doctorName" label="Doctor Name" />
-                </Col>
-                <Col lg={2}>
-                  <TextField
-                    name="mobileNumber"
-                    type="number"
-                    label="Mobile Number"
+                    name="Keywords"
+                    label="Search Patient"
+                    placeholder="Enter Name or Mobile number"
                     onChange={handleDebounceChange}
                   />
                 </Col>
@@ -166,15 +162,15 @@ const PatientList = () => {
         <div className={`table-responsive ${classes.ListContainer}`}>
           <table className="table table-borderless">
             <tbody>
-              {patientList.length === 0 && (
+              {patientList.item.length === 0 && (
                 <tr key="NoRecords">
                   <td style={{ textAlign: "center", fontWeight: "500" }}>
                     No Patients Found
                   </td>
                 </tr>
               )}
-              {patientList.length > 0 &&
-                patientList.map((item, ind) => {
+              {patientList.item.length > 0 &&
+                patientList.item.map((item, ind) => {
                   return (
                     <tr key={item.id_patient} className={classes.tr}>
                       <td className={`text-center ${classes.td}`} width="30px">

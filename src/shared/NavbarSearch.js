@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useRef } from "react";
-import { Typeahead } from "react-bootstrap-typeahead";
+import { Typeahead, AsyncTypeahead } from "react-bootstrap-typeahead";
 import { createUseStyles } from "react-jss";
 import CreateAppointmentModal from "../pages/Patient/CreateAppointmentModal";
 import AddEditPatientModal from "../pages/Patient/AddEditPatient/AddEditPatientModal";
 import { PatientContext } from "../context/Patient";
 import { AppointmentContext } from "../context/Appointment";
 import moment from "moment";
+import { debounce } from "lodash";
 
 const useStyles = createUseStyles({
   customMenuItem: {
@@ -22,17 +23,20 @@ const NavbarSearch = () => {
   const ref = useRef();
   const [state, actions] = useContext(PatientContext);
   const { globalPatientList } = state;
-
   const [aptState, aptActions] = useContext(AppointmentContext);
   const { appointmentForm, canResetSearchBox } = aptState;
 
-  useEffect(() => {
-    actions.getGlobalList();
-  }, []);
+  // useEffect(() => {
+  //   actions.getGlobalList();
+  // }, []);
+
+  const handleDebounceChange = debounce((val) => {
+    actions.getGlobalList(val);
+  }, 1000);
 
   useEffect(() => {
     if (canResetSearchBox) {
-      ref.current?.clear();
+      // ref.current?.clear();
       aptActions.setCanResetSearchBox(false);
     }
   }, [canResetSearchBox]);
@@ -48,13 +52,13 @@ const NavbarSearch = () => {
             <i className="ti-search"></i>
           </span>
         </div>
-        <Typeahead
+        <AsyncTypeahead
           labelKey="patient_name"
           filterBy={["patient_name", "mobile_number"]}
           id="globalSearch"
           name="globalSearch"
-          // minLength={3}
-          options={globalPatientList}
+          onSearch={handleDebounceChange}
+          options={globalPatientList || []}
           renderMenuItemChildren={(option, props, index) => {
             return (
               <div className={classes.customMenuItem} key={index}>
@@ -70,7 +74,7 @@ const NavbarSearch = () => {
                     req.reason = "Consultation";
 
                     aptActions.createAppointment(req, () => {
-                      ref.current?.clear();
+                      // ref.current?.clear();
                       aptActions.getAppointmentByDoctor();
                     });
                   }}
