@@ -17,6 +17,8 @@ export const actionTypes = {
   GET_USER_ROLES_SUCCESS: "GET_USER_ROLES_SUCCESS",
   GET_USERS: "GET_USERS",
   GET_USERS_SUCCESS: "GET_USERS_SUCCESS",
+  REGISTER_USER: "REGISTER_USER",
+  REGISTER_DOCTOR: "REGISTER_DOCTOR",
 };
 
 const initialState = {
@@ -29,7 +31,9 @@ const initialState = {
   addEditUserModal: {
     isAdd: true,
     formData: {
-      userType: "staff",
+      countryCode: "91",
+      termsAccepted: 1,
+      id_clinic: parseInt(localStorage.getItem("id_clinic")),
     },
     open: false,
     step: 0,
@@ -99,6 +103,20 @@ export const useActions = (state, dispatch) => ({
   getUsers: () => {
     dispatch({
       type: actionTypes.GET_USERS,
+    });
+  },
+  registerUser: (req, callback) => {
+    dispatch({
+      type: actionTypes.REGISTER_USER,
+      request: req,
+      callback: callback,
+    });
+  },
+  registerDoctor: (req, callback) => {
+    dispatch({
+      type: actionTypes.REGISTER_DOCTOR,
+      request: req,
+      callback: callback,
     });
   },
 });

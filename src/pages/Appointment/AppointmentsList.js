@@ -36,7 +36,6 @@ const AppointmentsList = () => {
 
   const [calendarView, setCalendarView] = useState("month");
   const [calendarDate, setCalendarDate] = useState(new Date());
-  console.log("calendarList == ", calendarList, calendarView, calendarDate);
 
   const getDateRange = (view, date) => {
     let range = "";

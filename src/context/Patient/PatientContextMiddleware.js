@@ -121,11 +121,6 @@ export const applyPatientContextMiddleware =
               if (action.onUploadProgress) {
                 action.onUploadProgress(progressEvent);
               }
-
-              // let percentCompleted = Math.round(
-              //   (progressEvent.loaded * 100) / progressEvent.total
-              // );
-              // console.log(percentCompleted);
             },
             headers: {
               "content-type": "multipart/form-data",

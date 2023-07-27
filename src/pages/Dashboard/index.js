@@ -4,7 +4,6 @@ import { Card } from "../../components";
 import ListFilters from "./ListFilters";
 import ListWidget from "./ListWidget";
 import { AppointmentContext } from "../../context/Appointment";
-import { DoctorContext } from "../../context/Doctor";
 import moment from "moment";
 
 function Dashboard(props) {
@@ -16,11 +15,6 @@ function Dashboard(props) {
     queueCount,
     totalCount,
   } = state;
-
-  const [drState, drActions] = useContext(DoctorContext);
-  const { doctorsByClinicId } = drState;
-
-  const [doctorName, setDoctorName] = useState(null);
 
   const id_doctor = parseInt(localStorage.getItem("id_doctor"));
 
@@ -47,16 +41,6 @@ function Dashboard(props) {
       </Card>
     );
   };
-
-  // useEffect(() => {
-  //   if (doctorName === null && doctorsByClinicId.length > 0) {
-  //     let filteredList = doctorsByClinicId.filter(
-  //       (item) => parseInt(localStorage.getItem("id_doctor")) === item.id_doctor
-  //     );
-  //     const doctor = filteredList[0];
-  //     setDoctorName(`${doctor.first_name} ${doctor.last_name}`);
-  //   }
-  // }, [doctorsByClinicId, doctorName]);
 
   const getGreetingTime = (m) => {
     var g = null; //return g

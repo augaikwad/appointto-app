@@ -270,7 +270,7 @@ export const applyDoctorContextMiddleware =
                   payload: data.payload,
                 });
                 if (action.callback) {
-                  action.callback();
+                  action.callback(data.payload);
                 }
               } else {
                 cogoToast.error(data.message, toastOption);

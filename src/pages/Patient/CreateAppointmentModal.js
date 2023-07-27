@@ -5,9 +5,11 @@ import {
   TextField,
   DateTimePickerField,
   DatePickerField,
+  SelectField,
 } from "../../components/Forms";
 import { useForm, FormProvider } from "react-hook-form";
 import { AppointmentContext } from "../../context/Appointment";
+import { DoctorContext } from "../../context/Doctor";
 import moment from "moment";
 import { Button } from "react-bootstrap";
 
@@ -35,6 +37,8 @@ const formattedFormData = (data) => {
 
 const CreateAppointmentModal = () => {
   const location = useLocation();
+  const [drState, drActions] = useContext(DoctorContext);
+  const { doctorsByClinicId } = drState;
 
   const [state, actions] = useContext(AppointmentContext);
   const { appointmentForm } = state;
@@ -49,6 +53,21 @@ const CreateAppointmentModal = () => {
   useEffect(() => {
     reset(formattedFormData(appointmentForm));
   }, [appointmentForm]);
+
+  useEffect(() => {
+    drActions.getDoctorsByClinicId(
+      localStorage.getItem("id_clinic"),
+      (docList) => {
+        if (isAdd) {
+          let idDoctor = parseInt(localStorage.getItem("id_doctor"));
+          if (idDoctor === 0) {
+            idDoctor = docList[0].id_doctor;
+          }
+          setValue("id_doctor", idDoctor);
+        }
+      }
+    );
+  }, []);
 
   const callback = () => {
     actions.resetAppointmentForm();
@@ -104,6 +123,18 @@ const CreateAppointmentModal = () => {
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="row">
+            <div className="col-lg-12">
+              <SelectField
+                label="Select Doctor"
+                name="id_doctor"
+                labelField="first_name"
+                valueField="id_doctor"
+                options={doctorsByClinicId}
+                optionRenderer={(opt) =>
+                  `Dr. ${opt?.first_name} ${opt?.last_name}`
+                }
+              />
+            </div>
             <div className="col-lg-6">
               <DatePickerField
                 label="Date"

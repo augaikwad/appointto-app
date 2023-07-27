@@ -10,12 +10,10 @@ const PrescriptionSetting = () => {
 
   const form = useForm({ defaultValues: prescriptionMargins });
   const { handleSubmit, reset } = form;
-  console.log("PrescriptionSetting === ", state);
   const onSubmit = (formData) => {
     let request = { ...formData };
     request.id_doctor = parseInt(localStorage.getItem("id_doctor"));
     request.id_clinic = parseInt(localStorage.getItem("id_clinic"));
-    console.log("onSubmit === ", request);
     if (request.hasOwnProperty("id")) {
       actions.updatePrintingSetting(request);
     } else {

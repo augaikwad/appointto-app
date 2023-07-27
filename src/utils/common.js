@@ -19,7 +19,6 @@ export const getWeekRange = (date) => {
 };
 
 export const getMonthRange = (date) => {
-  console.log("getMonthRange === ", date);
   const startOfMonth = moment(date).startOf("month").toDate();
   const endOfMonth = moment(date).endOf("month").toDate();
   return {
@@ -43,7 +42,6 @@ export const calendarDataFormatter = (data) => {
     const aptDate = moment(event.date);
     event.start = clonedDate(aptDate, event.start_time);
     event.end = clonedDate(aptDate, event.end_time);
-    // console.log("calendarDataFormatter === ", event);
     return event;
   });
   return formattedData;

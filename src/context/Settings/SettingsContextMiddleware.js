@@ -114,6 +114,40 @@ export const applySettingsContextMiddleware =
               console.log("Service error === ", error);
               globalActions.setLoadingIndicator(false);
             });
+        case actionTypes.REGISTER_USER:
+          globalActions.setLoadingIndicator(true);
+          return service
+            .post(baseUrl + "Registration/register-user-clinc", action.request)
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                if (action.callback) {
+                  action.callback();
+                }
+              }
+              globalActions.setLoadingIndicator(false);
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+              globalActions.setLoadingIndicator(false);
+            });
+        case actionTypes.REGISTER_DOCTOR:
+          globalActions.setLoadingIndicator(true);
+          return service
+            .post(baseUrl + "Doctor/create_clinic_doctor", action.request)
+            .then((res) => {
+              const { data } = res;
+              if (data.response_code === 2000) {
+                if (action.callback) {
+                  action.callback();
+                }
+              }
+              globalActions.setLoadingIndicator(false);
+            })
+            .catch((error) => {
+              console.log("Service error === ", error);
+              globalActions.setLoadingIndicator(false);
+            });
         default:
           dispatch(action);
       }

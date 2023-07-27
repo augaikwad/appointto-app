@@ -42,14 +42,17 @@ const ListFilters = () => {
   const { setValue, getValues } = form;
 
   useEffect(() => {
-    drActions.getDoctorsByClinicId(localStorage.getItem("id_clinic"), () => {
-      let idDoctor = parseInt(localStorage.getItem("id_doctor"));
-      if (parseInt(localStorage.getItem("id_doctor")) === 0) {
-        idDoctor = doctorsByClinicId[0].id_doctor;
+    drActions.getDoctorsByClinicId(
+      parseInt(localStorage.getItem("id_clinic")),
+      (docList) => {
+        let idDoctor = parseInt(localStorage.getItem("id_doctor"));
+        if (idDoctor === 0) {
+          idDoctor = docList[0].id_doctor;
+        }
+        setValue("id_doctor", idDoctor);
+        actions.setFilters({ id_doctor: idDoctor });
       }
-      setValue("id_doctor", idDoctor);
-      actions.setFilters({ id_doctor: idDoctor });
-    });
+    );
   }, []);
 
   const filterList = (name, value) => {

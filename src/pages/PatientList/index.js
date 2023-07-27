@@ -21,6 +21,7 @@ import { BillingContext } from "../../context/Billing";
 import { FormProvider, useForm } from "react-hook-form";
 import moment from "moment";
 import { debounce } from "lodash";
+import ListPagination from "../../components/ListPagination";
 
 const useStyles = createUseStyles({
   ListContainer: {
@@ -67,6 +68,13 @@ const useStyles = createUseStyles({
     padding: 0,
     fontWeight: 600,
   },
+  filterContainer: {
+    display: "flex",
+    alignItems: "center",
+    "& > form": {
+      flex: 1,
+    },
+  },
 });
 
 const PatientList = () => {
@@ -75,11 +83,6 @@ const PatientList = () => {
   const history = useHistory();
 
   const form = useForm();
-  const { handleSubmit } = form;
-
-  const filterList = (formData) => {
-    console.log("onSubmit === ", formData);
-  };
 
   const [, actions] = useContext(AppointmentContext);
   const [patientState, patientActions] = useContext(PatientContext);
@@ -143,9 +146,9 @@ const PatientList = () => {
   return (
     <div style={{ flex: 1 }}>
       <Card>
-        <div className="list-filters">
+        <div className={`list-filters ${classes.filterContainer}`}>
           <FormProvider {...form}>
-            <form onSubmit={handleSubmit(filterList)}>
+            <form>
               <Row>
                 <Col lg={3}>
                   <TextField
@@ -158,6 +161,16 @@ const PatientList = () => {
               </Row>
             </form>
           </FormProvider>
+          <div>
+            <ListPagination
+              totalCount={patientList.count}
+              start={patientListFilter.start_record}
+              end={patientListFilter.end_record}
+              onPaginationChange={(range) => {
+                handleGetPatientList(range);
+              }}
+            />
+          </div>
         </div>
         <div className={`table-responsive ${classes.ListContainer}`}>
           <table className="table table-borderless">
