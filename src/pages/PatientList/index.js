@@ -140,7 +140,7 @@ const PatientList = () => {
 
   const handleDebounceChange = debounce((e) => {
     const { name, value } = e.target;
-    handleGetPatientList({ [name]: value });
+    handleGetPatientList({ [name]: value, start_record: 1, end_record: 10 });
   }, 1000);
 
   return (

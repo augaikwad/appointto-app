@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pagination } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 
@@ -27,6 +27,10 @@ const getPageRange = (currentPage, itemsPerPage, totalCount) => {
   };
 };
 
+const getPageFromStartEndIndices = (startIndex, itemsPerPage) => {
+  return Math.floor(startIndex / itemsPerPage) + 1;
+};
+
 const ListPagination = ({
   totalCount = 0,
   start,
@@ -36,7 +40,16 @@ const ListPagination = ({
 }) => {
   const totalPages = getTotalPages(totalCount, itemsPerPage);
   const classes = useStyles();
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(
+    getPageFromStartEndIndices(start, itemsPerPage)
+  );
+
+  useEffect(() => {
+    const pageFromSartEnd = getPageFromStartEndIndices(start, itemsPerPage);
+    if (currentPage !== pageFromSartEnd) {
+      setCurrentPage(pageFromSartEnd);
+    }
+  }, [start, end, currentPage]);
 
   const handlePageClick = (page) => {
     setCurrentPage(page);
