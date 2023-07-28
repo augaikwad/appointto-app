@@ -64,6 +64,8 @@ const getFormattedRequestForCreateDocUser = (data) => {
 };
 
 const AddEditUser = () => {
+  const id_clinic = parseInt(localStorage.getItem("id_clinic"));
+
   const [docState, docActions] = useContext(DoctorContext);
 
   const [state, actions] = useContext(SettingsContext);
@@ -118,7 +120,7 @@ const AddEditUser = () => {
       actions.setAddEditUserModal({ step: step + 1 });
     } else if (name === "SaveBtn") {
       if (lastStep === 1) {
-        actions.registerUser(data, () => {
+        actions.registerUser({ ...data, id_clinic: id_clinic }, () => {
           actions.setAddEditUserModal({ open: false });
           actions.getUsers();
         });
@@ -245,6 +247,10 @@ const AddEditUser = () => {
                   type="password"
                   rules={{
                     required: "Password Required",
+                    minLength: {
+                      value: 8,
+                      message: "Password should be minimum 8 charachter",
+                    },
                   }}
                 />
               </Col>
