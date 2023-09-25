@@ -13,7 +13,6 @@ function MobileOTP(props) {
 
   const form = useForm();
   const {
-    register,
     handleSubmit,
     getValues,
     formState: { errors },

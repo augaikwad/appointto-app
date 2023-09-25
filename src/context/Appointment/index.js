@@ -140,10 +140,7 @@ export const useActions = (state, dispatch) => ({
   getAppointmentsForCalendar: (req) => {
     dispatch({
       type: actionTypes.GET_APPOINTMENTS_FOR_CALENDAR,
-      request: {
-        ...req,
-        id_doctor: parseInt(localStorage.getItem("id_doctor")),
-      },
+      request: req,
     });
   },
 });

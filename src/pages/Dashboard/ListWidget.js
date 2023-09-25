@@ -65,7 +65,7 @@ const ListWidget = () => {
     });
   };
 
-  const handleButtonClick = (patientId, tab) => {
+  const handleButtonClick = (patientId, pageState) => {
     patientActions.getPatientById(patientId, (res) => {
       billActions.getAllBillingDataAction({
         id_doctor: parseInt(localStorage.getItem("id_doctor")),
@@ -74,9 +74,7 @@ const ListWidget = () => {
       });
       history.push({
         pathname: "/patient/" + patientId,
-        state: {
-          selectedTab: tab,
-        },
+        state: pageState,
       });
     });
   };
@@ -127,7 +125,12 @@ const ListWidget = () => {
                     <td className={`font-weight-bold ${classes.td}`}>
                       <button
                         className={`btn btn-sm btn-link ${classes.patientName}`}
-                        onClick={() => handleButtonClick(item.id_patient, 0)}
+                        onClick={() =>
+                          handleButtonClick(item.id_patient, {
+                            selectedTab: 0,
+                            id_appointment: item.id_appointment,
+                          })
+                        }
                       >
                         {item.patient_first_name} {item.patient_last_name}
                       </button>
@@ -215,7 +218,12 @@ const ListWidget = () => {
                       <IconButton
                         tooltipText="Prescription"
                         btnClasses="btn-primary"
-                        btnOnClick={() => handleButtonClick(item.id_patient, 1)}
+                        btnOnClick={() =>
+                          handleButtonClick(item.id_patient, {
+                            selectedTab: 1,
+                            id_appointment: item.id_appointment,
+                          })
+                        }
                         icon={faPrescription}
                       />
                     </td>
@@ -223,7 +231,12 @@ const ListWidget = () => {
                       <IconButton
                         tooltipText="Bill"
                         btnClasses="btn-dark"
-                        btnOnClick={() => handleButtonClick(item.id_patient, 2)}
+                        btnOnClick={() =>
+                          handleButtonClick(item.id_patient, {
+                            selectedTab: 2,
+                            id_appointment: item.id_appointment,
+                          })
+                        }
                         icon={faWallet}
                       />
                     </td>

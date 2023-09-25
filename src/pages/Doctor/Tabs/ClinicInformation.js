@@ -102,8 +102,9 @@ const ClinicInformation = () => {
               labelField="city_name"
               valueField="id_city"
               options={cities}
+              placeholder="Search city"
               onInputChange={(val) => {
-                if (val && val.length >= 2) {
+                if (val && val.length >= 1) {
                   globalActions.getCities(val);
                 }
               }}

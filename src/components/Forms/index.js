@@ -7,3 +7,4 @@ export { default as DateTimePickerField } from "./DateTimePickerField";
 export { default as SelectField } from "./SelectField";
 export { default as TextFieldWithIcon } from "./TextFieldWithIcon";
 export { default as TextField } from "./TextField";
+export { default as MaskedField } from "./MaskedField";

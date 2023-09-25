@@ -105,7 +105,7 @@ const AddEditUser = () => {
     const { name } = e.target;
     if (name === "NextBtn") {
       if (lastStep === 2 && step === 1) {
-        actions.registerUser(data, () => {
+        actions.registerUser({ ...data, id_clinic: id_clinic }, () => {
           actions.getUsers();
           const nextFormData = {
             first_name: data.firstName,

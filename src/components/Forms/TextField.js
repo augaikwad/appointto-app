@@ -12,6 +12,7 @@ const TextField = ({
   inline = false,
   labelWidth,
   rules = {},
+  onKeyDown,
   ...restProps
 }) => {
   const {
@@ -26,6 +27,20 @@ const TextField = ({
     labelWidth: labelWidth,
     required: rules.hasOwnProperty("required"),
   };
+
+  const handleOnKeyDown = (e) => {
+    if (type === "number") {
+      const preventKeys = ["e", "E", "-", "+"];
+      if (preventKeys.includes(e.key)) {
+        e.preventDefault();
+      }
+    }
+
+    if (onKeyDown) {
+      onKeyDown();
+    }
+  };
+
   return (
     <Field {...fieldProps}>
       <Form.Control
@@ -34,6 +49,7 @@ const TextField = ({
         name={name}
         placeholder={placeholder}
         size={size}
+        onKeyDown={handleOnKeyDown}
         {...register(name, rules)}
         {...restProps}
       />

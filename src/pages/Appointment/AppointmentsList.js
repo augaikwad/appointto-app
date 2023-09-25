@@ -6,6 +6,8 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { getWeekRange, getMonthRange } from "../../utils/common";
 import { AppointmentContext } from "../../context/Appointment";
+import { DoctorContext } from "../../context/Doctor";
+import Select from "react-select";
 
 const localizer = momentLocalizer(moment);
 
@@ -26,16 +28,89 @@ const useStyles = createUseStyles({
       borderColor: "#0270ec !important",
     },
   },
+  customEventWrapper: {
+    "& > .rbc-event": {
+      "&, &.rbc-selected": {
+        backgroundColor: "#d0e6ff",
+        color: "inherit",
+      },
+      "& > .rbc-event-label": {
+        display: "none",
+      },
+    },
+    "&.OnGoing > .rbc-event": {
+      backgroundColor: "#d0ffe1",
+      color: "inherit",
+      "& .faIcon": {
+        color: "#00bd44",
+      },
+    },
+  },
+  customEventContent: {
+    position: "relative",
+    color: "#555",
+    "& > b": {
+      fontSize: ".75em",
+      marginRight: 5,
+    },
+    "& > span": {
+      fontSize: ".80em",
+      fontWeight: 500,
+    },
+    "& > i.faIcon": {
+      fontSize: 8,
+      verticalAlign: "middle",
+      marginRight: 5,
+      color: "#0276f8",
+    },
+  },
+  drDropdownFilter: {
+    width: 300,
+    "& > .customDrDropDown > div": {
+      minHeight: "31px",
+      height: 31,
+      fontSize: 14,
+      flexWrap: "inherit",
+    },
+  },
+  ml10: {
+    marginLeft: 10,
+  },
 });
 
 const AppointmentsList = () => {
   const classes = useStyles();
 
+  const [drState, drActions] = useContext(DoctorContext);
+  const { doctorsByClinicId } = drState;
+  console.log("doctorsByClinicId === ", doctorsByClinicId);
+
   const [state, actions] = useContext(AppointmentContext);
-  const { calendarList } = state;
+  const { calendarList, appointmentStatusList } = state;
 
   const [calendarView, setCalendarView] = useState("month");
   const [calendarDate, setCalendarDate] = useState(new Date());
+  const [selectedDoctor, setSelectedDoctor] = useState(doctorsByClinicId[0]);
+
+  const getList = (req) => {
+    actions.getAppointmentsForCalendar(req);
+  };
+
+  useEffect(() => {
+    drActions.getDoctorsByClinicId(
+      parseInt(localStorage.getItem("id_clinic")),
+      (docList) => {
+        let idDoctor = parseInt(localStorage.getItem("id_doctor"));
+        let doctor = "";
+        if (idDoctor === 0) {
+          doctor = docList[0];
+        } else {
+          doctor = docList.find((doc) => doc.id_doctor === idDoctor);
+        }
+        setSelectedDoctor(doctor);
+      }
+    );
+  }, []);
 
   const getDateRange = (view, date) => {
     let range = "";
@@ -53,10 +128,11 @@ const AppointmentsList = () => {
   };
 
   useEffect(() => {
-    actions.getAppointmentsForCalendar(
-      getDateRange(calendarView, calendarDate)
-    );
-  }, [calendarView, calendarDate]);
+    getList({
+      id_doctor: selectedDoctor?.id_doctor,
+      ...getDateRange(calendarView, calendarDate),
+    });
+  }, [calendarView, calendarDate, selectedDoctor]);
 
   const handleOnNavigate = (date, view) => {
     setCalendarView(view);
@@ -70,40 +146,69 @@ const AppointmentsList = () => {
   };
 
   const EventComponent = ({ event }) => {
-    const { patient_first_name, patient_last_name } = event;
+    const { patient_first_name, patient_last_name, start_time } = event;
+    return (
+      <div className={classes.customEventContent}>
+        <i className="fa fa-circle faIcon"></i>
+        <b>{`${start_time}`}</b>
+        <span>{`${patient_first_name} ${patient_last_name}`}</span>
+      </div>
+    );
+  };
+
+  const EventWrapper = ({ event, children }) => {
+    console.log(
+      "EventWrapper === appointment_status :: ",
+      event.appointment_status,
+      appointmentStatusList
+    );
     return (
       <div
-        style={{ fontSize: 14 }}
-      >{`${patient_first_name} ${patient_last_name}`}</div>
+        className={`${classes.customEventWrapper} ${event.appointment_status}`}
+      >
+        {children}
+      </div>
     );
   };
 
   const viewButtons = [{ name: "Month" }, { name: "Week" }, { name: "Day" }];
   const navigationButtons = [
-    { name: "Today" },
-    { name: "Prev" },
-    { name: "Next" },
+    { name: "Prev", icon: "fa-chevron-left" },
+    { name: "Next", icon: "fa-chevron-right" },
   ];
 
   const CustomToolbar = ({ label, onNavigate, onView }) => {
-    const handleCustomButtonClick = () => {
-      // Handle custom button click event
-      console.log("Custom button clicked!");
-    };
-
     return (
       <div className="rbc-toolbar">
-        {/* <div className="rbc-btn-group">
-          <button
-            type="button"
-            className={`btn btn-sm`}
-            onClick={handleCustomButtonClick}
-          >
-            Custom Button
-          </button>
-        </div> */}
+        <div className="rbc-btn-group">
+          <div className={classes.drDropdownFilter}>
+            <Select
+              className="customDrDropDown"
+              placeholder="Please select doctor..."
+              getOptionValue={(option) => option["id_doctor"]}
+              getOptionLabel={(option) => option["first_name"]}
+              formatOptionLabel={(opt) =>
+                `Dr. ${opt?.first_name} ${opt?.last_name}`
+              }
+              defaultValue={selectedDoctor}
+              name="id_doctor"
+              options={doctorsByClinicId}
+              isSearchable={true}
+              onChange={(val) => {
+                setSelectedDoctor(val);
+              }}
+            />
+          </div>
+        </div>
+        <button
+          type="button"
+          className={`btn btn-sm ${classes.ml10}`}
+          onClick={() => onNavigate("Today".toUpperCase())}
+        >
+          Today
+        </button>
         <div
-          className={`rbc-btn-group btn-group`}
+          className={`rbc-btn-group btn-group ${classes.ml10}`}
           role="group"
           aria-label="Navigation buttons"
         >
@@ -116,7 +221,7 @@ const AppointmentsList = () => {
                 className={`btn btn-sm`}
                 onClick={() => onNavigate(btnName)}
               >
-                {btn.name}
+                <i className={`fa faIcon ${btn.icon}`}></i>
               </button>
             );
           })}
@@ -145,17 +250,6 @@ const AppointmentsList = () => {
             );
           })}
         </div>
-        {/* <div className="rbc-btn-group">
-          <button type="button" onClick={() => onView("month")}>
-            Month
-          </button>
-          <button type="button" onClick={() => onView("week")}>
-            Week
-          </button>
-          <button type="button" onClick={() => onView("day")}>
-            Day
-          </button>
-        </div> */}
       </div>
     );
   };
@@ -173,8 +267,11 @@ const AppointmentsList = () => {
           onRangeChange={handleOnRangeChange}
           components={{
             event: EventComponent,
+            eventWrapper: EventWrapper,
             toolbar: CustomToolbar,
           }}
+          popup={true}
+          step={15}
         />
       </Card>
     </div>

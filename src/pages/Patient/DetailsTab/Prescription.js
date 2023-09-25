@@ -18,6 +18,7 @@ import {
   TextField,
   SelectField,
   DatePickerField,
+  MaskedField,
 } from "../../../components/Forms";
 import { useHistory } from "react-router-dom";
 import { PrescriptionContext } from "../../../context/Prescription";
@@ -27,6 +28,7 @@ import cogoToast from "cogo-toast";
 import PrescriptionPrint from "../components/PrescriptionPrint";
 import { useReactToPrint } from "react-to-print";
 import { allowOnlyNumbers } from "../../../utils/common";
+import { useLocation } from "react-router-dom";
 import moment from "moment";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
@@ -44,6 +46,10 @@ const Prescription = () => {
   const { patientData } = patientState;
 
   const [settingsState, settingsActions] = useContext(SettingsContext);
+
+  const location = useLocation();
+  const { id_appointment } = location.state;
+  console.log("location.state 123 === ", location.state, id_appointment);
 
   useEffect(() => {
     settingsActions.getPrintingSetting();
@@ -125,8 +131,6 @@ const Prescription = () => {
     }
   };
 
-  const [nextVisit, setNextVisit] = useState(new Date());
-
   const [show, setShow] = useState(false);
   const FooterActions = () => {
     return (
@@ -152,9 +156,10 @@ const Prescription = () => {
             <div className="col-lg-9">
               <div className="row">
                 <div className="col-lg-3">
-                  <TextField
+                  <MaskedField
                     label="BP"
                     name="bp"
+                    mask="111/111"
                     inline={true}
                     labelWidth="60px"
                   />
@@ -165,9 +170,6 @@ const Prescription = () => {
                     name="tempratureInFahrenhiet"
                     inline={true}
                     labelWidth="60px"
-                    // rules={{
-                    //   required: true,
-                    // }}
                   />
                 </div>
                 <div className="col-lg-3">
@@ -176,9 +178,6 @@ const Prescription = () => {
                     name="oxizenSaturation"
                     inline={true}
                     labelWidth="60px"
-                    // rules={{
-                    //   required: true,
-                    // }}
                   />
                 </div>
                 <div className="col-lg-3">
