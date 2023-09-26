@@ -37,7 +37,7 @@ const TextField = ({
     }
 
     if (onKeyDown) {
-      onKeyDown();
+      onKeyDown(e);
     }
   };
 

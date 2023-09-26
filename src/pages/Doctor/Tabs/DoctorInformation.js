@@ -145,6 +145,13 @@ const DoctorInformation = () => {
             <TextField
               label="Qualification"
               name="qualification"
+              onKeyDown={(e) => {
+                const key = e.key;
+                const pattern = /^[A-Za-z]+$/;
+                if (!pattern.test(key)) {
+                  e.preventDefault();
+                }
+              }}
               rules={{
                 required: "Please Enter Qualification",
               }}
