@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import moment from "moment";
-// import { InputField, CheckBoxField } from "../../../components";
+import { debounce } from "lodash";
 import TextField from "../../../components/Forms/TextField";
 import ReactSelectField from "../../../components/Forms/ReactSelectField";
 import { Button } from "react-bootstrap";
@@ -23,9 +23,7 @@ const ClinicInformation = () => {
   });
 
   const {
-    register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = form;
 
@@ -45,6 +43,12 @@ const ClinicInformation = () => {
 
     actions.updateClinicInfo(formData, callback);
   };
+
+  const handleDebounceChange = debounce((val) => {
+    if (val && val.length >= 1) {
+      globalActions.getCities(val);
+    }
+  }, 1000);
 
   return (
     <FormProvider {...form}>
@@ -103,11 +107,7 @@ const ClinicInformation = () => {
               valueField="id_city"
               options={cities}
               placeholder="Search city"
-              onInputChange={(val) => {
-                if (val && val.length >= 1) {
-                  globalActions.getCities(val);
-                }
-              }}
+              onInputChange={handleDebounceChange}
               rules={{
                 required: "Please select City",
               }}

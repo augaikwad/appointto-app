@@ -258,7 +258,13 @@ function Login(props) {
             </Button>
           </div>
           <div className="text-center mt-4 font-weight-light">
-            <Link to="/otpConfirmation" className="text-primary">
+            <Link
+              to="/otpConfirmation"
+              className="text-primary"
+              onClick={() => {
+                docActions.resetOTPData();
+              }}
+            >
               <b>Register now for Free</b>
             </Link>
           </div>

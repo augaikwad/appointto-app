@@ -103,6 +103,7 @@ const DoctorInformation = () => {
             <DatePickerField
               label="Date of Birth"
               name="dob"
+              maxDate={new Date()}
               rules={{
                 required: "Please Enter Date of Birth",
               }}

@@ -65,7 +65,7 @@ function Navbar(props) {
                     <i className="ti-user"></i>
                   </Dropdown.Toggle>
                   <Dropdown.Menu className="preview-list navbar-dropdown">
-                    <Dropdown.Item
+                    {/*  <Dropdown.Item
                       className="dropdown-item preview-item"
                       onClick={(evt) => evt.preventDefault()}
                     >
@@ -73,7 +73,7 @@ function Navbar(props) {
                         <i className="ti-settings text-primary"></i>
                         <span className="pl-2">Settings</span>
                       </div>
-                    </Dropdown.Item>
+                    </Dropdown.Item> */}
                     <Dropdown.Item
                       className="dropdown-item preview-item"
                       onClick={(evt) => {

@@ -31,7 +31,6 @@ const TextFieldWithIcon = ({
   };
 
   const handleOnKeyDown = (e) => {
-    console.log("handleOnKeyDown == ", e.key);
     const preventKeys = ["e", "E", "-", "+"];
     if (preventKeys.includes(e.key)) {
       e.preventDefault();
