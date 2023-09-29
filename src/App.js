@@ -11,12 +11,15 @@ import AppointmentContextProvider from "./context/Appointment";
 import PrescriptionContextProvider from "./context/Prescription";
 import BillingContextProvider from "./context/Billing";
 import SettingsContextProvider from "./context/Settings";
-
+import { useSelector } from "react-redux";
 import { setAuthToken } from "./helpers/setAuthToken";
 
 function App(props) {
   const history = useHistory();
-
+  console.log(
+    "App === ",
+    useSelector((state) => state)
+  );
   useEffect(() => {
     //check jwt token
     const token = localStorage.getItem("token");
