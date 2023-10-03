@@ -3,16 +3,25 @@ import CreateSelectTagsAutoComplete from "./CreateSelectTagsAutoComplete";
 import { PrescriptionContext } from "../../../context/Prescription";
 import { useFormContext } from "react-hook-form";
 import SelectGroupModal from "./SelectGroupModal";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAdvices,
+  getAdviceGroup,
+  saveAdviceGroup,
+} from "../../../store/actions/prescriptionActions";
 
 const AdvicesTags = ({ name = "lstadvice" }) => {
+  const dispatch = useDispatch();
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { advices, adviceGroup } = useSelector((state) => state.prescription);
+
   const [state, actions] = useContext(PrescriptionContext);
-  const { adviceGroup, advices } = state;
   const [open, setOpen] = useState(false);
   const { setValue, getValues } = useFormContext();
 
   useEffect(() => {
-    actions.getAdvices();
-    actions.getAdviceGroup();
+    dispatch(getAdvices(id_doctor));
+    dispatch(getAdviceGroup(id_doctor));
   }, []);
 
   return (
@@ -38,7 +47,7 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
             type: "Advice",
           };
           actions.saveUpdateTag(name, req, (res) => {
-            actions.getAdvices();
+            dispatch(getAdvices(id_doctor));
 
             let val = getValues(name) || [];
             setValue(name, [...val, ...[res]]);
@@ -57,10 +66,12 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
             adviceDetails: adviceDetails.toString(),
             id_doctor: localStorage.getItem("id_doctor"),
           };
-          actions.saveAdviceGroup(req, () => {
-            callback();
-            actions.getAdviceGroup();
-          });
+          dispatch(
+            saveAdviceGroup(req, () => {
+              callback();
+              dispatch(getAdviceGroup(id_doctor));
+            })
+          );
         }}
         selectGroupBtnClick={() => {
           setOpen(true);

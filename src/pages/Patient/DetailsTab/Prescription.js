@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Tooltip } from "../../../components";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Alert } from "react-bootstrap";
@@ -22,37 +22,38 @@ import {
 } from "../../../components/Forms";
 import { useHistory } from "react-router-dom";
 import { PrescriptionContext } from "../../../context/Prescription";
-import { PatientContext } from "../../../context/Patient";
-import { SettingsContext } from "../../../context/Settings";
 import cogoToast from "cogo-toast";
 import PrescriptionPrint from "../components/PrescriptionPrint";
 import { useReactToPrint } from "react-to-print";
 import { allowOnlyNumbers } from "../../../utils/common";
 import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getPrintingSetting } from "../../../store/actions/settingActions";
+import {
+  getPrescriptions,
+  savePrescription,
+} from "../../../store/actions/prescriptionActions";
 import moment from "moment";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
 const Prescription = () => {
   const history = useHistory();
+  const dispatch = useDispatch();
+
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { patientById } = useSelector((state) => state.patients);
+  const { prescriptionForm } = useSelector((state) => state.prescription);
+
   const printRef = useRef(null);
   const [printData, setPrintData] = useState([]);
   const [hasAllergies, setHasAllergies] = useState(false);
 
-  const [state, actions] = useContext(PrescriptionContext);
-  const { prescriptionForm, allPrescriptions } = state;
-
-  const [patientState, patientActions] = useContext(PatientContext);
-  const { patientData } = patientState;
-
-  const [settingsState, settingsActions] = useContext(SettingsContext);
-
   const location = useLocation();
   const { id_appointment } = location.state;
-  console.log("location.state 123 === ", location.state, id_appointment);
 
   useEffect(() => {
-    settingsActions.getPrintingSetting();
+    dispatch(getPrintingSetting(id_doctor));
   }, []);
 
   const form = useForm({
@@ -75,11 +76,11 @@ const Prescription = () => {
   const { handleSubmit, reset, control, setValue, watch } = form;
 
   useEffect(() => {
-    if (patientData !== null) {
-      const { medicalPrecondition } = patientData;
+    if (patientById !== null) {
+      const { medicalPrecondition } = patientById;
       setHasAllergies(medicalPrecondition.includes("allergies"));
     }
-  }, [patientData]);
+  }, [patientById]);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -87,7 +88,7 @@ const Prescription = () => {
 
   const onSubmit = (data, e) => {
     const formData = { ...data };
-    formData.patientId = patientData.id_patient;
+    formData.patientId = patientById.id_patient;
     const prescribedMed = [];
     if (data.prescribedMedicines.length === 1) {
       cogoToast.error("Please Enter Medicine Details", toastOption);
@@ -112,22 +113,24 @@ const Prescription = () => {
       });
       formData.prescribedMedicines = prescribedMed;
 
-      actions.savePrescription(formData, (res) => {
-        const btnId = e.target.id;
-        actions.getPrescriptions({ PatientId: res.patientId });
-        if (btnId === "SaveNext") {
-          history.push({
-            pathname: "/patient/" + patientData.id_patient,
-            state: {
-              selectedTab: 2,
-            },
-          });
-        } else if (btnId === "SavePrint") {
-          setPrintData(res);
-          handlePrint();
-        }
-        reset();
-      });
+      dispatch(
+        savePrescription(formData, (res) => {
+          const btnId = e.target.id;
+          dispatch(getPrescriptions({ PatientId: res.patientId }));
+          if (btnId === "SaveNext") {
+            history.push({
+              pathname: "/patient/" + patientById.id_patient,
+              state: {
+                selectedTab: 2,
+              },
+            });
+          } else if (btnId === "SavePrint") {
+            setPrintData(res);
+            handlePrint();
+          }
+          reset();
+        })
+      );
     }
   };
 

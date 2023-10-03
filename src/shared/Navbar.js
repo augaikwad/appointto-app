@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
 import NavbarSearch from "./NavbarSearch";
-
+import { persistStore } from "redux-persist";
+import store from "../store";
 import LogoLarge from "../assets/images/logo-large.svg";
 import LogoMini from "../assets/images/logo-mini.svg";
 
@@ -18,6 +19,13 @@ function Navbar(props) {
       setIsLoggedIn(true);
     }
   }, [pathname]);
+
+  const logout = async () => {
+    sessionStorage.clear();
+    const persistor = persistStore(store);
+    await persistor.purge();
+    window.location.reload(false);
+  };
 
   return (
     <nav className="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
@@ -76,10 +84,7 @@ function Navbar(props) {
                     </Dropdown.Item> */}
                     <Dropdown.Item
                       className="dropdown-item preview-item"
-                      onClick={(evt) => {
-                        localStorage.clear();
-                        window.location.reload(false);
-                      }}
+                      onClick={(evt) => logout()}
                     >
                       <div className="d-flex align-items-center">
                         <i className="ti-power-off text-primary"></i>

@@ -39,7 +39,7 @@ const DatePickerField = ({
                 inputOnChange(date);
                 onChange(date);
               }}
-              selected={value}
+              selected={new Date(value)}
               dateFormat={dateFormat}
               className={`form-control form-control-sm`}
               calendarClassName="form-control-calendar"

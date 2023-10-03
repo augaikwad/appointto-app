@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Modal } from "../../components";
 import {
@@ -8,10 +8,18 @@ import {
   SelectField,
 } from "../../components/Forms";
 import { useForm, FormProvider } from "react-hook-form";
-import { AppointmentContext } from "../../context/Appointment";
-import { DoctorContext } from "../../context/Doctor";
 import moment from "moment";
 import { Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+// import {
+//   setAppointmentModal,
+//   initialState as appointmentInitState,
+// } from "../../store/reducers/appointmentsSlice";
+import {
+  getDashboardAppointments,
+  updateAppointment,
+  createAppointment,
+} from "../../store/actions/appointmentActions";
 
 const getFormattedTime = (date, time) => {
   let oDate = "";
@@ -29,51 +37,50 @@ const getFormattedTime = (date, time) => {
 
 const formattedFormData = (data) => {
   let obj = { ...data };
-  obj.date = !!data.date ? new Date(data.date) : "";
+  obj.date = !!data?.date ? new Date(data.date) : "";
   obj.start_time = getFormattedTime(data.date, data.start_time);
   obj.end_time = getFormattedTime(data.date, data.end_time);
   return obj;
 };
 
-const CreateAppointmentModal = () => {
+const CreateAppointmentModal = ({ onHide }) => {
   const location = useLocation();
-  const [drState, drActions] = useContext(DoctorContext);
-  const { doctorsByClinicId } = drState;
+  const dispatch = useDispatch();
 
-  const [state, actions] = useContext(AppointmentContext);
-  const { appointmentForm } = state;
-  const { isAdd, show } = state.appointmentModal;
+  const { doctorsByClinicId } = useSelector((state) => state.user);
+  console.log(
+    "useSelector = appointments ==",
+    useSelector((state) => state.appointments),
+    useSelector((state) => state)
+  );
+  const { dashboardListFilters, appointmentModal } = useSelector(
+    (state) => state.appointments
+  );
+  const { form: formValues, show, isAdd } = appointmentModal;
 
   const form = useForm({
-    defaultValues: appointmentForm,
+    defaultValues: formattedFormData(formValues),
   });
 
   const { reset, setValue, handleSubmit } = form;
 
   useEffect(() => {
-    reset(formattedFormData(appointmentForm));
-  }, [appointmentForm]);
+    reset(formattedFormData(formValues));
+  }, [appointmentModal.form]);
 
-  useEffect(() => {
-    drActions.getDoctorsByClinicId(
-      localStorage.getItem("id_clinic"),
-      (docList) => {
-        if (isAdd) {
-          let idDoctor = parseInt(localStorage.getItem("id_doctor"));
-          if (idDoctor === 0) {
-            idDoctor = docList[0].id_doctor;
-          }
-          setValue("id_doctor", idDoctor);
-        }
-      }
-    );
-  }, []);
+  const handleOnHide = () => {
+    // dispatch(
+    //   setAppointmentModal({
+    //     ...appointmentModal,
+    //     show: false,
+    //   })
+    // );
+  };
 
   const callback = () => {
-    actions.resetAppointmentForm();
-    actions.setAppointmentModal({ show: false });
+    onHide();
     if (["/dashboard", "/"].includes(location.pathname)) {
-      actions.getAppointmentByDoctor();
+      dispatch(getDashboardAppointments(dashboardListFilters));
     }
   };
 
@@ -85,13 +92,10 @@ const CreateAppointmentModal = () => {
       "YYYY-MM-DDTHH:mm:ss.sssZ"
     );
 
-    if (["/dashboard", "/"].includes(location.pathname)) {
-      actions.setCanResetSearchBox(true);
-    }
     if (isAdd) {
-      actions.createAppointment(formData, callback);
+      dispatch(createAppointment(formData, callback));
     } else {
-      actions.updateAppointment(formData, callback);
+      dispatch(updateAppointment(formData, callback));
     }
   };
 
@@ -114,10 +118,7 @@ const CreateAppointmentModal = () => {
       title={`${isAdd ? "Create" : "Update"} Appointment`}
       size="md"
       show={show}
-      onHide={() => {
-        actions.resetAppointmentForm();
-        actions.setAppointmentModal({ isAdd: true, show: false });
-      }}
+      onHide={onHide}
       footerActions={<FooterActions />}
     >
       <FormProvider {...form}>

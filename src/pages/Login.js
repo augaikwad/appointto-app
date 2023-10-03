@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import LoginLayout from "../shared/LoginLayout";
 import { Modal } from "../components";
@@ -7,6 +7,10 @@ import { useForm, FormProvider } from "react-hook-form";
 import { TextField, TextFieldWithIcon } from "../components/Forms";
 import { AuthContext } from "../context/Auth";
 import { DoctorContext } from "../context/Doctor";
+import { login } from "../store/actions/userActions";
+import { useDispatch, useSelector } from "react-redux";
+import { getDoctorsByClinicId } from "../store/actions/userActions";
+import { navigateTo } from "../store/reducers/navigationSlice";
 
 const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
   const [state, actions] = useContext(DoctorContext);
@@ -176,9 +180,8 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
 };
 
 function Login(props) {
-  const [state, actions] = useContext(AuthContext);
-
-  const [docState, docActions] = useContext(DoctorContext);
+  const dispatch = useDispatch();
+  const [, docActions] = useContext(DoctorContext);
 
   const [isForgotPassModalOpen, setIsForgotPassModalOpen] = useState(false);
 
@@ -186,7 +189,16 @@ function Login(props) {
   const { handleSubmit, register } = form;
 
   const onSubmit = (formData) => {
-    actions.login(formData);
+    dispatch(
+      login(formData, (res) => {
+        const { id_clinic, id_doctor } = res;
+        dispatch(
+          getDoctorsByClinicId({ id_clinic }, id_doctor, () => {
+            dispatch(navigateTo("/dashboard"));
+          })
+        );
+      })
+    );
   };
 
   return (

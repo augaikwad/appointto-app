@@ -1,24 +1,33 @@
 import axios from "axios";
 import config from "./config";
 import { createBrowserHistory } from "history";
+import store from "./store";
+import { setLoading } from "./store/reducers/globalSlice";
+
 const history = createBrowserHistory();
+
+const handleSetLoading = (isLoading, config) => {
+  if (isLoading && !config.silentCall) store.dispatch(setLoading(isLoading));
+};
+
 const getAxiosClient = (baseUrl = null) => {
   const { API_BASE_URL } = config;
-  baseUrl = null !== baseUrl ? baseUrl : API_BASE_URL;
   const options = {
-    baseURL: baseUrl,
+    baseURL: API_BASE_URL ? API_BASE_URL : baseUrl,
     withCredentials: false,
     timeout: 30000,
   };
+
   const client = axios.create(options);
   client.interceptors.request.use(
     (config) => {
+      // handleSetLoading(true, config);
       config.headers["Content-Type"] = "application/json; charset=utf-8";
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (token !== null) {
         config.headers.Authorization =
-          "Bearer " + localStorage.getItem("token");
+          "Bearer " + sessionStorage.getItem("token");
       } else {
         delete config.headers["Authorization"];
       }
@@ -30,6 +39,7 @@ const getAxiosClient = (baseUrl = null) => {
 
   client.interceptors.response.use(
     (response) => {
+      // handleSetLoading(false);
       if ("undefined" === typeof response || response.status < 200) {
         return Promise.reject(response);
       }
@@ -37,6 +47,7 @@ const getAxiosClient = (baseUrl = null) => {
     },
     (error) => {
       let { response } = error;
+      // handleSetLoading(false);
       let errResponse = {};
       if ("undefined" === typeof response || response === undefined) {
         return Promise.reject("Something went wrong, Please try again.");

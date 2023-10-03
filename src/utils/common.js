@@ -46,3 +46,12 @@ export const calendarDataFormatter = (data) => {
   });
   return formattedData;
 };
+
+export const isPlainObject = (value) => {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    typeof value !== "function"
+  );
+};

@@ -3,16 +3,25 @@ import CreateSelectTagsAutoComplete from "./CreateSelectTagsAutoComplete";
 import { PrescriptionContext } from "../../../context/Prescription";
 import { useFormContext } from "react-hook-form";
 import SelectGroupModal from "./SelectGroupModal";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getInvestigations,
+  getInvestigationsGroup,
+} from "../../../store/actions/prescriptionActions";
 
 const InvestigationsTags = ({ name = "lstinvestigations" }) => {
+  const dispatch = useDispatch();
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { investigations, investigationsGroup } = useSelector(
+    (state) => state.prescription
+  );
   const [state, actions] = useContext(PrescriptionContext);
-  const { investigationsGroup, investigations } = state;
   const [open, setOpen] = useState(false);
   const { setValue, getValues } = useFormContext();
 
   useEffect(() => {
-    actions.getInvestigations();
-    actions.getInvestigationsGroup();
+    dispatch(getInvestigations(id_doctor));
+    dispatch(getInvestigationsGroup(id_doctor));
   }, []);
 
   return (
@@ -38,7 +47,7 @@ const InvestigationsTags = ({ name = "lstinvestigations" }) => {
             type: "Investigations",
           };
           actions.saveUpdateTag(name, req, (res) => {
-            actions.getInvestigations();
+            dispatch(getInvestigations(id_doctor));
 
             let val = getValues(name) || [];
             setValue(name, [...val, ...[res]]);
@@ -58,7 +67,7 @@ const InvestigationsTags = ({ name = "lstinvestigations" }) => {
             id_doctor: localStorage.getItem("id_doctor"),
           };
           actions.saveInvestigationsGroup(req, () => {
-            actions.getInvestigationsGroup();
+            dispatch(getInvestigationsGroup(id_doctor));
             callback();
           });
         }}

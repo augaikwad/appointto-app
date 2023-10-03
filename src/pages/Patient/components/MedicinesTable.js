@@ -10,6 +10,11 @@ import { AutocompleteField, Modal } from "../../../components";
 import { PrescriptionContext } from "../../../context/Prescription";
 import { typeOptions, unitOptions } from "../../../utils/constants";
 import cogoToast from "cogo-toast";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getRxGroups,
+  saveRxGroup,
+} from "../../../store/actions/prescriptionActions";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
@@ -185,14 +190,17 @@ const timingOptions = [
 
 const NewMedTable = ({ control, setValue }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { rxGroups } = useSelector((state) => state.prescription);
+
   const [open, setOpen] = useState(false);
   const [rxGroupModalShow, setRxGroupModalShow] = useState(false);
 
   const [state, actions] = useContext(PrescriptionContext);
-  const { rxGroups } = state;
 
   useEffect(() => {
-    actions.getRxGroups();
+    dispatch(getRxGroups(id_doctor));
   }, []);
 
   const [durationData, setDurationData] = useState([
@@ -507,11 +515,13 @@ const NewMedTable = ({ control, setValue }) => {
               group.push(groupItem);
             });
             request.RxGroupPrescribedMedicine = group;
-            actions.saveRxGroup(request, () => {
-              if (callback && typeof callback === "function") {
-                callback();
-              }
-            });
+            dispatch(
+              saveRxGroup(request, () => {
+                if (callback && typeof callback === "function") {
+                  callback();
+                }
+              })
+            );
           }}
           onHide={() => setOpen(false)}
         />
@@ -569,7 +579,7 @@ const NewMedTable = ({ control, setValue }) => {
                       setGroupToForm(group);
                       setRxGroupModalShow(false);
                       actions.setPreviousPrescription(group.rxGroupId, () => {
-                        actions.getRxGroups();
+                        dispatch(getRxGroups(id_doctor));
                       });
                     }}
                   >

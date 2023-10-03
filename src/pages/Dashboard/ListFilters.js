@@ -1,10 +1,11 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import { DatePickerField, SelectField } from "../../components/Forms";
 import { useForm, FormProvider } from "react-hook-form";
-import { AppointmentContext } from "../../context/Appointment";
-import { DoctorContext } from "../../context/Doctor";
+import { useDispatch, useSelector } from "react-redux";
+import { setDashboardListFilters } from "../../store/reducers/appointmentsSlice";
+import { getDashboardAppointments } from "../../store/actions/appointmentActions";
 
 const useStyles = createUseStyles({
   queueForFilter: {
@@ -26,39 +27,29 @@ const useStyles = createUseStyles({
 
 const ListFilters = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { doctorsByClinicId, selectedDoctorId } = useSelector(
+    (state) => state.user
+  );
+  const { dashboardListFilters } = useSelector((state) => state.appointments);
 
   const [activeBtn, setActiveBtn] = useState(0);
 
-  const [state, actions] = useContext(AppointmentContext);
-  const { filters } = state;
-
-  const [drState, drActions] = useContext(DoctorContext);
-  const { doctorsByClinicId } = drState;
-
   const form = useForm({
-    defaultValues: { ...filters },
+    defaultValues: { ...dashboardListFilters },
   });
 
-  const { setValue, getValues } = form;
+  const { setValue, getValues, reset } = form;
 
   useEffect(() => {
-    drActions.getDoctorsByClinicId(
-      parseInt(localStorage.getItem("id_clinic")),
-      (docList) => {
-        let idDoctor = parseInt(localStorage.getItem("id_doctor"));
-        if (idDoctor === 0) {
-          idDoctor = docList[0].id_doctor;
-        }
-        setValue("id_doctor", idDoctor);
-        actions.setFilters({ id_doctor: idDoctor });
-      }
-    );
+    reset(dashboardListFilters);
   }, []);
 
   const filterList = (name, value) => {
     let req = getValues();
     req[name] = value;
-    actions.setFilters(req);
+    dispatch(setDashboardListFilters(req));
+    dispatch(getDashboardAppointments(req));
   };
 
   const appointmentStatus = [

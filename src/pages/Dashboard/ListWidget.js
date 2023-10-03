@@ -11,9 +11,17 @@ import {
 import CreateAppointmentModal from "../Patient/CreateAppointmentModal";
 import { useHistory } from "react-router-dom";
 import { Tooltip } from "../../components";
-import { AppointmentContext } from "../../context/Appointment";
 import { PatientContext } from "../../context/Patient";
 import { BillingContext } from "../../context/Billing";
+import { getAppointmentStatusList } from "../../store/actions/userActions";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getDashboardAppointments,
+  updateAppointment,
+} from "../../store/actions/appointmentActions";
+import { setAppointmentModal } from "../../store/reducers/appointmentsSlice";
+import { getPatientById } from "../../store/actions/patientActions";
+import { navigateTo } from "../../store/reducers/navigationSlice";
 
 const useStyles = createUseStyles({
   tr: {
@@ -44,39 +52,53 @@ const useStyles = createUseStyles({
 
 const ListWidget = () => {
   const classes = useStyles();
-
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  const [state, actions] = useContext(AppointmentContext);
-  const { appointmentList, appointmentStatusList } = state;
-  const [patientState, patientActions] = useContext(PatientContext);
+  const { dashboardList, dashboardListFilters } = useSelector(
+    (state) => state.appointments
+  );
 
-  const [billState, billActions] = useContext(BillingContext);
+  const { appointmentStatuses } = useSelector((state) => state.user);
+
+  const [, patientActions] = useContext(PatientContext);
+  const [, billActions] = useContext(BillingContext);
 
   useEffect(() => {
-    if (appointmentStatusList.length === 0) {
-      actions.getAppointmentStatusList();
+    if (appointmentStatuses === null) {
+      dispatch(getAppointmentStatusList());
     }
-  }, [appointmentStatusList]);
+  }, [appointmentStatuses]);
 
-  const updateAppointment = (req) => {
-    actions.updateAppointment(req, () => {
-      actions.getAppointmentByDoctor();
-    });
+  const handleUpdateAppointment = (req) => {
+    dispatch(
+      updateAppointment(req, () => {
+        dispatch(getDashboardAppointments(dashboardListFilters));
+      })
+    );
   };
 
   const handleButtonClick = (patientId, pageState) => {
-    patientActions.getPatientById(patientId, (res) => {
-      billActions.getAllBillingDataAction({
-        id_doctor: parseInt(localStorage.getItem("id_doctor")),
-        id_patient: res.id_patient,
-        id_clinic: res.id_clinic,
-      });
-      history.push({
-        pathname: "/patient/" + patientId,
-        state: pageState,
-      });
-    });
+    dispatch(
+      getPatientById({ PatientId: patientId }, () => {
+        // history.push({
+        //   pathname: "/patient/" + patientId,
+        //   state: pageState,
+        // });
+        dispatch(navigateTo({ to: `/patient/${patientId}`, state: pageState }));
+      })
+    );
+    // patientActions.getPatientById(patientId, (res) => {
+    //   billActions.getAllBillingDataAction({
+    //     id_doctor: parseInt(localStorage.getItem("id_doctor")),
+    //     id_patient: res.id_patient,
+    //     id_clinic: res.id_clinic,
+    //   });
+    //   history.push({
+    //     pathname: "/patient/" + patientId,
+    //     state: pageState,
+    //   });
+    // });
   };
 
   const IconButton = ({
@@ -101,19 +123,23 @@ const ListWidget = () => {
 
   return (
     <>
-      <CreateAppointmentModal isAdd={false} />
+      <CreateAppointmentModal
+        onHide={() => {
+          dispatch(setAppointmentModal({ show: false }));
+        }}
+      />
       <div className="table-responsive">
         <table className="table table-borderless">
           <tbody>
-            {appointmentList.length === 0 && (
+            {dashboardList.length === 0 && (
               <tr key="NoRecords">
                 <td style={{ textAlign: "center", fontWeight: "500" }}>
                   No Appointments Found
                 </td>
               </tr>
             )}
-            {appointmentList.length > 0 &&
-              appointmentList.map((item, ind) => {
+            {dashboardList.length > 0 &&
+              dashboardList.map((item, ind) => {
                 if (item.appointment_status === "Cancelled") {
                   return true;
                 }
@@ -190,7 +216,7 @@ const ListWidget = () => {
                         btnOnClick={() => {
                           let req = { ...item };
                           req.checked_in = req.checked_in === 0 ? 1 : 0;
-                          updateAppointment(req);
+                          handleUpdateAppointment(req);
                         }}
                       />
                     </td>
@@ -204,10 +230,10 @@ const ListWidget = () => {
                         onChange={(e) => {
                           let req = { ...item };
                           req.appointment_status = e.target.value;
-                          updateAppointment(req);
+                          handleUpdateAppointment(req);
                         }}
                       >
-                        {appointmentStatusList.map((item, ind) => (
+                        {appointmentStatuses.map((item, ind) => (
                           <option key={ind} value={item.statusValue}>
                             {item.statusName}
                           </option>
@@ -251,11 +277,13 @@ const ListWidget = () => {
                         <Dropdown.Menu>
                           <Dropdown.Item
                             onClick={() => {
-                              actions.setAppointmentForm(item);
-                              actions.setAppointmentModal({
-                                isAdd: false,
-                                show: true,
-                              });
+                              dispatch(
+                                setAppointmentModal({
+                                  isAdd: false,
+                                  show: true,
+                                  form: item,
+                                })
+                              );
                             }}
                           >
                             Edit
@@ -264,7 +292,7 @@ const ListWidget = () => {
                             onClick={() => {
                               let req = { ...item };
                               req.appointment_status = "Cancelled";
-                              updateAppointment(req);
+                              handleUpdateAppointment(req);
                             }}
                           >
                             Delete

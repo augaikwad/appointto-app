@@ -17,7 +17,7 @@ export const applyAuthContextMiddleware =
         case actionTypes.LOGIN:
           globalActions.setLoadingIndicator(true);
           return service
-            .post(baseUrl + "Login/login", action.request)
+            .post("Login/login", action.request)
             .then((res) => {
               const { data } = res;
               if (data.response_code === 2000) {

@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
-import { PatientContext } from "../../../context/Patient";
+import React from "react";
 import { createUseStyles } from "react-jss";
 import moment from "moment";
 import RXImg from "../../../content/images/rx.png";
-import { SettingsContext } from "../../../context/Settings";
+import { useSelector } from "react-redux";
 
 const useStyles = createUseStyles({
   container: {
@@ -80,13 +79,10 @@ const useStyles = createUseStyles({
 });
 
 const PrescriptionPrint = React.forwardRef(({ data }, ref) => {
-  const [settingsState, settingsActions] = useContext(SettingsContext);
-  const { prescriptionMargins } = settingsState;
+  const { prescriptionMargins } = useSelector((state) => state.settings);
+  const { patientById } = useSelector((state) => state.patients);
 
   const classes = useStyles(prescriptionMargins);
-
-  const [patientState, patientActions] = useContext(PatientContext);
-  const { patientData } = patientState;
 
   const getStringFromObj = (arr) => {
     return (
@@ -110,7 +106,7 @@ const PrescriptionPrint = React.forwardRef(({ data }, ref) => {
                 <td width={"70px"}>
                   <b>Name</b>:
                 </td>
-                <td>{`${patientData?.first_name} ${patientData?.last_name} (${patientData?.age}y, ${patientData?.gender})`}</td>
+                <td>{`${patientById?.first_name} ${patientById?.last_name} (${patientById?.age}y, ${patientById?.gender})`}</td>
                 <td width={"60px"}>
                   <b>Date</b>:
                 </td>

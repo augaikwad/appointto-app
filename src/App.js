@@ -1,5 +1,5 @@
 import React, { useState, Suspense, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, BrowserRouter as Router } from "react-router-dom";
 import Routes from "./Routes";
 import Layout from "./shared/Layout";
 import Loader from "./shared/Loader";
@@ -16,13 +16,16 @@ import { setAuthToken } from "./helpers/setAuthToken";
 
 function App(props) {
   const history = useHistory();
-  console.log(
-    "App === ",
-    useSelector((state) => state)
-  );
+
+  const isLoading = useSelector((state) => state.global.loading);
+  // console.log(
+  //   "App isLoading=== ",
+  //   isLoading,
+  //   useSelector((state) => state)
+  // );
   useEffect(() => {
     //check jwt token
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (token) {
       setAuthToken(token);
     }
@@ -31,39 +34,41 @@ function App(props) {
   const [isFullPageLayout, setIsFullPageLayout] = useState(true);
 
   return (
-    <GlobalContextProvider>
-      <GlobalContext.Consumer>
-        {([state, actions]) => (
-          <>
-            <Loader open={state.loading} />
-            {/* <Notification
+    <Router>
+      <GlobalContextProvider>
+        <GlobalContext.Consumer>
+          {([state, actions]) => (
+            <>
+              <Loader open={isLoading} />
+              {/* <Notification
                 error={state.error}
                 success={state.successMessage}
                 onClose={() => actions.clearGenericResponse()}
               /> */}
-          </>
-        )}
-      </GlobalContext.Consumer>
-      <AuthContextProvider>
-        <SettingsContextProvider>
-          <DoctorContextProvider>
-            <PatientContextProvider>
-              <AppointmentContextProvider>
-                <PrescriptionContextProvider>
-                  <BillingContextProvider>
-                    <Suspense fallback={<Loader open={true} />}>
-                      <Layout isFullPageLayout={isFullPageLayout}>
-                        <Routes setIsFullPageLayout={setIsFullPageLayout} />
-                      </Layout>
-                    </Suspense>
-                  </BillingContextProvider>
-                </PrescriptionContextProvider>
-              </AppointmentContextProvider>
-            </PatientContextProvider>
-          </DoctorContextProvider>
-        </SettingsContextProvider>
-      </AuthContextProvider>
-    </GlobalContextProvider>
+            </>
+          )}
+        </GlobalContext.Consumer>
+        <AuthContextProvider>
+          <SettingsContextProvider>
+            <DoctorContextProvider>
+              <PatientContextProvider>
+                <AppointmentContextProvider>
+                  <PrescriptionContextProvider>
+                    <BillingContextProvider>
+                      <Suspense fallback={<Loader open={true} />}>
+                        <Layout isFullPageLayout={isFullPageLayout}>
+                          <Routes setIsFullPageLayout={setIsFullPageLayout} />
+                        </Layout>
+                      </Suspense>
+                    </BillingContextProvider>
+                  </PrescriptionContextProvider>
+                </AppointmentContextProvider>
+              </PatientContextProvider>
+            </DoctorContextProvider>
+          </SettingsContextProvider>
+        </AuthContextProvider>
+      </GlobalContextProvider>
+    </Router>
   );
 }
 

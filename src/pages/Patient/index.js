@@ -4,9 +4,9 @@ import { Card } from "../../components";
 import { Profile, Prescription, Billings } from "./DetailsTab";
 import { createUseStyles } from "react-jss";
 import { useLocation } from "react-router-dom";
-import { PatientContext } from "../../context/Patient";
 import { BillingContext } from "../../context/Billing";
 import AmountWithCurrancy from "../../components/AmountWithCurrancy";
+import { useDispatch, useSelector } from "react-redux";
 
 const useStyles = createUseStyles({
   tabContent: {
@@ -66,8 +66,7 @@ const History = () => {
 const Patient = () => {
   const classes = useStyles();
 
-  const [state, actions] = useContext(PatientContext);
-  const { patientData, profileActiveTab } = state;
+  const { patientById } = useSelector((state) => state.patients);
 
   const [billState, billActions] = useContext(BillingContext);
   const { billSummary } = billState;
@@ -83,17 +82,17 @@ const Patient = () => {
     }
   }, [selectedTab]);
 
-  useEffect(() => {
-    if (patientData === null) {
-      actions.getPatientById(location.pathname.split("/")[2], (res) => {
-        billActions.getAllBillingDataAction({
-          id_doctor: parseInt(localStorage.getItem("id_doctor")),
-          id_patient: res.id_patient,
-          id_clinic: res.id_clinic,
-        });
-      });
-    }
-  }, [patientData]);
+  // useEffect(() => {
+  //   if (patientData === null) {
+  //     actions.getPatientById(location.pathname.split("/")[2], (res) => {
+  //       billActions.getAllBillingDataAction({
+  //         id_doctor: parseInt(localStorage.getItem("id_doctor")),
+  //         id_patient: res.id_patient,
+  //         id_clinic: res.id_clinic,
+  //       });
+  //     });
+  //   }
+  // }, [patientData]);
 
   const tabs = [
     { name: "Profile", component: <Profile /> },
@@ -105,22 +104,19 @@ const Patient = () => {
   return (
     <div style={{ flex: 1 }}>
       <Card>
-        {patientData !== null && (
-          <div className={classes.header}>
-            <span className="pl-0 name">
-              {patientData.first_name} {patientData.last_name}
-            </span>
-            <span className="gender">{patientData.gender}</span>
-            <span className="age">{patientData.age}</span>
-            <span className="outstandingAmt no-border">
-              O/s Amount:{" "}
-              <b>
-                <AmountWithCurrancy amount={billSummary.balanceBillAmount} />
-              </b>
-            </span>
-          </div>
-        )}
-
+        <div className={classes.header}>
+          <span className="pl-0 name">
+            {patientById.first_name} {patientById.last_name}
+          </span>
+          <span className="gender">{patientById.gender}</span>
+          <span className="age">{patientById.age}</span>
+          <span className="outstandingAmt no-border">
+            O/s Amount:{" "}
+            <b>
+              <AmountWithCurrancy amount={billSummary.balanceBillAmount} />
+            </b>
+          </span>
+        </div>
         <div className="tab-pills-horizontal">
           <Tab.Container id="top-tabs-example" activeKey={activeTab}>
             <Row>

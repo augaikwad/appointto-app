@@ -1,20 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
-import { PrescriptionContext } from "../../../context/Prescription";
+import React, { useEffect, useState } from "react";
 import TopTagsCreatable from "./TopTagsCreatable";
+import { useDispatch, useSelector } from "react-redux";
+import { getObservations } from "../../../store/actions/prescriptionActions";
 
 const ObservationTags = () => {
+  const dispatch = useDispatch();
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { observations } = useSelector((state) => state.prescription);
   const [top, setTop] = useState([]);
 
-  const [state, actions] = useContext(PrescriptionContext);
-  const { observations } = state;
-
   useEffect(() => {
-    actions.getObservations();
+    dispatch(getObservations(id_doctor));
   }, []);
 
   useEffect(() => {
     if (observations.length > 0) {
-      let topArr = observations.sort((a, b) => b.count - a.count).slice(0, 5);
+      let options = [...observations];
+      let topArr = options.sort((a, b) => b.count - a.count).slice(0, 5);
       setTop(topArr);
     }
   }, [observations]);
@@ -27,7 +29,7 @@ const ObservationTags = () => {
       valueField="id_observations"
       topFive={top}
       addNewCallback={() => {
-        actions.getObservations();
+        dispatch(getObservations(id_doctor));
       }}
     />
   );

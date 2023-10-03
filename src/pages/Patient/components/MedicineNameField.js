@@ -1,11 +1,15 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, InputField } from "../../../components";
 import { ReactSelectField } from "../../../components/Forms";
 import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 import cogoToast from "cogo-toast";
-import { PrescriptionContext } from "../../../context/Prescription";
 import { useFormContext } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getMedicinesByDoctorId,
+  searchMedicines,
+} from "../../../store/actions/prescriptionActions";
 
 const useStyles = createUseStyles({
   nameEditBtn: {},
@@ -26,25 +30,6 @@ const useStyles = createUseStyles({
   },
 });
 
-const data = [
-  {
-    type: "Tab",
-    name: "Azithral 500",
-  },
-  {
-    type: "Syr",
-    name: "Ascoril LS",
-  },
-  {
-    type: "Cre",
-    name: "Betnovate-N",
-  },
-  {
-    type: "Cap",
-    name: "Betacap TR 40",
-  },
-];
-
 const MedicineNameField = ({
   name,
   objKey,
@@ -55,10 +40,14 @@ const MedicineNameField = ({
   ind,
 }) => {
   const classes = useStyles();
-  const [show, setShow] = useState(false);
+  const dispatch = useDispatch();
 
-  const [state, actions] = useContext(PrescriptionContext);
-  const { doctorMedicines, medicines } = state;
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { doctorMedicines, medicines } = useSelector(
+    (state) => state.prescription
+  );
+
+  const [show, setShow] = useState(false);
 
   const [composition, setComposition] = useState(null);
   const [medicineName, setMedicineName] = useState("");
@@ -73,7 +62,7 @@ const MedicineNameField = ({
   }, [composition]);
 
   useEffect(() => {
-    actions.getDoctorMedicines();
+    dispatch(getMedicinesByDoctorId(id_doctor));
   }, []);
 
   const getTitle = () => {
@@ -132,7 +121,7 @@ const MedicineNameField = ({
         }}
         onInputChange={(value) => {
           if (value.length > 2) {
-            actions.searchMedicines(value);
+            dispatch(searchMedicines(value));
           }
         }}
         components={{

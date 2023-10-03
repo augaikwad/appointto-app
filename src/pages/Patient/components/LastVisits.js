@@ -1,12 +1,12 @@
-import React, { useEffect, useContext, useRef } from "react";
-import { Card, Tooltip } from "../../../components";
+import React, { useEffect, useRef } from "react";
+import { Tooltip } from "../../../components";
 import { createUseStyles } from "react-jss";
 import { format } from "date-fns";
 import CommonMedicineTable from "./CommonMedicineTable";
-import { PrescriptionContext } from "../../../context/Prescription";
-import { PatientContext } from "../../../context/Patient";
 import PrescriptionPrint from "../components/PrescriptionPrint";
 import ReactToPrint from "react-to-print";
+import { useDispatch, useSelector } from "react-redux";
+import { getPrescriptions } from "../../../store/actions/prescriptionActions";
 
 const useStyles = createUseStyles({
   container: {
@@ -107,20 +107,17 @@ const PrintButton = ({ data }) => {
   );
 };
 
-const LastVisits = ({ data = [] }) => {
+const LastVisits = () => {
   const classes = useStyles();
-
-  const [state, actions] = useContext(PrescriptionContext);
-  const { allPrescriptions } = state;
-
-  const [patientState, patientActions] = useContext(PatientContext);
-  const { patientData } = patientState;
+  const dispatch = useDispatch();
+  const { allPrescriptions } = useSelector((state) => state.prescription);
+  const { patientById } = useSelector((state) => state.patients);
 
   useEffect(() => {
-    if (patientData !== null) {
-      actions.getPrescriptions({ PatientId: patientData.id_patient });
+    if (patientById !== null) {
+      dispatch(getPrescriptions({ PatientId: patientById.id_patient }));
     }
-  }, [patientData]);
+  }, [patientById]);
 
   const getCardTitle = (item) => {
     return (
@@ -129,7 +126,6 @@ const LastVisits = ({ data = [] }) => {
           {format(new Date(item.prescriptionDate), "dd-MMM-yyyy")}
         </b>{" "}
         By: {localStorage.getItem("id_doctor")}
-        {/* {item.by} */}
       </>
     );
   };

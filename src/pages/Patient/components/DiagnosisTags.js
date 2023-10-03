@@ -1,20 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
-import { PrescriptionContext } from "../../../context/Prescription";
+import React, { useEffect, useState } from "react";
 import TopTagsCreatable from "./TopTagsCreatable";
+import { useDispatch, useSelector } from "react-redux";
+import { getDiagnosis } from "../../../store/actions/prescriptionActions";
 
 const DiagnosisTags = () => {
+  const dispatch = useDispatch();
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { diagnosis } = useSelector((state) => state.prescription);
   const [top, setTop] = useState([]);
 
-  const [state, actions] = useContext(PrescriptionContext);
-  const { diagnosis } = state;
-
   useEffect(() => {
-    actions.getDiagnosis();
+    dispatch(getDiagnosis(id_doctor));
   }, []);
 
   useEffect(() => {
     if (diagnosis.length > 0) {
-      let topArr = diagnosis.sort((a, b) => b.count - a.count).slice(0, 5);
+      let options = [...diagnosis];
+      let topArr = options.sort((a, b) => b.count - a.count).slice(0, 5);
       setTop(topArr);
     }
   }, [diagnosis]);
@@ -27,7 +29,7 @@ const DiagnosisTags = () => {
       valueField="id_diagnosis"
       topFive={top}
       addNewCallback={() => {
-        actions.getDiagnosis();
+        dispatch(getDiagnosis(id_doctor));
       }}
     />
   );

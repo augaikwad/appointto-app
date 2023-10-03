@@ -7,6 +7,9 @@ import { PatientContext } from "../context/Patient";
 import { AppointmentContext } from "../context/Appointment";
 import moment from "moment";
 import { debounce } from "lodash";
+import { useDispatch, useSelector } from "react-redux";
+import { setAppointmentModal } from "../store/reducers/appointmentsSlice";
+import { createAppointment } from "../store/actions/appointmentActions";
 
 const useStyles = createUseStyles({
   customMenuItem: {
@@ -21,10 +24,15 @@ const useStyles = createUseStyles({
 const NavbarSearch = () => {
   const classes = useStyles();
   const ref = useRef();
+  const dispatch = useDispatch();
+
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { appointmentForm } = useSelector((state) => state.appointments);
+
   const [state, actions] = useContext(PatientContext);
   const { globalPatientList } = state;
   const [aptState, aptActions] = useContext(AppointmentContext);
-  const { appointmentForm, canResetSearchBox } = aptState;
+  const { canResetSearchBox } = aptState;
 
   // useEffect(() => {
   //   actions.getGlobalList();
@@ -73,10 +81,15 @@ const NavbarSearch = () => {
                     req.day = moment(currentDate).format("dddd");
                     req.reason = "Consultation";
 
-                    aptActions.createAppointment(req, () => {
-                      // ref.current?.clear();
-                      aptActions.getAppointmentByDoctor();
-                    });
+                    dispatch(
+                      createAppointment(req, () => {
+                        aptActions.getAppointmentByDoctor();
+                      })
+                    );
+                    // aptActions.createAppointment(req, () => {
+                    //   // ref.current?.clear();
+                    //   aptActions.getAppointmentByDoctor();
+                    // });
                   }}
                 >
                   Add to Queue
@@ -84,11 +97,22 @@ const NavbarSearch = () => {
                 <button
                   className="btn btn-sm btn-link"
                   onClick={() => {
-                    aptActions.setAppointmentForm({
-                      id_patient: option.id_patient,
-                      id_doctor: localStorage.getItem("id_doctor"),
-                    });
-                    aptActions.setAppointmentModal({ show: true });
+                    // aptActions.setAppointmentForm({
+                    //   id_patient: option.id_patient,
+                    //   id_doctor: localStorage.getItem("id_doctor"),
+                    // });
+                    // aptActions.setAppointmentModal({ show: true });
+                    let form = appointmentForm.form;
+                    dispatch(
+                      setAppointmentModal({
+                        show: true,
+                        form: {
+                          ...form,
+                          id_patient: option.id_patient,
+                          id_doctor,
+                        },
+                      })
+                    );
                   }}
                 >
                   Add Appointment
@@ -116,7 +140,11 @@ const NavbarSearch = () => {
           </button>
         </div>
       </div>
-      <CreateAppointmentModal />
+      <CreateAppointmentModal
+        onHide={() => {
+          dispatch(setAppointmentModal({ show: false }));
+        }}
+      />
       <AddEditPatientModal />
     </>
   );

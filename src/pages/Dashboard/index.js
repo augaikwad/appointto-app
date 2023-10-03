@@ -1,22 +1,27 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import CountUp from "react-countup";
 import { Card } from "../../components";
 import ListFilters from "./ListFilters";
 import ListWidget from "./ListWidget";
-import { AppointmentContext } from "../../context/Appointment";
 import moment from "moment";
+import { useSelector, useDispatch } from "react-redux";
+import { getDashboardAppointments } from "../../store/actions/appointmentActions";
 
-function Dashboard(props) {
-  const [state, actions] = useContext(AppointmentContext);
+function Dashboard() {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+  const { id_doctor, user_name } = user.details;
   const {
+    dashboardListFilters,
     appointmentCount,
     followUpPatient,
     newPatient,
     queueCount,
-    totalCount,
-  } = state;
+  } = useSelector((state) => state.appointments);
 
-  const id_doctor = parseInt(localStorage.getItem("id_doctor"));
+  useEffect(() => {
+    dispatch(getDashboardAppointments(dashboardListFilters));
+  }, []);
 
   const counts = [
     { title: "Today's Queue", count: queueCount, icon: "ti-menu-alt" },
@@ -70,10 +75,7 @@ function Dashboard(props) {
         <div className="col-12 col-xl-5 mb-4 mb-xl-0 grid-margin">
           <p className="card-description">
             Hi, Good {getGreetingTime(moment())}!{" "}
-            <b>
-              {`${id_doctor !== 0 ? "Dr." : ""}`}
-              {localStorage.getItem("user_name")}
-            </b>
+            <b>{`${id_doctor !== 0 ? "Dr." : ""} ${user_name}`}</b>
           </p>
         </div>
       </div>
