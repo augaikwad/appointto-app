@@ -48,11 +48,7 @@ const CreateAppointmentModal = ({ onHide }) => {
   const dispatch = useDispatch();
 
   const { doctorsByClinicId } = useSelector((state) => state.user);
-  console.log(
-    "useSelector = appointments ==",
-    useSelector((state) => state.appointments),
-    useSelector((state) => state)
-  );
+
   const { dashboardListFilters, appointmentModal } = useSelector(
     (state) => state.appointments
   );
@@ -67,15 +63,6 @@ const CreateAppointmentModal = ({ onHide }) => {
   useEffect(() => {
     reset(formattedFormData(formValues));
   }, [appointmentModal.form]);
-
-  const handleOnHide = () => {
-    // dispatch(
-    //   setAppointmentModal({
-    //     ...appointmentModal,
-    //     show: false,
-    //   })
-    // );
-  };
 
   const callback = () => {
     onHide();

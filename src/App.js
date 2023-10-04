@@ -18,11 +18,7 @@ function App(props) {
   const history = useHistory();
 
   const isLoading = useSelector((state) => state.global.loading);
-  // console.log(
-  //   "App isLoading=== ",
-  //   isLoading,
-  //   useSelector((state) => state)
-  // );
+
   useEffect(() => {
     //check jwt token
     const token = sessionStorage.getItem("token");
@@ -35,11 +31,11 @@ function App(props) {
 
   return (
     <Router>
+      <Loader open={isLoading} />
       <GlobalContextProvider>
         <GlobalContext.Consumer>
           {([state, actions]) => (
             <>
-              <Loader open={isLoading} />
               {/* <Notification
                 error={state.error}
                 success={state.successMessage}

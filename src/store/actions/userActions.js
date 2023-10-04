@@ -6,7 +6,6 @@ import {
   setDoctorsByClinicId,
   setSelectedDoctorId,
 } from "../reducers/userSlice";
-import { setLoading } from "../reducers/globalSlice";
 import { setAuthToken } from "../../helpers/setAuthToken";
 import { setDashboardListFilters } from "../reducers/appointmentsSlice";
 
@@ -14,7 +13,6 @@ const toastOption = { hideAfter: 5, position: "top-right" };
 
 // Login user
 export const login = (request, callback) => async (dispatch) => {
-  dispatch(setLoading(true));
   try {
     const response = await service.post("Login/login", request);
     const { response_code, payload, message } = response.data;
@@ -35,11 +33,9 @@ export const login = (request, callback) => async (dispatch) => {
         callback(payload);
       }
     }
-    dispatch(setLoading(false));
   } catch (error) {
     // Handle error here
     console.error("Error fetching user data:", error);
-    dispatch(setLoading(false));
   }
 };
 

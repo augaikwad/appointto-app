@@ -5,15 +5,30 @@ import store from "./store";
 import { setLoading } from "./store/reducers/globalSlice";
 
 const history = createBrowserHistory();
+let requestCounter = 0;
 
-const handleSetLoading = (isLoading, config) => {
-  if (isLoading && !config.silentCall) store.dispatch(setLoading(isLoading));
+const showLoader = () => {
+  requestCounter++;
+  store.dispatch(setLoading(true));
+};
+
+const hideLoader = (isSilent) => {
+  if (requestCounter > 0 && !isSilent) {
+    requestCounter--;
+  }
+  if (requestCounter === 0) {
+    store.dispatch(setLoading(false));
+  }
+  return requestCounter;
 };
 
 const getAxiosClient = (baseUrl = null) => {
   const { API_BASE_URL } = config;
   const options = {
     baseURL: API_BASE_URL ? API_BASE_URL : baseUrl,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+    },
     withCredentials: false,
     timeout: 30000,
   };
@@ -21,13 +36,13 @@ const getAxiosClient = (baseUrl = null) => {
   const client = axios.create(options);
   client.interceptors.request.use(
     (config) => {
-      // handleSetLoading(true, config);
-      config.headers["Content-Type"] = "application/json; charset=utf-8";
+      if (!config?.silent) {
+        showLoader(true);
+      }
 
-      const token = sessionStorage.getItem("token");
+      const token = sessionStorage.token;
       if (token !== null) {
-        config.headers.Authorization =
-          "Bearer " + sessionStorage.getItem("token");
+        config.headers["Authorization"] = "Bearer " + token;
       } else {
         delete config.headers["Authorization"];
       }
@@ -39,7 +54,8 @@ const getAxiosClient = (baseUrl = null) => {
 
   client.interceptors.response.use(
     (response) => {
-      // handleSetLoading(false);
+      requestCounter = hideLoader(response?.config?.silent);
+
       if ("undefined" === typeof response || response.status < 200) {
         return Promise.reject(response);
       }
@@ -47,7 +63,9 @@ const getAxiosClient = (baseUrl = null) => {
     },
     (error) => {
       let { response } = error;
-      // handleSetLoading(false);
+
+      requestCounter = hideLoader(error?.config?.silent);
+
       let errResponse = {};
       if ("undefined" === typeof response || response === undefined) {
         return Promise.reject("Something went wrong, Please try again.");

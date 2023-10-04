@@ -1,5 +1,4 @@
 import service from "../../service";
-import { setLoading } from "../reducers/globalSlice";
 import { setDashboardAppointments } from "../reducers/appointmentsSlice";
 import moment from "moment";
 
@@ -16,7 +15,6 @@ export const formattedFilters = (filters) => {
 
 // Login user
 export const getDashboardAppointments = (request) => async (dispatch) => {
-  dispatch(setLoading(true));
   try {
     const response = await service.post(
       "Appointment/get-appointment-by-doctor",
@@ -26,16 +24,13 @@ export const getDashboardAppointments = (request) => async (dispatch) => {
     if (response_code === 2000) {
       dispatch(setDashboardAppointments(payload));
     }
-    dispatch(setLoading(false));
   } catch (error) {
     // Handle error here
     console.error("Error fetching user data:", error);
-    dispatch(setLoading(false));
   }
 };
 
 export const createAppointment = (req, callback) => async (dispatch) => {
-  dispatch(setLoading(true));
   try {
     const response = await service.post("Appointment/Create", req);
     const { response_code, message } = response.data;
@@ -47,16 +42,13 @@ export const createAppointment = (req, callback) => async (dispatch) => {
     } else {
       cogoToast.error(message, toastOption);
     }
-    dispatch(setLoading(false));
   } catch (error) {
     // Handle error here
     console.error("Error fetching user data:", error);
-    dispatch(setLoading(false));
   }
 };
 
 export const updateAppointment = (req, callback) => async (dispatch) => {
-  dispatch(setLoading(true));
   try {
     const response = await service.post("Appointment/Update", req);
     const { response_code, message } = response.data;
@@ -68,10 +60,8 @@ export const updateAppointment = (req, callback) => async (dispatch) => {
     } else {
       cogoToast.error(message, toastOption);
     }
-    dispatch(setLoading(false));
   } catch (error) {
     // Handle error here
     console.error("Error fetching user data:", error);
-    dispatch(setLoading(false));
   }
 };

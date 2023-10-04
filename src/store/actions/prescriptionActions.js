@@ -1,6 +1,5 @@
 import service from "../../service";
 import cogoToast from "cogo-toast";
-import { setLoading } from "../reducers/globalSlice";
 import {
   setComplaints,
   setObservations,
@@ -138,7 +137,6 @@ export const getAdviceGroup = (id_doctor, callback) => async (dispatch) => {
 };
 
 export const saveAdviceGroup = (req, callback) => async (dispatch) => {
-  dispatch(setLoading(true));
   try {
     const response = await service.post("Prescription/SaveAdviceGroup", req);
     const { response_code } = response.data;
@@ -147,10 +145,8 @@ export const saveAdviceGroup = (req, callback) => async (dispatch) => {
         callback();
       }
     }
-    dispatch(setLoading(false));
   } catch (error) {
     console.error("Error fetching user data:", error);
-    dispatch(setLoading(false));
   }
 };
 
@@ -173,7 +169,6 @@ export const getInvestigationsGroup =
   };
 
 export const saveInvestigationsGroup = (req, callback) => async (dispatch) => {
-  dispatch(setLoading(true));
   try {
     const response = await service.post(
       "Prescription/SaveInvestigationGroup",
@@ -185,12 +180,10 @@ export const saveInvestigationsGroup = (req, callback) => async (dispatch) => {
         callback();
       }
     }
-    dispatch(setLoading(false));
   } catch (error) {
     console.error("Error fetching user data:", error);
-    dispatch(setLoading(false));
   }
-}; //getDoctorMedicines
+};
 
 export const getMedicinesByDoctorId = (id_doctor) => async (dispatch) => {
   try {
@@ -224,7 +217,6 @@ export const getRxGroups = (id_doctor, callback) => async (dispatch) => {
 };
 
 export const saveRxGroup = (req, callback) => async (dispatch) => {
-  dispatch(setLoading(true));
   try {
     const response = await service.post("Prescription/SaveRxGroup", req);
     const { response_code } = response.data;
@@ -233,10 +225,8 @@ export const saveRxGroup = (req, callback) => async (dispatch) => {
         callback();
       }
     }
-    dispatch(setLoading(false));
   } catch (error) {
     console.error("Error fetching user data:", error);
-    dispatch(setLoading(false));
   }
 };
 
@@ -268,7 +258,6 @@ export const getPrescriptions = (req, callback) => async (dispatch) => {
 };
 
 export const savePrescription = (req, callback) => async (dispatch) => {
-  dispatch(setLoading(true));
   try {
     const response = await service.post("Prescription/SavePrescription", req);
     const { response_code, payload, message } = response.data;
@@ -278,9 +267,7 @@ export const savePrescription = (req, callback) => async (dispatch) => {
         callback(payload);
       }
     }
-    dispatch(setLoading(false));
   } catch (error) {
     console.error("Error fetching user data:", error);
-    dispatch(setLoading(false));
   }
 };
