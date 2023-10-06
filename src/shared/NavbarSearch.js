@@ -9,7 +9,11 @@ import moment from "moment";
 import { debounce } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { setAppointmentModal } from "../store/reducers/appointmentsSlice";
-import { createAppointment } from "../store/actions/appointmentActions";
+import {
+  createAppointment,
+  getDashboardAppointments,
+} from "../store/actions/appointmentActions";
+import { getGlobalList } from "../store/actions/patientActions";
 
 const useStyles = createUseStyles({
   customMenuItem: {
@@ -26,25 +30,31 @@ const NavbarSearch = () => {
   const ref = useRef();
   const dispatch = useDispatch();
 
-  const { id_doctor } = useSelector((state) => state.user.details);
-  const { appointmentForm } = useSelector((state) => state.appointments);
+  const { id_doctor, id_clinic } = useSelector((state) => state.user.details);
+  const { appointmentModal, dashboardListFilters } = useSelector(
+    (state) => state.appointments
+  );
+
+  const { globalPatientList } = useSelector((state) => state.patients);
 
   const [state, actions] = useContext(PatientContext);
-  const { globalPatientList } = state;
+
   const [aptState, aptActions] = useContext(AppointmentContext);
   const { canResetSearchBox } = aptState;
 
-  // useEffect(() => {
-  //   actions.getGlobalList();
-  // }, []);
-
   const handleDebounceChange = debounce((val) => {
-    actions.getGlobalList(val);
+    dispatch(
+      getGlobalList({
+        id_clinic,
+        Keywords: val,
+        start_record: 1,
+        end_record: 10,
+      })
+    );
   }, 1000);
 
   useEffect(() => {
     if (canResetSearchBox) {
-      // ref.current?.clear();
       aptActions.setCanResetSearchBox(false);
     }
   }, [canResetSearchBox]);
@@ -66,7 +76,7 @@ const NavbarSearch = () => {
           id="globalSearch"
           name="globalSearch"
           onSearch={handleDebounceChange}
-          options={globalPatientList || []}
+          options={globalPatientList?.item || []}
           renderMenuItemChildren={(option, props, index) => {
             return (
               <div className={classes.customMenuItem} key={index}>
@@ -75,21 +85,20 @@ const NavbarSearch = () => {
                   className="btn btn-sm btn-link"
                   onClick={() => {
                     let currentDate = new Date();
-                    let req = { ...appointmentForm };
+                    let req = { ...appointmentModal.form };
                     req.id_patient = option.id_patient;
+                    req.id_doctor = id_doctor;
                     req.date = currentDate.toISOString();
                     req.day = moment(currentDate).format("dddd");
                     req.reason = "Consultation";
 
                     dispatch(
                       createAppointment(req, () => {
-                        aptActions.getAppointmentByDoctor();
+                        dispatch(
+                          getDashboardAppointments(dashboardListFilters)
+                        );
                       })
                     );
-                    // aptActions.createAppointment(req, () => {
-                    //   // ref.current?.clear();
-                    //   aptActions.getAppointmentByDoctor();
-                    // });
                   }}
                 >
                   Add to Queue
@@ -97,19 +106,14 @@ const NavbarSearch = () => {
                 <button
                   className="btn btn-sm btn-link"
                   onClick={() => {
-                    // aptActions.setAppointmentForm({
-                    //   id_patient: option.id_patient,
-                    //   id_doctor: localStorage.getItem("id_doctor"),
-                    // });
-                    // aptActions.setAppointmentModal({ show: true });
-                    let form = appointmentForm.form;
                     dispatch(
                       setAppointmentModal({
                         show: true,
+                        isAdd: true,
                         form: {
-                          ...form,
-                          id_patient: option.id_patient,
+                          ...appointmentModal.form,
                           id_doctor,
+                          id_patient: option.id_patient,
                         },
                       })
                     );

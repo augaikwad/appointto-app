@@ -1,5 +1,5 @@
 import service from "../../service";
-import { setPatientById } from "../reducers/patientSlice";
+import { setPatientById, setGlobalList } from "../reducers/patientSlice";
 
 export const getPatientById = (reqParams, callback) => async (dispatch) => {
   const stringParams = new URLSearchParams(reqParams);
@@ -20,10 +20,12 @@ export const getPatientById = (reqParams, callback) => async (dispatch) => {
 export const getGlobalList = (reqParams, callback) => async (dispatch) => {
   const stringParams = new URLSearchParams(reqParams);
   try {
-    const response = await service.get("Patient/get-patient?" + stringParams);
+    const response = await service.get(
+      "Patient/get-patient-list?" + stringParams
+    );
     const { response_code, payload, message } = response.data;
     if (response_code === 2000) {
-      dispatch(setPatientById(payload));
+      dispatch(setGlobalList(payload));
       if (callback) {
         callback(payload);
       }

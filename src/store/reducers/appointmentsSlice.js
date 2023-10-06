@@ -23,7 +23,7 @@ export const initialState = {
       id_appointment: 0,
       id_doctor: 0,
       id_patient: 0,
-      date: currentDate,
+      date: "",
       day: "",
       start_time: "",
       end_time: "",

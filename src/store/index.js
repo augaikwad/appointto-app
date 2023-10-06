@@ -28,6 +28,7 @@ const store = configureStore({
         ignoredActionPaths: [
           "payload.appointment_date",
           "prescription.prescriptionForm.nextVisitDate",
+          "appointments.dashboardListFilters.appointment_date",
         ],
       },
     }),

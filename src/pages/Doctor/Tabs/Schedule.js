@@ -250,7 +250,7 @@ const Schedule = () => {
                 <DateTimePickerField
                   label="Start time"
                   name="start_time"
-                  dateFormat="h:mmaa"
+                  dateFormat="hh:mmaa"
                   showTimeSelect
                   showTimeSelectOnly
                   timeIntervals={15}
@@ -265,7 +265,7 @@ const Schedule = () => {
                 <DateTimePickerField
                   label="End Time"
                   name="end_time"
-                  dateFormat="h:mmaa"
+                  dateFormat="hh:mmaa"
                   showTimeSelect
                   showTimeSelectOnly
                   timeIntervals={15}

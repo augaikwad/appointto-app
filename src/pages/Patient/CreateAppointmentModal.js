@@ -142,13 +142,15 @@ const CreateAppointmentModal = ({ onHide }) => {
               <DateTimePickerField
                 label="Start time"
                 name="start_time"
-                dateFormat="h:mmaa"
+                dateFormat="hh:mmaa"
                 showTimeSelect
                 showTimeSelectOnly
                 timeIntervals={15}
                 timeCaption="Time"
                 inputOnChange={(val) => {
-                  setValue("end_time", moment(val).add(15, "m").toDate());
+                  if (val) {
+                    setValue("end_time", moment(val).add(15, "m").toDate());
+                  }
                 }}
                 rules={{
                   required: "Start Time Required",
@@ -159,7 +161,7 @@ const CreateAppointmentModal = ({ onHide }) => {
               <DateTimePickerField
                 label="End Time"
                 name="end_time"
-                dateFormat="h:mmaa"
+                dateFormat="hh:mmaa"
                 showTimeSelect
                 showTimeSelectOnly
                 timeIntervals={15}

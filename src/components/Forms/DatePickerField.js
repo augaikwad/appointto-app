@@ -14,6 +14,7 @@ const DatePickerField = ({
   dateFormat = "dd/MM/yyyy",
   rules = {},
   inputOnChange = () => {},
+  defaultValue = null,
   ...restProps
 }) => {
   const { control } = useFormContext();
@@ -32,14 +33,16 @@ const DatePickerField = ({
         name={name}
         control={control}
         rules={rules}
+        defaultValue={defaultValue}
         render={({ field: { onChange, value } }) => {
+          let newValue = !!value && value !== "" ? new Date(value) : null;
           return (
             <DatePicker
               onChange={(date) => {
                 inputOnChange(date);
                 onChange(date);
               }}
-              selected={new Date(value)}
+              selected={newValue}
               dateFormat={dateFormat}
               className={`form-control form-control-sm`}
               calendarClassName="form-control-calendar"

@@ -70,8 +70,11 @@ const patientSlice = createSlice({
     setPatientById: (state, action) => {
       state.patientById = action.payload;
     },
+    setGlobalList: (state, action) => {
+      state.globalPatientList = action.payload;
+    },
   },
 });
 
-export const { setPatientById } = patientSlice.actions;
+export const { setPatientById, setGlobalList } = patientSlice.actions;
 export default patientSlice.reducer;
