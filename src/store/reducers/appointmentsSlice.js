@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import moment from "moment";
 import { formattedFilters } from "../actions/appointmentActions";
+import { calendarDataFormatter } from "../../utils/common";
 
 const currentDate = moment(new Date()).format("YYYY-MM-DD");
 
@@ -31,11 +32,11 @@ export const initialState = {
       appointment_status: "",
     },
   },
+  calendarList: [],
 
   appointmentList: [],
   appointmentStatusList: [],
   canResetSearchBox: false,
-  calendarList: [],
 };
 
 const appointmentsSlice = createSlice({
@@ -69,12 +70,14 @@ const appointmentsSlice = createSlice({
       });
     },
     setAppointmentModal: (state, action) => {
-      console.log("setAppointmentModal == ", action, action.payload);
       if (action.payload.hasOwnProperty("show") && !action.payload.show) {
         state.appointmentModal = initialState.appointmentModal;
       } else {
         state.appointmentModal = action.payload;
       }
+    },
+    setAppointmentsForCalendar: (state, action) => {
+      state.calendarList = calendarDataFormatter(action.payload);
     },
   },
 });
@@ -83,5 +86,6 @@ export const {
   setDashboardAppointments,
   setDashboardListFilters,
   setAppointmentModal,
+  setAppointmentsForCalendar,
 } = appointmentsSlice.actions;
 export default appointmentsSlice.reducer;

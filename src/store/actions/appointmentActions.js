@@ -1,5 +1,8 @@
 import service from "../../service";
-import { setDashboardAppointments } from "../reducers/appointmentsSlice";
+import {
+  setDashboardAppointments,
+  setAppointmentsForCalendar,
+} from "../reducers/appointmentsSlice";
 import moment from "moment";
 
 import cogoToast from "cogo-toast";
@@ -13,7 +16,6 @@ export const formattedFilters = (filters) => {
   return filter;
 };
 
-// Login user
 export const getDashboardAppointments = (request) => async (dispatch) => {
   try {
     const response = await service.post(
@@ -59,6 +61,22 @@ export const updateAppointment = (req, callback) => async (dispatch) => {
       }
     } else {
       cogoToast.error(message, toastOption);
+    }
+  } catch (error) {
+    // Handle error here
+    console.error("Error fetching user data:", error);
+  }
+};
+
+export const getAppointmentsForCalendar = (request) => async (dispatch) => {
+  try {
+    const response = await service.post(
+      "Appointment/get-appointment-for-calendar",
+      request
+    );
+    const { response_code, payload } = response.data;
+    if (response_code === 2000) {
+      dispatch(setAppointmentsForCalendar(payload));
     }
   } catch (error) {
     // Handle error here

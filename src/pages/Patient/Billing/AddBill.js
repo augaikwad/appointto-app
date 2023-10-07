@@ -1,12 +1,22 @@
-import React, { useEffect, useContext } from "react";
+import React from "react";
 import { Tooltip } from "../../../components";
 import { Form, Alert, Button } from "react-bootstrap";
 import { format } from "date-fns";
 import CommonBillingList from "./CommonBillingList";
 import { createUseStyles } from "react-jss";
-import { BillingContext } from "../../../context/Billing";
-import { PatientContext } from "../../../context/Patient";
 import AmountWithCurrancy from "../../../components/AmountWithCurrancy";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  updateBill,
+  getBillSummary,
+  getAllBillData,
+  deleteBill,
+} from "../../../store/actions/billingActions";
+import {
+  setBillModal,
+  setPaymentModal,
+  initialState as billingInitState,
+} from "../../../store/reducers/billingSlice";
 
 const useStyles = createUseStyles({
   th: {
@@ -75,12 +85,10 @@ const useStyles = createUseStyles({
 
 const AddBill = () => {
   const classes = useStyles();
-
-  const [state, actions] = useContext(BillingContext);
-  const { allBillData, billSummary } = state;
-
-  const [patientState, patientActions] = useContext(PatientContext);
-  const { patientData } = patientState;
+  const dispatch = useDispatch();
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { patientById } = useSelector((state) => state.patients);
+  const { billSummary, allBillData } = useSelector((state) => state.billings);
 
   const getDateFormatted = (cell, row) => {
     return format(new Date(cell), "dd/MM/yyyy");
@@ -101,12 +109,16 @@ const AddBill = () => {
         onChange={(e) => {
           let rowData = { ...row };
           rowData.is_Completed = e.target.checked ? 1 : 0;
-          actions.updateBill(rowData, (res) => {
-            actions.getAllBillData({
-              id_doctor: res.id_doctor,
-              id_patient: res.id_patient,
-            });
-          });
+          dispatch(
+            updateBill(rowData, (res) => {
+              dispatch(
+                getAllBillData({
+                  id_doctor: res.id_doctor,
+                  id_patient: res.id_patient,
+                })
+              );
+            })
+          );
         }}
       />
     );
@@ -121,11 +133,13 @@ const AddBill = () => {
             className={`${classes.listActionBtn} btn btn-inverse-info btn-icon`}
             disabled={row.is_Completed === 1}
             onClick={() => {
-              actions.setPaymentModal({
-                open: true,
-                isAdd: true,
-                formValue: { bill_id: row.bill_id },
-              });
+              dispatch(
+                setPaymentModal({
+                  open: true,
+                  isAdd: true,
+                  formValue: { bill_id: row.bill_id },
+                })
+              );
             }}
           >
             <i className="fa fa-plus"></i>
@@ -136,11 +150,13 @@ const AddBill = () => {
             size="sm"
             className={`${classes.listActionBtn} btn-inverse-info btn-icon`}
             onClick={() => {
-              actions.setBillModal({
-                open: true,
-                isAdd: false,
-                formValue: row,
-              });
+              dispatch(
+                setBillModal({
+                  open: true,
+                  isAdd: false,
+                  formValue: row,
+                })
+              );
             }}
           >
             <i className="fa fa-pencil"></i>
@@ -160,17 +176,23 @@ const AddBill = () => {
             className={`${classes.listActionBtn} btn-inverse-danger btn-icon`}
             onClick={() => {
               let req = { bill_id: row.bill_id };
-              actions.deleteBill(req, () => {
-                actions.getAllBillData({
-                  id_doctor: row.id_doctor,
-                  id_patient: row.id_patient,
-                });
-                actions.getBillSummary({
-                  id_doctor: parseInt(localStorage.getItem("id_doctor")),
-                  id_patient: patientData.id_patient,
-                  id_clinic: patientData.id_clinic,
-                });
-              });
+              dispatch(
+                deleteBill(req, () => {
+                  dispatch(
+                    getAllBillData({
+                      id_doctor: row.id_doctor,
+                      id_patient: row.id_patient,
+                    })
+                  );
+                  dispatch(
+                    getBillSummary({
+                      id_doctor: id_doctor,
+                      id_patient: patientById.id_patient,
+                      id_clinic: patientById.id_clinic,
+                    })
+                  );
+                })
+              );
             }}
           >
             <i className="fa fa-trash"></i>
@@ -267,9 +289,13 @@ const AddBill = () => {
               <button
                 className={`btn btn-sm btn-primary`}
                 onClick={() => {
-                  actions.setBillModal({
-                    open: true,
-                  });
+                  dispatch(
+                    setBillModal({
+                      open: true,
+                      isAdd: true,
+                      formValue: billingInitState.billModal.formValue,
+                    })
+                  );
                 }}
               >
                 Add New Bill

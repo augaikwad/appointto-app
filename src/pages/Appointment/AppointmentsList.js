@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "../../components";
 import { createUseStyles } from "react-jss";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { getWeekRange, getMonthRange } from "../../utils/common";
-import { AppointmentContext } from "../../context/Appointment";
-import { DoctorContext } from "../../context/Doctor";
 import Select from "react-select";
+import { useSelector, useDispatch } from "react-redux";
+import { getAppointmentsForCalendar } from "../../store/actions/appointmentActions";
 
 const localizer = momentLocalizer(moment);
 
@@ -80,37 +80,18 @@ const useStyles = createUseStyles({
 
 const AppointmentsList = () => {
   const classes = useStyles();
-
-  const [drState, drActions] = useContext(DoctorContext);
-  const { doctorsByClinicId } = drState;
-  console.log("doctorsByClinicId === ", doctorsByClinicId);
-
-  const [state, actions] = useContext(AppointmentContext);
-  const { calendarList, appointmentStatusList } = state;
+  const dispatch = useDispatch();
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { doctorsByClinicId } = useSelector((state) => state.user);
+  const { calendarList } = useSelector((state) => state.appointments);
 
   const [calendarView, setCalendarView] = useState("month");
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [selectedDoctor, setSelectedDoctor] = useState(doctorsByClinicId[0]);
 
   const getList = (req) => {
-    actions.getAppointmentsForCalendar(req);
+    dispatch(getAppointmentsForCalendar(req));
   };
-
-  useEffect(() => {
-    drActions.getDoctorsByClinicId(
-      parseInt(localStorage.getItem("id_clinic")),
-      (docList) => {
-        let idDoctor = parseInt(localStorage.getItem("id_doctor"));
-        let doctor = "";
-        if (idDoctor === 0) {
-          doctor = docList[0];
-        } else {
-          doctor = docList.find((doc) => doc.id_doctor === idDoctor);
-        }
-        setSelectedDoctor(doctor);
-      }
-    );
-  }, []);
 
   const getDateRange = (view, date) => {
     let range = "";
@@ -129,7 +110,7 @@ const AppointmentsList = () => {
 
   useEffect(() => {
     getList({
-      id_doctor: selectedDoctor?.id_doctor,
+      id_doctor,
       ...getDateRange(calendarView, calendarDate),
     });
   }, [calendarView, calendarDate, selectedDoctor]);
@@ -157,11 +138,6 @@ const AppointmentsList = () => {
   };
 
   const EventWrapper = ({ event, children }) => {
-    console.log(
-      "EventWrapper === appointment_status :: ",
-      event.appointment_status,
-      appointmentStatusList
-    );
     return (
       <div
         className={`${classes.customEventWrapper} ${event.appointment_status}`}

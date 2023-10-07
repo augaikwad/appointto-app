@@ -81,10 +81,6 @@ const ListWidget = () => {
   const handleButtonClick = (patientId, pageState) => {
     dispatch(
       getPatientById({ PatientId: patientId }, () => {
-        // history.push({
-        //   pathname: "/patient/" + patientId,
-        //   state: pageState,
-        // });
         dispatch(navigateTo({ to: `/patient/${patientId}`, state: pageState }));
       })
     );

@@ -11,10 +11,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import moment from "moment";
 import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-// import {
-//   setAppointmentModal,
-//   initialState as appointmentInitState,
-// } from "../../store/reducers/appointmentsSlice";
 import {
   getDashboardAppointments,
   updateAppointment,

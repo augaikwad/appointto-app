@@ -1,23 +1,34 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Modal } from "../../../components";
 import {
   TextField,
   DatePickerField,
   SelectField,
-  ReactSelectField,
   CreatableReactSelect,
 } from "../../../components/Forms";
 import { FormProvider, useForm } from "react-hook-form";
 import { Form, Button } from "react-bootstrap";
-import { BillingContext, initialState } from "../../../context/Billing";
-import { PatientContext } from "../../../context/Patient";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getTreatmentList,
+  createBill,
+  updateBill,
+  getAllBillingDataAction,
+  saveTreatment,
+} from "../../../store/actions/billingActions";
+import {
+  setBillModal,
+  initialState,
+} from "../../../store/reducers/billingSlice";
 
 const AddEditBillModal = () => {
-  const [state, actions] = useContext(BillingContext);
-  const { treatmentList, billModal } = state;
+  const dispatch = useDispatch();
+
+  const { id_doctor, id_clinic } = useSelector((state) => state.user.details);
+  const { treatmentList, billModal } = useSelector((state) => state.billings);
+  const { patientById } = useSelector((state) => state.patients);
+
   const { open, isAdd, formValue } = billModal;
-  const [patientState, patientActions] = useContext(PatientContext);
-  const { patientData } = patientState;
 
   const form = useForm({
     defaultValues: formValue,
@@ -27,7 +38,7 @@ const AddEditBillModal = () => {
   const watchDiscountType = watch("discount_type");
 
   useEffect(() => {
-    actions.getTreatmentList();
+    dispatch(getTreatmentList(id_doctor));
   }, []);
 
   useEffect(() => {
@@ -42,29 +53,31 @@ const AddEditBillModal = () => {
 
   const submitCallback = (res) => {
     reset(initialState.billModal.formValue);
-    actions.getAllBillingDataAction({
-      id_doctor: res.id_doctor,
-      id_patient: res.id_patient,
-      id_clinic: localStorage.getItem("id_clinic"),
-    });
-    actions.setBillModal({ open: false });
+    dispatch(
+      getAllBillingDataAction({
+        id_doctor: res.id_doctor,
+        id_patient: res.id_patient,
+        id_clinic: id_clinic,
+      })
+    );
+    dispatch(setBillModal({ open: false }));
   };
 
   const onSubmit = (data) => {
     let formData = { ...data };
     if (formData.bill_id === 0) {
-      formData.id_patient = patientData.id_patient;
-      formData.id_doctor = parseInt(localStorage.getItem("id_doctor"));
-      formData.id_clinic = parseInt(localStorage.getItem("id_clinic"));
-      actions.createBill(formData, submitCallback);
+      formData.id_patient = patientById.id_patient;
+      formData.id_doctor = id_doctor;
+      formData.id_clinic = id_clinic;
+      dispatch(createBill(formData, submitCallback));
     } else {
-      actions.updateBill(formData, submitCallback);
+      dispatch(updateBill(formData, submitCallback));
     }
   };
 
   const onHide = () => {
     reset(initialState.billModal.formValue);
-    actions.setBillModal({ open: false });
+    dispatch(setBillModal({ open: false }));
   };
 
   const FooterAction = () => {
@@ -142,10 +155,12 @@ const AddEditBillModal = () => {
                     treatment_id: 0,
                     id_doctor: parseInt(localStorage.getItem("id_doctor")),
                   };
-                  actions.saveTreatment(req, (response) => {
-                    setValue("treatment", response);
-                    actions.getTreatmentList();
-                  });
+                  dispatch(
+                    saveTreatment(req, (response) => {
+                      setValue("treatment", response);
+                      dispatch(getTreatmentList(id_doctor));
+                    })
+                  );
                 }}
                 rules={{
                   required: "Please select Treatment",

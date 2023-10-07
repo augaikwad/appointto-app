@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { isPlainObject } from "../../utils/common";
 
 export const initialState = {
   activeTab: 0,
@@ -73,8 +72,20 @@ const patientSlice = createSlice({
     setGlobalList: (state, action) => {
       state.globalPatientList = action.payload;
     },
+    setPatientsList: (state, action) => {
+      state.patientList = action.payload;
+    },
+    setPatientListFilters: (state, action) => {
+      state.patientListFilter = action.payload;
+    },
   },
 });
 
-export const { setPatientById, setGlobalList } = patientSlice.actions;
+export const {
+  setPatientById,
+  setGlobalList,
+  setPatientsList,
+  setPatientListFilters,
+} = patientSlice.actions;
+
 export default patientSlice.reducer;

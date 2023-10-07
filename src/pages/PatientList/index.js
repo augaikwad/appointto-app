@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Card } from "../../components";
 import { TextField } from "../../components/Forms";
 import { Row, Col } from "react-bootstrap";
@@ -13,15 +13,19 @@ import {
   faTrashCan,
   faCalendarAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { useHistory } from "react-router-dom";
 import { Tooltip } from "../../components";
-import { AppointmentContext } from "../../context/Appointment";
-import { PatientContext } from "../../context/Patient";
-import { BillingContext } from "../../context/Billing";
 import { FormProvider, useForm } from "react-hook-form";
 import moment from "moment";
 import { debounce } from "lodash";
 import ListPagination from "../../components/ListPagination";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getPatientsList,
+  getPatientById,
+} from "../../store/actions/patientActions";
+import { navigateTo } from "../../store/reducers/navigationSlice";
+import { createAppointment } from "../../store/actions/appointmentActions";
+import { setAppointmentModal } from "../../store/reducers/appointmentsSlice";
 
 const useStyles = createUseStyles({
   ListContainer: {
@@ -79,43 +83,40 @@ const useStyles = createUseStyles({
 
 const PatientList = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
 
-  const history = useHistory();
+  const { id_clinic } = useSelector((state) => state.user.details);
+  const { patientList, patientListFilter } = useSelector(
+    (state) => state.patients
+  );
+  const { appointmentModal } = useSelector((state) => state.appointments);
 
   const form = useForm();
 
-  const [, actions] = useContext(AppointmentContext);
-  const [patientState, patientActions] = useContext(PatientContext);
-  const { patientList, patientListFilter } = patientState;
-  const [, billActions] = useContext(BillingContext);
-
   const handleGetPatientList = (opt) => {
-    patientActions.getPatientsList({
-      ...patientListFilter,
-      ...opt,
-    });
+    dispatch(
+      getPatientsList({
+        ...patientListFilter,
+        ...opt,
+      })
+    );
   };
 
   useEffect(() => {
-    handleGetPatientList({
-      id_clinic: parseInt(localStorage.getItem("id_clinic")),
-    });
+    handleGetPatientList({ id_clinic });
   }, []);
 
   const handleButtonClick = (patientId, tab) => {
-    patientActions.getPatientById(patientId, (res) => {
-      billActions.getAllBillingDataAction({
-        id_doctor: parseInt(localStorage.getItem("id_doctor")),
-        id_patient: res.id_patient,
-        id_clinic: res.id_clinic,
-      });
-      history.push({
-        pathname: "/patient/" + patientId,
-        state: {
-          selectedTab: tab,
-        },
-      });
-    });
+    dispatch(
+      getPatientById({ PatientId: patientId }, (res) => {
+        dispatch(
+          navigateTo({
+            to: `/patient/${patientId}`,
+            state: { selectedTab: tab },
+          })
+        );
+      })
+    );
   };
 
   const IconButton = ({
@@ -226,10 +227,7 @@ const PatientList = () => {
                               reason: "Consultation",
                               appointment_status: "",
                             };
-
-                            actions.createAppointment(req, () => {
-                              actions.getAppointmentByDoctor();
-                            });
+                            dispatch(createAppointment(req));
                           }}
                         />
                       </td>
@@ -239,10 +237,16 @@ const PatientList = () => {
                           btnClasses={classes.appointmentBtn}
                           icon={faCalendarAlt}
                           btnOnClick={() => {
-                            actions.setAppointmentForm({
-                              id_patient: item.id_patient,
-                            });
-                            actions.setAppointmentModal({ show: true });
+                            dispatch(
+                              setAppointmentModal({
+                                isAdd: true,
+                                show: true,
+                                form: {
+                                  ...appointmentModal.form,
+                                  id_patient: item.id_patient,
+                                },
+                              })
+                            );
                           }}
                         />
                       </td>

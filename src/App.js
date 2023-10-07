@@ -1,5 +1,5 @@
 import React, { useState, Suspense, useEffect } from "react";
-import { useHistory, BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import Routes from "./Routes";
 import Layout from "./shared/Layout";
 import Loader from "./shared/Loader";
@@ -11,11 +11,12 @@ import AppointmentContextProvider from "./context/Appointment";
 import PrescriptionContextProvider from "./context/Prescription";
 import BillingContextProvider from "./context/Billing";
 import SettingsContextProvider from "./context/Settings";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAuthToken } from "./helpers/setAuthToken";
+import { navigateTo } from "./store/reducers/navigationSlice";
 
 function App(props) {
-  const history = useHistory();
+  const dispatch = useDispatch();
 
   const isLoading = useSelector((state) => state.global.loading);
 
@@ -24,6 +25,8 @@ function App(props) {
     const token = sessionStorage.getItem("token");
     if (token) {
       setAuthToken(token);
+    } else {
+      dispatch(navigateTo("/login"));
     }
   }, []);
 
@@ -33,17 +36,6 @@ function App(props) {
     <Router>
       <Loader open={isLoading} />
       <GlobalContextProvider>
-        <GlobalContext.Consumer>
-          {([state, actions]) => (
-            <>
-              {/* <Notification
-                error={state.error}
-                success={state.successMessage}
-                onClose={() => actions.clearGenericResponse()}
-              /> */}
-            </>
-          )}
-        </GlobalContext.Consumer>
         <AuthContextProvider>
           <SettingsContextProvider>
             <DoctorContextProvider>
@@ -51,11 +43,9 @@ function App(props) {
                 <AppointmentContextProvider>
                   <PrescriptionContextProvider>
                     <BillingContextProvider>
-                      <Suspense fallback={<Loader open={true} />}>
-                        <Layout isFullPageLayout={isFullPageLayout}>
-                          <Routes setIsFullPageLayout={setIsFullPageLayout} />
-                        </Layout>
-                      </Suspense>
+                      <Layout isFullPageLayout={isFullPageLayout}>
+                        <Routes setIsFullPageLayout={setIsFullPageLayout} />
+                      </Layout>
                     </BillingContextProvider>
                   </PrescriptionContextProvider>
                 </AppointmentContextProvider>
