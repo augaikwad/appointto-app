@@ -78,6 +78,13 @@ const patientSlice = createSlice({
     setPatientListFilters: (state, action) => {
       state.patientListFilter = action.payload;
     },
+    setPatientModal: (state, action) => {
+      if (action.payload.hasOwnProperty("open") && !action.payload.open) {
+        state.patientModal = initialState.patientModal;
+      } else {
+        state.patientModal = action.payload;
+      }
+    },
   },
 });
 
@@ -86,6 +93,7 @@ export const {
   setGlobalList,
   setPatientsList,
   setPatientListFilters,
+  setPatientModal,
 } = patientSlice.actions;
 
 export default patientSlice.reducer;

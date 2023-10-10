@@ -36,7 +36,6 @@ export const initialState = {
 
   appointmentList: [],
   appointmentStatusList: [],
-  canResetSearchBox: false,
 };
 
 const appointmentsSlice = createSlice({

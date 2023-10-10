@@ -1,10 +1,8 @@
-import React, { useContext, useEffect, useRef } from "react";
-import { Typeahead, AsyncTypeahead } from "react-bootstrap-typeahead";
+import React, { useRef } from "react";
+import { AsyncTypeahead } from "react-bootstrap-typeahead";
 import { createUseStyles } from "react-jss";
 import CreateAppointmentModal from "../pages/Patient/CreateAppointmentModal";
 import AddEditPatientModal from "../pages/Patient/AddEditPatient/AddEditPatientModal";
-import { PatientContext } from "../context/Patient";
-import { AppointmentContext } from "../context/Appointment";
 import moment from "moment";
 import { debounce } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +12,7 @@ import {
   getDashboardAppointments,
 } from "../store/actions/appointmentActions";
 import { getGlobalList } from "../store/actions/patientActions";
+import { setPatientModal } from "../store/reducers/patientSlice";
 
 const useStyles = createUseStyles({
   customMenuItem: {
@@ -27,20 +26,16 @@ const useStyles = createUseStyles({
 
 const NavbarSearch = () => {
   const classes = useStyles();
-  const ref = useRef();
+  const globalSearchRef = useRef();
   const dispatch = useDispatch();
 
   const { id_doctor, id_clinic } = useSelector((state) => state.user.details);
   const { appointmentModal, dashboardListFilters } = useSelector(
     (state) => state.appointments
   );
-
-  const { globalPatientList } = useSelector((state) => state.patients);
-
-  const [state, actions] = useContext(PatientContext);
-
-  const [aptState, aptActions] = useContext(AppointmentContext);
-  const { canResetSearchBox } = aptState;
+  const { globalPatientList, patientModal } = useSelector(
+    (state) => state.patients
+  );
 
   const handleDebounceChange = debounce((val) => {
     dispatch(
@@ -52,12 +47,6 @@ const NavbarSearch = () => {
       })
     );
   }, 1000);
-
-  useEffect(() => {
-    if (canResetSearchBox) {
-      aptActions.setCanResetSearchBox(false);
-    }
-  }, [canResetSearchBox]);
 
   return (
     <>
@@ -126,14 +115,14 @@ const NavbarSearch = () => {
           }}
           placeholder="Search & Add Patients"
           className="globalSearchField"
-          ref={ref}
+          ref={globalSearchRef}
         />
         <div className="input-group-append">
           <button
             type="button"
             className="btn btn-primary btn-icon-text"
             onClick={() => {
-              actions.setPatientModal({ open: true });
+              dispatch(setPatientModal({ ...patientModal, open: true }));
             }}
           >
             <i
