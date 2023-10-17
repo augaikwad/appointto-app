@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Row, Col } from "react-bootstrap";
 import Modal from "../../../components/Modal";
 import { FormProvider, useForm } from "react-hook-form";
@@ -8,10 +8,17 @@ import {
   RadioField,
   DatePickerField,
 } from "../../../components/Forms";
-import { SettingsContext } from "../../../context/Settings";
-import { DoctorContext } from "../../../context/Doctor";
 import { createUseStyles } from "react-jss";
 import moment from "moment";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getUsers,
+  getUserRoles,
+  registerUser,
+  registerDoctor,
+} from "../../../store/actions/settingActions";
+import { setAddEditUserModal } from "../../../store/reducers/settingSlice";
+import { getSpeciality } from "../../../store/actions/doctorActions";
 
 const useStyles = createUseStyles({
   userSettingContainer: {},
@@ -64,13 +71,16 @@ const getFormattedRequestForCreateDocUser = (data) => {
 };
 
 const AddEditUser = () => {
-  const id_clinic = parseInt(localStorage.getItem("id_clinic"));
+  const dispatch = useDispatch();
 
-  const [docState, docActions] = useContext(DoctorContext);
+  const { id_clinic } = useSelector((state) => state.user.details);
+  const { userRoles, addEditUserModal } = useSelector(
+    (state) => state.settings
+  );
+  const { formData, isAdd, open, step } = addEditUserModal;
 
-  const [state, actions] = useContext(SettingsContext);
-  const { userRoles } = state;
-  const { isAdd, open, step, formData } = state.addEditUserModal;
+  const { speciality } = useSelector((state) => state.doctors);
+
   const form = useForm({
     defaultValues: formData,
   });
@@ -105,40 +115,56 @@ const AddEditUser = () => {
     const { name } = e.target;
     if (name === "NextBtn") {
       if (lastStep === 2 && step === 1) {
-        actions.registerUser({ ...data, id_clinic: id_clinic }, () => {
-          actions.getUsers();
-          const nextFormData = {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            mobile_number: data.mobileNumber,
-            email_id: data.emailId,
-            role: data.userRole,
-          };
-          reset({ ...data, ...nextFormData });
-        });
+        dispatch(
+          registerUser({ ...data, id_clinic: id_clinic }, () => {
+            dispatch(getUsers(id_clinic));
+            const nextFormData = {
+              first_name: data.firstName,
+              last_name: data.lastName,
+              mobile_number: data.mobileNumber,
+              email_id: data.emailId,
+              role: data.userRole,
+            };
+            reset({ ...data, ...nextFormData });
+          })
+        );
       }
-      actions.setAddEditUserModal({ step: step + 1 });
+      dispatch(
+        setAddEditUserModal({
+          ...addEditUserModal,
+          step: step + 1,
+        })
+      );
     } else if (name === "SaveBtn") {
       if (lastStep === 1) {
-        actions.registerUser({ ...data, id_clinic: id_clinic }, () => {
-          actions.setAddEditUserModal({ open: false });
-          actions.getUsers();
-        });
+        dispatch(
+          registerUser({ ...data, id_clinic: id_clinic }, () => {
+            dispatch(setAddEditUserModal({ open: false }));
+            dispatch(getUsers(id_clinic));
+          })
+        );
       } else if (lastStep === 2) {
         let request = getFormattedRequestForCreateDocUser(data);
-        actions.registerDoctor(request, () => {
-          actions.setAddEditUserModal({ open: false });
-          actions.getUsers();
-        });
+        dispatch(
+          registerDoctor(request, () => {
+            dispatch(setAddEditUserModal({ open: false }));
+            dispatch(getUsers(id_clinic));
+          })
+        );
       }
     }
   };
 
   useEffect(() => {
-    actions.getUsers();
-    actions.getUserRoles();
-    docActions.getSpeciality();
+    dispatch(getUsers(id_clinic));
+    dispatch(getUserRoles());
   }, []);
+
+  useEffect(() => {
+    if (speciality && speciality.length === 0) {
+      dispatch(getSpeciality());
+    }
+  }, [speciality]);
 
   const FooterActions = () => {
     return (
@@ -174,7 +200,7 @@ const AddEditUser = () => {
       show={open}
       size="md"
       onHide={() => {
-        actions.setAddEditUserModal({ open: false });
+        dispatch(setAddEditUserModal({ open: false }));
       }}
       footerActions={<FooterActions />}
     >
@@ -221,8 +247,17 @@ const AddEditUser = () => {
                   type="number"
                   label="Mobile Number"
                   name="mobileNumber"
+                  placeholder="Enter 10 Digit Mobile Number"
                   rules={{
-                    required: "Mobile Number Required",
+                    required: "Please enter 10 digit mobile number",
+                    minLength: {
+                      value: 10,
+                      message: "Please enter correct Mobile Number",
+                    },
+                    maxLength: {
+                      value: 10,
+                      message: "Please enter correct Mobile Number",
+                    },
                   }}
                 />
               </Col>
@@ -363,7 +398,7 @@ const AddEditUser = () => {
                   name="id_speciality"
                   labelField="specialityName"
                   valueField="idSpeciality"
-                  options={docState.speciality}
+                  options={speciality}
                   rules={{
                     required: "Please select Speciality",
                   }}
@@ -396,15 +431,19 @@ const AddEditUser = () => {
 
 const Users = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
 
-  const [state, actions] = useContext(SettingsContext);
-  const { formData } = state.addEditUserModal;
+  const { addEditUserModal } = useSelector((state) => state.settings);
+  const { formData } = addEditUserModal;
 
   const handleButtonClick = (userTypeId) => {
-    actions.setAddEditUserModal({
-      open: true,
-      formData: { ...formData, userTypeId: userTypeId },
-    });
+    dispatch(
+      setAddEditUserModal({
+        ...addEditUserModal,
+        open: true,
+        formData: { ...formData, userTypeId: userTypeId },
+      })
+    );
   };
 
   return (

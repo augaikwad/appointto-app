@@ -59,6 +59,7 @@ const General = (props) => {
             <DatePickerField
               label="Date of Birth"
               name="dob"
+              maxDate={new Date()}
               showYearDropdown
               inputOnChange={(date) => {
                 setValue("age", moment().diff(new Date(date), "years", false));
@@ -84,6 +85,9 @@ const General = (props) => {
                   name="age"
                   type="number"
                   placeholder="Enter Age"
+                  onChange={() => {
+                    setValue("dob", null);
+                  }}
                   rules={{
                     required: "Required",
                   }}

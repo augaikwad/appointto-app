@@ -1,7 +1,5 @@
-import React, { useContext, useEffect } from "react";
+import React from "react";
 import { useLocation } from "react-router-dom";
-import { PatientContext } from "../../../context/Patient";
-import { AppointmentContext } from "../../../context/Appointment";
 import VerticalTabs from "../../../components/VerticalTabs";
 import Modal from "../../../components/Modal";
 import { Button } from "react-bootstrap";
@@ -11,21 +9,26 @@ import Additional from "./Additional";
 import Documents from "./Documents";
 import { createUseStyles } from "react-jss";
 import { FormProvider, useForm } from "react-hook-form";
-import {
-  getFormattedValueForRequest,
-  formattedObjForSetForm,
-} from "./dataFormatter";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
-import { setPatientModal } from "../../../store/reducers/patientSlice";
+import {
+  setPatientModal,
+  setActiveTab,
+  initialState,
+} from "../../../store/reducers/patientSlice";
 import {
   addPatientGeneralInfo,
   updatePatientGeneralInfo,
+  getPatientById,
 } from "../../../store/actions/patientActions";
 import {
   createAppointment,
   getDashboardAppointments,
 } from "../../../store/actions/appointmentActions";
+import {
+  setAppointmentModal,
+  initialState as aptInitState,
+} from "../../../store/reducers/appointmentsSlice";
 
 const useStyles = createUseStyles({
   buttonMinWidth: {
@@ -39,37 +42,42 @@ const AddEditPatientModal = () => {
   const dispatch = useDispatch();
 
   const { id_doctor, id_clinic } = useSelector((state) => state.user.details);
-  const { patientModal } = useSelector((state) => state.patients);
-  const { dashboardListFilters } = useSelector((state) => state.appointments);
+  const { patientModal, activeTab, patientById } = useSelector(
+    (state) => state.patients
+  );
+  const { dashboardListFilters, appointmentModal } = useSelector(
+    (state) => state.appointments
+  );
 
-  console.log("patientModal === ", patientModal.formValue);
-
-  const [state, actions] = useContext(PatientContext);
-  const { activeTab } = state;
   const { open, isAdd, formValue } = patientModal;
-
-  const [aptState, aptActions] = useContext(AppointmentContext);
-  const { appointmentForm } = aptState;
   const form = useForm({
-    defaultValues: formattedObjForSetForm(formValue),
+    defaultValues: formValue,
   });
 
   const { handleSubmit, reset } = form;
 
-  useEffect(() => {
-    reset(formattedObjForSetForm(formValue));
-  }, [formValue]);
+  const refreshDashboardList = () => {
+    if (["/dashboard", "/"].includes(location.pathname)) {
+      dispatch(getDashboardAppointments(dashboardListFilters));
+    } else {
+      dispatch(getPatientById({ PatientId: patientById.id_patient }));
+    }
+  };
 
   const callback = (response) => {
-    reset(formattedObjForSetForm(response));
-    actions.setActiveTab(activeTab + 1);
+    dispatch(
+      setPatientModal({
+        ...patientModal,
+        formValue: { ...formValue, id_patient: response.id_patient },
+      })
+    );
+    dispatch(setActiveTab(activeTab + 1));
   };
 
   const handleSave = (data) => {
     let formData = { ...data };
-    formData = getFormattedValueForRequest(data);
     formData.id_clinic = id_clinic;
-
+    formData.id_patient = formValue.id_patient;
     if (formValue.id_patient === 0) {
       dispatch(addPatientGeneralInfo(formData, callback));
     } else {
@@ -79,67 +87,63 @@ const AddEditPatientModal = () => {
 
   const addToQueue = (obj) => {
     let currentDate = new Date();
-    let req = { ...appointmentForm, ...obj };
+    let req = { ...appointmentModal.form, ...obj };
     req.date = moment(currentDate).format("YYYY-MM-DD");
     req.day = moment(currentDate).format("dddd");
     req.reason = "Consultation";
     req.id_doctor = id_doctor;
     dispatch(
       createAppointment(req, () => {
-        if (["/dashboard", "/"].includes(location.pathname)) {
-          dispatch(getDashboardAppointments(dashboardListFilters));
-        }
+        refreshDashboardList();
       })
     );
   };
 
   const handleAddToQueue = (data) => {
     let formData = { ...data };
-    formData = getFormattedValueForRequest(data);
-    formData.id_clinic = localStorage.getItem("id_clinic");
+    formData.id_clinic = id_clinic;
     if (formValue.id_patient === 0) {
       dispatch(
         addPatientGeneralInfo(formData, (response) => {
-          dispatch(
-            setPatientModal({
-              ...patientModal,
-              formValue: response,
-            })
-          );
-          aptActions.setAppointmentForm({
-            id_patient: response.id_patient,
-          });
           addToQueue({ id_patient: response.id_patient });
         })
       );
     } else {
       addToQueue({ id_patient: formValue.id_patient });
     }
-    actions.getGlobalList();
   };
 
   const handleAddAppointment = (data) => {
     let formData = { ...data };
-    formData = getFormattedValueForRequest(data);
-    formData.id_clinic = localStorage.getItem("id_clinic");
-    if (formValue.id_patient === 0) {
-      actions.addPatientGeneralInfo(formData, (response) => {
-        dispatch(
-          setPatientModal({
-            ...patientModal,
-            formValue: response,
-          })
-        );
+    formData.id_clinic = id_clinic;
 
-        aptActions.setAppointmentForm({
-          id_patient: response.id_patient,
-        });
-        aptActions.setAppointmentModal({ show: true });
-      });
+    if (formValue.id_patient === 0) {
+      dispatch(
+        addPatientGeneralInfo(formData, (response) => {
+          dispatch(
+            setAppointmentModal({
+              ...aptInitState.appointmentModal,
+              isAdd: true,
+              show: true,
+              form: {
+                ...aptInitState.appointmentModal.form,
+                id_patient: response.id_patient,
+                id_doctor: id_doctor,
+              },
+            })
+          );
+        })
+      );
     } else {
-      aptActions.setAppointmentModal({ show: true });
+      dispatch(
+        setAppointmentModal({
+          ...aptInitState.appointmentModal,
+          isAdd: true,
+          show: true,
+        })
+      );
     }
-    actions.getGlobalList();
+    refreshDashboardList();
   };
 
   const onSubmit = (data, e) => {
@@ -181,7 +185,7 @@ const AddEditPatientModal = () => {
               <Button
                 variant="primary mr-2 btn-sm"
                 className={classes.buttonMinWidth}
-                onClick={() => actions.setActiveTab(activeTab - 1)}
+                onClick={() => dispatch(setActiveTab(activeTab - 1))}
               >
                 Previous
               </Button>
@@ -201,15 +205,9 @@ const AddEditPatientModal = () => {
                 variant="primary btn-sm"
                 className={classes.buttonMinWidth}
                 onClick={() => {
-                  actions.setActiveTab(0);
+                  dispatch(setActiveTab(0));
                   dispatch(setPatientModal({ open: false }));
-                  actions.getGlobalList();
-                  if (!isAdd) {
-                    actions.getPatientById(formValue.id_patient);
-                  }
-                  if (["/dashboard", "/"].includes(location.pathname)) {
-                    aptActions.getAppointmentByDoctor();
-                  }
+                  refreshDashboardList();
                 }}
               >
                 Finish
@@ -234,11 +232,8 @@ const AddEditPatientModal = () => {
         title={`${isAdd ? "Add" : "Update"} Patient`}
         show={open}
         onHide={() => {
-          actions.setActiveTab(0);
           dispatch(setPatientModal({ open: false }));
-          if (!isAdd) {
-            actions.getPatientById(formValue.id_patient);
-          }
+          reset(initialState.patientModal.formValue);
         }}
         dialogClassName="modal-1030px"
         footerActions={<ModalFooterActions />}

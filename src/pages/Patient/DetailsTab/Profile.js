@@ -1,7 +1,12 @@
-import React, { useContext } from "react";
+import React from "react";
 import { createUseStyles } from "react-jss";
-import { PatientContext } from "../../../context/Patient";
+import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
+import { formattedObjForPatientForm } from "../../../store/actions/dataFormatters/patients";
+import {
+  setActiveTab,
+  setPatientModal,
+} from "../../../store/reducers/patientSlice";
 
 const useStyles = createUseStyles({
   smAddBtn: {
@@ -53,13 +58,13 @@ const useStyles = createUseStyles({
 
 const Profile = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
 
-  const [state, actions] = useContext(PatientContext);
-  const { patientData } = state;
+  const { patientById } = useSelector((state) => state.patients);
 
   return (
     <>
-      {patientData !== null && (
+      {patientById !== null && (
         <div className="row">
           <div className={`col-lg-4 ${classes.cardContainer}`}>
             <div className={classes.card}>
@@ -68,12 +73,14 @@ const Profile = () => {
                 <button
                   className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
                   onClick={() => {
-                    actions.setActiveTab(0);
-                    actions.setPatientModal({
-                      open: true,
-                      isAdd: false,
-                      formValue: patientData,
-                    });
+                    dispatch(setActiveTab(0));
+                    dispatch(
+                      setPatientModal({
+                        open: true,
+                        isAdd: false,
+                        formValue: formattedObjForPatientForm(patientById),
+                      })
+                    );
                   }}
                 >
                   <i className="fa fa-pencil"></i>
@@ -85,22 +92,22 @@ const Profile = () => {
                     <div className="form-group inline-form-group">
                       <label>Name:</label>
                       <div>
-                        {patientData.first_name} {patientData.last_name}
+                        {patientById.first_name} {patientById.last_name}
                       </div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Gender:</label>
-                      <div>{patientData.gender}</div>
+                      <div>{patientById.gender}</div>
                     </div>
                   </div>
                   <div className="col-lg-7">
                     <div className="form-group inline-form-group">
                       <label>D. O. B.:</label>
                       <div>
-                        {!!patientData.dob
-                          ? moment(new Date(patientData.dob)).format(
+                        {!!patientById.dob
+                          ? moment(new Date(patientById.dob)).format(
                               "DD/MM/yyyy"
                             )
                           : "-"}
@@ -110,55 +117,55 @@ const Profile = () => {
                   <div className="col-lg-5">
                     <div className="form-group inline-form-group">
                       <label>Age:</label>
-                      <div>{patientData.age}</div>
+                      <div>{patientById.age}</div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Mobile:</label>
-                      <div>{patientData.mobile_number}</div>
+                      <div>{patientById.mobile_number}</div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Emergency Contact No.:</label>
-                      <div>{patientData.emergency_contact}</div>
+                      <div>{patientById.emergency_contact}</div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Email:</label>
-                      <div>{patientData.email_id}</div>
+                      <div>{patientById.email_id}</div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Address:</label>
-                      <div>{patientData.address}</div>
+                      <div>{patientById.address}</div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Area:</label>
-                      <div>{patientData.area}</div>
+                      <div>{patientById.area}</div>
                     </div>
                   </div>
                   <div className="col-lg-7">
                     <div className="form-group inline-form-group">
                       <label>City:</label>
-                      <div>{patientData.city}</div>
+                      <div>{patientById.city}</div>
                     </div>
                   </div>
                   <div className="col-lg-5">
                     <div className="form-group inline-form-group">
                       <label>Pin:</label>
-                      <div>{patientData.pincode}</div>
+                      <div>{patientById.pincode}</div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Referred By:</label>
-                      <div>{patientData.reffered_by}</div>
+                      <div>{patientById.reffered_by}</div>
                     </div>
                   </div>
                 </div>
@@ -172,12 +179,14 @@ const Profile = () => {
                 <button
                   className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
                   onClick={() => {
-                    actions.setActiveTab(1);
-                    actions.setPatientModal({
-                      open: true,
-                      isAdd: false,
-                      formValue: patientData,
-                    });
+                    dispatch(setActiveTab(1));
+                    dispatch(
+                      setPatientModal({
+                        open: true,
+                        isAdd: false,
+                        formValue: formattedObjForPatientForm(patientById),
+                      })
+                    );
                   }}
                 >
                   <i className="fa fa-pencil"></i>
@@ -187,25 +196,25 @@ const Profile = () => {
                 <div className="row">
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
-                      <div>{patientData.medicalPrecondition}</div>
+                      <div>{patientById.medicalPrecondition}</div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Allergies:</label>
-                      <div>{patientData.allergies}</div>
+                      <div>{patientById.allergies}</div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Blood Group:</label>
-                      <div>{patientData.blood_group}</div>
+                      <div>{patientById.blood_group}</div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Current Medications:</label>
-                      <div>{patientData.current_medicine}</div>
+                      <div>{patientById.current_medicine}</div>
                     </div>
                   </div>
                 </div>
@@ -219,12 +228,14 @@ const Profile = () => {
                 <button
                   className={`btn btn-sm btn-primary ${classes.smAddBtn}`}
                   onClick={() => {
-                    actions.setActiveTab(2);
-                    actions.setPatientModal({
-                      open: true,
-                      isAdd: false,
-                      formValue: patientData,
-                    });
+                    dispatch(setActiveTab(2));
+                    dispatch(
+                      setPatientModal({
+                        open: true,
+                        isAdd: false,
+                        formValue: formattedObjForPatientForm(patientById),
+                      })
+                    );
                   }}
                 >
                   <i className="fa fa-pencil"></i>
@@ -235,13 +246,13 @@ const Profile = () => {
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Habits:</label>
-                      <div>{patientData.habbits}</div>
+                      <div>{patientById.habbits}</div>
                     </div>
                   </div>
                   <div className="col-lg-12">
                     <div className="form-group inline-form-group">
                       <label>Diet:</label>
-                      <div>{patientData.diet}</div>
+                      <div>{patientById.diet}</div>
                     </div>
                   </div>
                 </div>

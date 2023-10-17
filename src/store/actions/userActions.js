@@ -5,6 +5,7 @@ import {
   setAppointmentStatuses,
   setDoctorsByClinicId,
   setSelectedDoctorId,
+  setSelectedDoctor,
 } from "../reducers/userSlice";
 import { setAuthToken } from "../../helpers/setAuthToken";
 import { setDashboardListFilters } from "../reducers/appointmentsSlice";
@@ -69,7 +70,11 @@ export const getDoctorsByClinicId =
         if (idDoctor === 0) {
           idDoctor = payload[0].id_doctor;
         }
+
         dispatch(setSelectedDoctorId(idDoctor));
+        dispatch(
+          setSelectedDoctor(payload.find((dr) => dr.id_doctor === idDoctor))
+        );
         dispatch(setDashboardListFilters({ id_doctor: idDoctor }));
 
         if (callback) {

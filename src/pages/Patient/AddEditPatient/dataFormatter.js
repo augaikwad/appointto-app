@@ -40,16 +40,21 @@ export const arrayToArrayOfObject = (array) => {
 
 export const stringToArrayOfObject = (string) => {
   let arrayOfObjects = [];
-  arrayOfObjects = string.split(",").map((item) => {
-    const trimedItem = item.trim();
-    return { label: trimedItem, value: trimedItem };
-  });
+  if (string && string.length > 0) {
+    arrayOfObjects = string.split(",").map((item) => {
+      const trimedItem = item.trim();
+      return { label: trimedItem, value: trimedItem };
+    });
+  }
   return arrayOfObjects;
 };
 
 export const stringToArray = (string) => {
   let array = [];
-  array = string.split(",").map((item) => item.trim());
+  if (string && string.length > 0) {
+    array = string.split(",").map((item) => item.trim());
+  }
+
   return array;
 };
 

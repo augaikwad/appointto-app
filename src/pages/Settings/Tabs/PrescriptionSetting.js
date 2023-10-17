@@ -1,23 +1,39 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect } from "react";
 import { Row, Col, Button } from "react-bootstrap";
 import { FormProvider, useForm } from "react-hook-form";
 import { TextField } from "../../../components/Forms";
-import { SettingsContext } from "../../../context/Settings";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getPrintingSetting,
+  addPrintingSetting,
+  updatePrintingSetting,
+} from "../../../store/actions/settingActions";
 
 const PrescriptionSetting = () => {
-  const [state, actions] = useContext(SettingsContext);
-  const { prescriptionMargins } = state;
+  const dispatch = useDispatch();
+
+  const { id_doctor, id_clinic } = useSelector((state) => state.user.details);
+  const { prescriptionMargins } = useSelector((state) => state.settings);
 
   const form = useForm({ defaultValues: prescriptionMargins });
   const { handleSubmit, reset } = form;
+
+  useEffect(() => {
+    dispatch(
+      getPrintingSetting(id_doctor, (res) => {
+        reset(res);
+      })
+    );
+  }, []);
+
   const onSubmit = (formData) => {
     let request = { ...formData };
-    request.id_doctor = parseInt(localStorage.getItem("id_doctor"));
-    request.id_clinic = parseInt(localStorage.getItem("id_clinic"));
-    if (request.hasOwnProperty("id")) {
-      actions.updatePrintingSetting(request);
+    request.id_doctor = id_doctor;
+    request.id_clinic = id_clinic;
+    if (prescriptionMargins.hasOwnProperty("id")) {
+      dispatch(updatePrintingSetting(request));
     } else {
-      actions.addPrintingSetting(request);
+      dispatch(addPrintingSetting(request));
     }
   };
 

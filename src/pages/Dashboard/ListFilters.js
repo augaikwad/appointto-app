@@ -28,9 +28,7 @@ const useStyles = createUseStyles({
 const ListFilters = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { doctorsByClinicId, selectedDoctorId } = useSelector(
-    (state) => state.user
-  );
+  const { doctorsByClinicId } = useSelector((state) => state.user);
   const { dashboardListFilters } = useSelector((state) => state.appointments);
 
   const [activeBtn, setActiveBtn] = useState(0);

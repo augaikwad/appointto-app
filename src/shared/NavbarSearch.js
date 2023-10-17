@@ -138,7 +138,7 @@ const NavbarSearch = () => {
           dispatch(setAppointmentModal({ show: false }));
         }}
       />
-      <AddEditPatientModal />
+      {patientModal.open && <AddEditPatientModal />}
     </>
   );
 };

@@ -1,11 +1,15 @@
-import React, { useState, useCallback, useContext } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { ProgressBar, Button } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { useForm, FormProvider } from "react-hook-form";
-import { PatientContext } from "../../../context/Patient";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addDocuments,
+  getDocuments,
+} from "../../../store/actions/patientActions";
 import Img1 from "../../../assets/images/sampleReports/sample1.png";
 
 const useStyles = createUseStyles({
@@ -80,19 +84,26 @@ const useStyles = createUseStyles({
   },
 });
 
-function Documents(props) {
+function Documents() {
   const classes = useStyles();
+  const dispatch = useDispatch();
 
-  const [state, actions] = useContext(PatientContext);
-  const { patient } = state;
-
-  const [progress, setProgress] = useState(0);
+  const { patientModal } = useSelector((state) => state.patients);
 
   const form = useForm();
-
   const { handleSubmit } = form;
 
+  const [documents, setDocuments] = useState([]);
+  const [progress, setProgress] = useState(0);
   const [selectedFiles, setSelectedFiles] = useState([]);
+
+  useEffect(() => {
+    dispatch(
+      getDocuments(patientModal.formValue.id_patient, (response) => {
+        setDocuments(response);
+      })
+    );
+  }, []);
 
   const onDrop = useCallback(
     (acceptedFiles) => {
@@ -118,52 +129,32 @@ function Documents(props) {
     </li>
   ));
 
-  let images = [
-    {
-      url: Img1,
-      title: "image title 1",
-    },
-    {
-      url: Img1,
-      title: "image title 2",
-    },
-    {
-      url: Img1,
-      title: "image title 2",
-    },
-    {
-      url: Img1,
-      title: "image title 2",
-    },
-    {
-      url: Img1,
-      title: "image title 2",
-    },
-    {
-      url: Img1,
-      title: "image title 2",
-    },
-  ];
-
   const onSubmit = (data) => {
     const formData = new FormData();
     for (let i = 0; i < selectedFiles.length; i++) {
       formData.append(`files`, selectedFiles[i]);
     }
-    formData.append("id_patient", patient.id_patient);
+    formData.append("id_patient", patientModal.formValue.id_patient);
 
-    actions.addDocuments(
-      formData,
-      (progressEvent) => {
-        let percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        );
-        setProgress(percentCompleted);
-      },
-      () => {
-        setProgress(0);
-        setSelectedFiles([]);
-      }
+    dispatch(
+      addDocuments(
+        formData,
+        (progressEvent) => {
+          let percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setProgress(percentCompleted);
+        },
+        () => {
+          setProgress(0);
+          setSelectedFiles([]);
+          dispatch(
+            getDocuments(patientModal.formValue.id_patient, (response) => {
+              setDocuments(response);
+            })
+          );
+        }
+      )
     );
   };
 
@@ -202,12 +193,13 @@ function Documents(props) {
             </div>
           </div>
           <div className={`col-lg-7 ${classes.uploadedFilesListContainer}`}>
-            {/* {images.length > 0 &&
-              images.map((img, ind) => (
+            {documents &&
+              documents.length > 0 &&
+              documents.map((img, ind) => (
                 <div key={ind}>
-                  <img src={img.url} />
+                  <img src={`data:image/jpeg;base64, ${img.file_data}`} />
                 </div>
-              ))} */}
+              ))}
           </div>
         </div>
       </form>

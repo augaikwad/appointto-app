@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import moment from "moment";
 import { formattedFilters } from "../actions/appointmentActions";
-import { calendarDataFormatter } from "../../utils/common";
 
 const currentDate = moment(new Date()).format("YYYY-MM-DD");
 
@@ -76,7 +75,7 @@ const appointmentsSlice = createSlice({
       }
     },
     setAppointmentsForCalendar: (state, action) => {
-      state.calendarList = calendarDataFormatter(action.payload);
+      state.calendarList = action.payload;
     },
   },
 });

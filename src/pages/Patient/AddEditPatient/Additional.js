@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { Modal, InputField } from "../../../components";
 import {
   CheckBoxField,
@@ -7,6 +8,7 @@ import {
 } from "../../../components/Forms";
 import { Button } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
+import { CheckBoxInput } from "./Medical";
 
 const useStyles = createUseStyles({
   symptomsContainer: {
@@ -31,6 +33,12 @@ const useStyles = createUseStyles({
 const Additional = () => {
   const classes = useStyles();
 
+  const { control } = useFormContext();
+  const { fields, append } = useFieldArray({
+    control,
+    name: "habbits",
+  });
+
   const [habbits, setHabbits] = useState([
     { label: "Tobacco Chewing", value: "tobacco" },
     { label: "Smoking", value: "smoking" },
@@ -47,11 +55,11 @@ const Additional = () => {
           className="btn btn-sm btn-primary"
           onClick={() => {
             if (newHabit !== "") {
-              let newHabitObj = {
+              append({
                 label: newHabit,
-                value: newHabit.replace(/\s+/g, "").toLowerCase(),
-              };
-              setHabbits([...habbits, ...[newHabitObj]]);
+                value: newHabit.replace(/\s/g, "").toLowerCase(),
+                checked: true,
+              });
             }
             setIsOpen(false);
             setNewHabit("");
@@ -96,11 +104,24 @@ const Additional = () => {
   return (
     <div className="row">
       <div className={`col-lg-12`}>
-        <CheckBoxField
-          label={<HabitsLabel />}
-          name="habbits"
-          options={habbits}
-        />
+        <div className="form-group">
+          <label>
+            <HabitsLabel />
+          </label>
+          <div className="custom-form-check-inline">
+            {fields.map((field, index) => {
+              let name = `habbits[${index}].checked`;
+              return (
+                <CheckBoxInput
+                  key={index}
+                  name={name}
+                  label={field.label}
+                  checked={field.checked}
+                />
+              );
+            })}
+          </div>
+        </div>
       </div>
       <div className="col-lg-12">
         <RadioField

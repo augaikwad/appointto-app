@@ -72,7 +72,10 @@ class Sidebar extends Component {
               this.isPathActive("/patients") ? "nav-item active" : "nav-item"
             }
           >
-            <Link className="nav-link" to="/patients">
+            <Link
+              className="nav-link"
+              to={{ pathname: "/patients", state: { isInit: true } }}
+            >
               {/* <img src={Queue} className="menu-icon" /> */}
               <i className="fa fa-users menu-font-icon"></i>
               <span className="menu-title">Patients</span>

@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Card } from "../../components";
 import { TextField } from "../../components/Forms";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Button } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -26,6 +27,12 @@ import {
 import { navigateTo } from "../../store/reducers/navigationSlice";
 import { createAppointment } from "../../store/actions/appointmentActions";
 import { setAppointmentModal } from "../../store/reducers/appointmentsSlice";
+import {
+  setPatientModal,
+  initialState,
+} from "../../store/reducers/patientSlice";
+import { areObjectsEqual } from "../../utils/common";
+import { formattedObjForPatientForm } from "../../store/actions/dataFormatters/patients";
 
 const useStyles = createUseStyles({
   ListContainer: {
@@ -84,14 +91,25 @@ const useStyles = createUseStyles({
 const PatientList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const { isInit } = location.state;
 
   const { id_clinic } = useSelector((state) => state.user.details);
-  const { patientList, patientListFilter } = useSelector(
+  const { patientList, patientListFilter, patientModal } = useSelector(
     (state) => state.patients
   );
+
   const { appointmentModal } = useSelector((state) => state.appointments);
 
-  const form = useForm();
+  const form = useForm({
+    defaultValues: patientListFilter,
+  });
+
+  const { reset } = form;
+
+  useEffect(() => {
+    reset(patientListFilter);
+  }, [patientListFilter]);
 
   const handleGetPatientList = (opt) => {
     dispatch(
@@ -103,7 +121,11 @@ const PatientList = () => {
   };
 
   useEffect(() => {
-    handleGetPatientList({ id_clinic });
+    if (isInit) {
+      handleGetPatientList({ ...initialState.patientListFilter, id_clinic });
+    } else {
+      handleGetPatientList({ id_clinic });
+    }
   }, []);
 
   const handleButtonClick = (patientId, tab) => {
@@ -144,6 +166,8 @@ const PatientList = () => {
     handleGetPatientList({ [name]: value, start_record: 1, end_record: 10 });
   }, 1000);
 
+  let startIndex = patientListFilter.start_record - 1;
+
   return (
     <div style={{ flex: 1 }}>
       <Card>
@@ -158,6 +182,27 @@ const PatientList = () => {
                     placeholder="Enter Name or Mobile number"
                     onChange={handleDebounceChange}
                   />
+                </Col>
+                <Col lg={3}>
+                  {!areObjectsEqual(
+                    patientListFilter,
+                    initialState.patientListFilter
+                  ) && (
+                    <Button
+                      className="btn btn-sm btn-primary"
+                      style={{ marginTop: 19 }}
+                      onClick={() => {
+                        dispatch(
+                          getPatientsList({
+                            ...initialState.patientListFilter,
+                            id_clinic,
+                          })
+                        );
+                      }}
+                    >
+                      Reset
+                    </Button>
+                  )}
                 </Col>
               </Row>
             </form>
@@ -185,10 +230,11 @@ const PatientList = () => {
               )}
               {patientList.item.length > 0 &&
                 patientList.item.map((item, ind) => {
+                  startIndex++;
                   return (
                     <tr key={item.id_patient} className={classes.tr}>
                       <td className={`text-center ${classes.td}`} width="30px">
-                        {ind + 1}
+                        {startIndex}
                       </td>
                       <td className={`font-weight-bold ${classes.td}`}>
                         <button
@@ -274,9 +320,26 @@ const PatientList = () => {
                         <IconButton
                           tooltipText="Edit Patient"
                           btnClasses={classes.editPatientBtn}
-                          btnOnClick={() =>
-                            handleButtonClick(item.id_patient, 0)
-                          }
+                          btnOnClick={() => {
+                            dispatch(
+                              getPatientById(
+                                { PatientId: item.id_patient },
+                                (res) => {
+                                  dispatch(
+                                    setPatientModal({
+                                      ...patientModal,
+                                      isAdd: false,
+                                      open: true,
+                                      formValue: formattedObjForPatientForm({
+                                        ...patientModal.formValue,
+                                        ...res,
+                                      }),
+                                    })
+                                  );
+                                }
+                              )
+                            );
+                          }}
                           icon={faPencil}
                         />
                       </td>
@@ -284,9 +347,9 @@ const PatientList = () => {
                         <IconButton
                           tooltipText="Delete Patient"
                           btnClasses={classes.deletePatientBtn}
-                          btnOnClick={() =>
-                            handleButtonClick(item.id_patient, 0)
-                          }
+                          // btnOnClick={() =>
+                          //   // handleButtonClick(item.id_patient, 0)
+                          // }
                           icon={faTrashCan}
                         />
                       </td>

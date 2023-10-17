@@ -8,6 +8,7 @@ import { getWeekRange, getMonthRange } from "../../utils/common";
 import Select from "react-select";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppointmentsForCalendar } from "../../store/actions/appointmentActions";
+import { calendarDataFormatter } from "../../utils/common";
 
 const localizer = momentLocalizer(moment);
 
@@ -66,28 +67,37 @@ const useStyles = createUseStyles({
   },
   drDropdownFilter: {
     width: 300,
-    "& > .customDrDropDown > div": {
-      minHeight: "31px",
-      height: 31,
-      fontSize: 14,
-      flexWrap: "inherit",
-    },
   },
   ml10: {
     marginLeft: 10,
   },
 });
 
+const customStyles = {
+  control: (provided) => ({
+    ...provided,
+    minHeight: 31,
+    height: 31,
+    fontSize: 14,
+    flexWrap: "inherit",
+  }),
+  menu: (provided) => ({
+    ...provided,
+    zIndex: 6,
+  }),
+};
+
 const AppointmentsList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { id_doctor } = useSelector((state) => state.user.details);
+
+  const { selectedDoctor } = useSelector((state) => state.user);
   const { doctorsByClinicId } = useSelector((state) => state.user);
   const { calendarList } = useSelector((state) => state.appointments);
 
   const [calendarView, setCalendarView] = useState("month");
   const [calendarDate, setCalendarDate] = useState(new Date());
-  const [selectedDoctor, setSelectedDoctor] = useState(doctorsByClinicId[0]);
+  const [doctor, setDoctor] = useState(selectedDoctor);
 
   const getList = (req) => {
     dispatch(getAppointmentsForCalendar(req));
@@ -110,10 +120,10 @@ const AppointmentsList = () => {
 
   useEffect(() => {
     getList({
-      id_doctor,
+      id_doctor: doctor.id_doctor,
       ...getDateRange(calendarView, calendarDate),
     });
-  }, [calendarView, calendarDate, selectedDoctor]);
+  }, [calendarView, calendarDate, doctor]);
 
   const handleOnNavigate = (date, view) => {
     setCalendarView(view);
@@ -166,13 +176,14 @@ const AppointmentsList = () => {
               formatOptionLabel={(opt) =>
                 `Dr. ${opt?.first_name} ${opt?.last_name}`
               }
-              defaultValue={selectedDoctor}
+              defaultValue={doctor}
               name="id_doctor"
               options={doctorsByClinicId}
               isSearchable={true}
               onChange={(val) => {
-                setSelectedDoctor(val);
+                setDoctor(val);
               }}
+              styles={customStyles}
             />
           </div>
         </div>
@@ -237,7 +248,7 @@ const AppointmentsList = () => {
           localizer={localizer}
           view={calendarView}
           date={calendarDate}
-          events={calendarList}
+          events={calendarDataFormatter(calendarList)}
           views={{ month: true, week: true, day: true, agenda: false }}
           onNavigate={handleOnNavigate}
           onRangeChange={handleOnRangeChange}

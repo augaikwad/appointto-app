@@ -38,7 +38,8 @@ export const calendarDataFormatter = (data) => {
     return newDate.toDate();
   };
 
-  let formattedData = data.map((event) => {
+  let formattedData = data.map((item) => {
+    let event = { ...item };
     const aptDate = moment(event.date);
     event.start = clonedDate(aptDate, event.start_time);
     event.end = clonedDate(aptDate, event.end_time);
@@ -54,4 +55,24 @@ export const isPlainObject = (value) => {
     !Array.isArray(value) &&
     typeof value !== "function"
   );
+};
+
+export const areObjectsEqual = (objA, objB) => {
+  const entriesA = Object.entries(objA);
+  const entriesB = Object.entries(objB);
+
+  if (entriesA.length !== entriesB.length) {
+    return false;
+  }
+
+  for (const [keyA, valueA] of entriesA) {
+    const entryB = entriesB.find(
+      ([keyB, valueB]) => keyA === keyB && valueA === valueB
+    );
+    if (!entryB) {
+      return false;
+    }
+  }
+
+  return true;
 };

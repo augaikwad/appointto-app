@@ -123,6 +123,7 @@ const CreateAppointmentModal = ({ onHide }) => {
               <DatePickerField
                 label="Date"
                 name="date"
+                minDate={new Date()}
                 rules={{
                   required: "Please select Date",
                 }}

@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect } from "react";
 import { Dropdown } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,8 +11,6 @@ import {
 import CreateAppointmentModal from "../Patient/CreateAppointmentModal";
 import { useHistory } from "react-router-dom";
 import { Tooltip } from "../../components";
-import { PatientContext } from "../../context/Patient";
-import { BillingContext } from "../../context/Billing";
 import { getAppointmentStatusList } from "../../store/actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -52,7 +50,6 @@ const useStyles = createUseStyles({
 
 const ListWidget = () => {
   const classes = useStyles();
-  const history = useHistory();
   const dispatch = useDispatch();
 
   const { dashboardList, dashboardListFilters } = useSelector(
@@ -60,9 +57,6 @@ const ListWidget = () => {
   );
 
   const { appointmentStatuses } = useSelector((state) => state.user);
-
-  const [, patientActions] = useContext(PatientContext);
-  const [, billActions] = useContext(BillingContext);
 
   useEffect(() => {
     if (appointmentStatuses === null) {
@@ -84,17 +78,6 @@ const ListWidget = () => {
         dispatch(navigateTo({ to: `/patient/${patientId}`, state: pageState }));
       })
     );
-    // patientActions.getPatientById(patientId, (res) => {
-    //   billActions.getAllBillingDataAction({
-    //     id_doctor: parseInt(localStorage.getItem("id_doctor")),
-    //     id_patient: res.id_patient,
-    //     id_clinic: res.id_clinic,
-    //   });
-    //   history.push({
-    //     pathname: "/patient/" + patientId,
-    //     state: pageState,
-    //   });
-    // });
   };
 
   const IconButton = ({
@@ -293,9 +276,9 @@ const ListWidget = () => {
                           >
                             Delete
                           </Dropdown.Item>
-                          <Dropdown.Item disabled={true}>
+                          {/* <Dropdown.Item disabled={true}>
                             Add Vitals
-                          </Dropdown.Item>
+                          </Dropdown.Item> */}
                         </Dropdown.Menu>
                       </Dropdown>
                     </td>

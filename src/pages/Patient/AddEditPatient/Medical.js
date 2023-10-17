@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { InputField, Modal } from "../../../components";
-
-import {
-  CreatableReactSelect,
-  RadioField,
-  CheckBoxField,
-} from "../../../components/Forms";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import { CreatableReactSelect, RadioField } from "../../../components/Forms";
 import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
@@ -28,39 +24,52 @@ const useStyles = createUseStyles({
   },
 });
 
+export const CheckBoxInput = ({ label, name, checked, onChange }) => {
+  const { register, setValue } = useFormContext();
+  return (
+    <div className={`form-check form-check-primary`}>
+      <label className="form-check-label">
+        <input
+          type="checkbox"
+          className="form-check-input"
+          {...register(name)}
+          defaultChecked={checked}
+          onChange={(e) => {
+            setValue(name, e.target.checked);
+            if (onChange) {
+              onChange(e);
+            }
+          }}
+        />
+        {label}
+        <i className="input-helper"></i>
+      </label>
+    </div>
+  );
+};
+
 const Medical = (props) => {
   const classes = useStyles();
-
+  const { control } = useFormContext();
+  const { fields, append } = useFieldArray({
+    control,
+    name: "medicalPrecondition",
+  });
   const [isAllergies, setIsAllergies] = useState(false);
-
   const [isOpen, setIsOpen] = useState(false);
-
   const [newTerm, setNewTerm] = useState("");
-
-  const [terms, setTerms] = useState([
-    { label: "High BP", value: "highBP" },
-    { label: "Low BP", value: "lowBP" },
-    { label: "TB", value: "tb" },
-    { label: "Asthma", value: "asthma" },
-    { label: "Diabetes", value: "diabetes" },
-    { label: "Allergies", value: "allergies" },
-  ]);
-
-  const handleChange = (e) => {
-    const { name, value, checked } = e.target;
-    if (name === "medicalPrecondition" && value === "allergies") {
-      setIsAllergies(checked);
-    }
-  };
 
   const FooterActions = () => {
     return (
       <Button
         className="btn btn-sm btn-primary"
         onClick={() => {
-          if (newTerm !== "") {
-            let newTermObj = { label: newTerm, value: newTerm.toLowerCase() };
-            setTerms([...terms, ...[newTermObj]]);
+          if (newTerm !== "" && newTerm.length > 0) {
+            append({
+              label: newTerm,
+              value: newTerm.replace(/\s/g, "").toLowerCase(),
+              checked: true,
+            });
           }
           setIsOpen(false);
           setNewTerm("");
@@ -87,12 +96,24 @@ const Medical = (props) => {
       </Modal>
       <div className="row">
         <div className={`col-lg-12 ${classes.terms}`}>
-          <CheckBoxField
-            name="medicalPrecondition"
-            options={terms}
-            onChange={(e) => handleChange(e)}
-          />
-
+          <div className="form-group custom-form-check-inline">
+            {fields.map((field, index) => {
+              let name = `medicalPrecondition[${index}].checked`;
+              return (
+                <CheckBoxInput
+                  key={index}
+                  name={name}
+                  label={field.label}
+                  checked={field.checked}
+                  onChange={(e) => {
+                    if (field.value === "allergies") {
+                      setIsAllergies(e.target.checked);
+                    }
+                  }}
+                />
+              );
+            })}
+          </div>
           <div style={{ lineHeight: "32px" }}>
             <Button
               className={`btn btn-sm btn-primary ${classes.smAddBtn}`}

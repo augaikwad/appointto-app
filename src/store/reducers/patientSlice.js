@@ -1,5 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const termsOptions = [
+  { label: "High BP", value: "highBP", checked: false },
+  { label: "Low BP", value: "lowBP", checked: false },
+  { label: "TB", value: "tb", checked: false },
+  { label: "Asthma", value: "asthma", checked: false },
+  { label: "Diabetes", value: "diabetes", checked: false },
+  { label: "Allergies", value: "allergies", checked: false },
+];
+
+const habits = [
+  { label: "Tobacco Chewing", value: "tobacco", checked: false },
+  { label: "Smoking", value: "smoking", checked: false },
+  { label: "Alcohol", value: "alcohol", checked: false },
+];
+
 export const initialState = {
   activeTab: 0,
   profileActiveTab: 0,
@@ -7,39 +22,32 @@ export const initialState = {
     open: false,
     isAdd: true,
     formValue: {
-      gender: "Male",
-      blood_group: "A+ve",
-      id_patient: 0,
       first_name: "",
       last_name: "",
+      mobile_number: "",
+      dob: null,
       age: "",
       ageType: "Years",
-      mobile_number: "",
-      email_id: "",
-      dob: null,
+      gender: "Male",
       address: "",
       area: "",
       city: "",
       state: "",
       pincode: "",
       reffered_by: "",
+      email_id: "",
       emergency_contact: "",
+      blood_group: "A+ve",
+      id_patient: 0,
       diet: "veg",
       current_medicine: "",
-      medicalPrecondition: "lowBP",
-      habbits: "",
+      medicalPrecondition: termsOptions,
+      habbits: habits,
       otherInfo: "",
       document_url: "",
     },
   },
-  termsOptions: [
-    { label: "High BP", value: "highBP" },
-    { label: "Low BP", value: "lowBP" },
-    { label: "TB", value: "tb" },
-    { label: "Asthma", value: "asthma" },
-    { label: "Diabetes", value: "diabetes" },
-    { label: "Allergies", value: "allergies" },
-  ],
+  termsOptions: termsOptions,
   appointmentForm: {
     id_appointment: 0,
     id_patient: 0,
@@ -66,6 +74,9 @@ const patientSlice = createSlice({
   name: "patients",
   initialState,
   reducers: {
+    setActiveTab: (state, action) => {
+      state.activeTab = action.payload;
+    },
     setPatientById: (state, action) => {
       state.patientById = action.payload;
     },
@@ -79,8 +90,9 @@ const patientSlice = createSlice({
       state.patientListFilter = action.payload;
     },
     setPatientModal: (state, action) => {
-      if (action.payload.hasOwnProperty("open") && !action.payload.open) {
+      if (action.payload.hasOwnProperty("open") && !action.payload?.open) {
         state.patientModal = initialState.patientModal;
+        state.activeTab = 0;
       } else {
         state.patientModal = action.payload;
       }
@@ -94,6 +106,7 @@ export const {
   setPatientsList,
   setPatientListFilters,
   setPatientModal,
+  setActiveTab,
 } = patientSlice.actions;
 
 export default patientSlice.reducer;

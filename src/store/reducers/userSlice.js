@@ -11,6 +11,7 @@ const userSlice = createSlice({
     appointmentStatuses: null,
     doctorsByClinicId: null,
     selectedDoctorId: null,
+    selectedDoctor: null,
   },
   reducers: {
     setUser: (state, action) => {
@@ -27,6 +28,9 @@ const userSlice = createSlice({
     setSelectedDoctorId: (state, action) => {
       state.selectedDoctorId = action.payload;
     },
+    setSelectedDoctor: (state, action) => {
+      state.selectedDoctor = action.payload;
+    },
   },
 });
 
@@ -35,6 +39,7 @@ export const {
   setAppointmentStatuses,
   setDoctorsByClinicId,
   setSelectedDoctorId,
+  setSelectedDoctor,
 } = userSlice.actions;
 
 export default userSlice.reducer;

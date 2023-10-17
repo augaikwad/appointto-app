@@ -22,7 +22,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
   });
   const { handleSubmit, getValues, watch, reset } = form;
 
-  const onSubmit = (data) => {
+  const onSubmit = (data, e) => {
     let req = { ...data };
     if (forgetPasswordStep === 1) {
       actions.getOTPForResetPassword({
@@ -30,10 +30,24 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
         country_code: "91",
         otp_for: 2,
       });
-    } else {
+    } else if (forgetPasswordStep === 2) {
       let otpDataObj = { ...otpData };
       otpDataObj.otp_for = 2;
       actions.verifyOTP({ ...req, ...otpDataObj });
+    } else if (forgetPasswordStep === 3) {
+      const confirmReq = {
+        mobileNumber: data.mobile_no,
+        countryCode: "91",
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        reset_password_token: verifyOTPData.reset_password_token,
+      };
+
+      actions.resetPassword(confirmReq, () => {
+        reset({ mobile_no: "" });
+        actions.resetOTPData();
+        onHide();
+      });
     }
   };
 
@@ -46,24 +60,6 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
       otp_for: 2,
     };
     actions.resendOTP(req);
-  };
-
-  const changePassword = () => {
-    let formValues = getValues();
-
-    const req = {
-      mobileNumber: formValues.mobile_no,
-      countryCode: "91",
-      password: formValues.password,
-      confirmPassword: formValues.confirmPassword,
-      reset_password_token: verifyOTPData.reset_password_token,
-    };
-
-    actions.resetPassword(req, () => {
-      reset({ mobile_no: "" });
-      actions.resetOTPData();
-      onHide();
-    });
   };
 
   return (
@@ -98,12 +94,6 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
                   },
                 }}
               />
-              <Button
-                className="btn btn-block btn-primary btn-sm"
-                type="submit"
-              >
-                Send OTP
-              </Button>
             </>
           )}
           {forgetPasswordStep === 2 && (
@@ -134,12 +124,6 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
                   Resend OTP
                 </Button>
               </div>
-              <Button
-                className="btn btn-block btn-primary btn-sm"
-                type="submit"
-              >
-                Verify
-              </Button>
             </>
           )}
           {forgetPasswordStep === 3 && (
@@ -165,14 +149,13 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
                   },
                 }}
               />
-              <Button
-                className="btn btn-block btn-primary btn-sm"
-                onClick={() => changePassword()}
-              >
-                Change Password
-              </Button>
             </>
           )}
+          <Button className="btn btn-block btn-primary btn-sm" type="submit">
+            {forgetPasswordStep === 1 && `Send OTP`}
+            {forgetPasswordStep === 2 && `Verify`}
+            {forgetPasswordStep === 3 && `Change Password`}
+          </Button>
         </form>
       </FormProvider>
     </Modal>

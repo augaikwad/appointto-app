@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Tab, Row, Col, Nav } from "react-bootstrap";
 import { Card } from "../../components";
 import { PrescriptionSetting, Users } from "./Tabs";
 import { createUseStyles } from "react-jss";
-import { SettingsContext } from "../../context/Settings";
+import { useDispatch, useSelector } from "react-redux";
+import { getPrintingSetting } from "../../store/actions/settingActions";
 
 const useStyles = createUseStyles({
   tabContent: {
@@ -57,14 +58,16 @@ const useStyles = createUseStyles({
 });
 
 const Index = () => {
+  const dispatch = useDispatch();
+
+  const { id_doctor } = useSelector((state) => state.user.details);
+
   const [activeTab, setActiveTab] = useState(0);
 
   const classes = useStyles();
 
-  const [state, actions] = useContext(SettingsContext);
-
   useEffect(() => {
-    actions.getPrintingSetting();
+    dispatch(getPrintingSetting(id_doctor));
   }, []);
 
   const tabs = [
