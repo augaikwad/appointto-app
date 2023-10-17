@@ -94,6 +94,7 @@ const PatientList = () => {
   const location = useLocation();
   const { isInit } = location.state;
 
+  const { selectedDoctorId } = useSelector((state) => state.user);
   const { id_clinic } = useSelector((state) => state.user.details);
   const { patientList, patientListFilter, patientModal } = useSelector(
     (state) => state.patients
@@ -262,9 +263,7 @@ const PatientList = () => {
                             let currentDate = new Date();
                             let req = {
                               id_appointment: 0,
-                              id_doctor: parseInt(
-                                localStorage.getItem("id_doctor")
-                              ),
+                              id_doctor: selectedDoctorId,
                               id_patient: item.id_patient,
                               date: new Date(currentDate),
                               day: moment(currentDate).format("dddd"),
@@ -290,6 +289,7 @@ const PatientList = () => {
                                 form: {
                                   ...appointmentModal.form,
                                   id_patient: item.id_patient,
+                                  id_doctor: selectedDoctorId,
                                 },
                               })
                             );

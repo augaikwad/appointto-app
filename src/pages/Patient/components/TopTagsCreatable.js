@@ -3,6 +3,7 @@ import { CreatableReactSelect } from "../../../components/Forms";
 import { PrescriptionContext } from "../../../context/Prescription";
 import { useFormContext } from "react-hook-form";
 import { createUseStyles } from "react-jss";
+import { useSelector } from "react-redux";
 
 const useStyles = createUseStyles({
   badge: {
@@ -23,6 +24,7 @@ const TopTagsCreatable = ({
   const classes = useStyles();
   const { setValue, getValues } = useFormContext();
 
+  const { selectedDoctorId } = useSelector((state) => state.user);
   const [state, actions] = useContext(PrescriptionContext);
 
   const setNewValue = (newVal) => {
@@ -54,7 +56,7 @@ const TopTagsCreatable = ({
             [valueField]: 0,
             name: val,
             is_new: true,
-            id_doctor: localStorage.getItem("id_doctor"),
+            id_doctor: selectedDoctorId,
             count: 0,
           };
           actions.saveUpdateTag(name, req, callback);

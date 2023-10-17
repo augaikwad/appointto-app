@@ -11,11 +11,12 @@ import {
 
 const InvestigationsTags = ({ name = "lstinvestigations" }) => {
   const dispatch = useDispatch();
+  const { selectedDoctorId } = useSelector((state) => state.user);
   const { id_doctor } = useSelector((state) => state.user.details);
   const { investigations, investigationsGroup } = useSelector(
     (state) => state.prescription
   );
-  const [state, actions] = useContext(PrescriptionContext);
+  const [, actions] = useContext(PrescriptionContext);
   const [open, setOpen] = useState(false);
   const { setValue, getValues } = useFormContext();
 
@@ -43,7 +44,7 @@ const InvestigationsTags = ({ name = "lstinvestigations" }) => {
             id_investigations: 0,
             name: val,
             is_new: true,
-            id_doctor: localStorage.getItem("id_doctor"),
+            id_doctor: selectedDoctorId,
             type: "Investigations",
           };
           actions.saveUpdateTag(name, req, (res) => {
@@ -64,7 +65,7 @@ const InvestigationsTags = ({ name = "lstinvestigations" }) => {
             investigationGroupId: 0,
             invGroupName: groupName,
             investigationDetails: idArray.toString(),
-            id_doctor: localStorage.getItem("id_doctor"),
+            id_doctor: selectedDoctorId,
           };
           actions.saveInvestigationsGroup(req, () => {
             dispatch(getInvestigationsGroup(id_doctor));

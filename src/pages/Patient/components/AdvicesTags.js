@@ -12,6 +12,7 @@ import {
 
 const AdvicesTags = ({ name = "lstadvice" }) => {
   const dispatch = useDispatch();
+  const { selectedDoctorId } = useSelector((state) => state.user);
   const { id_doctor } = useSelector((state) => state.user.details);
   const { advices, adviceGroup } = useSelector((state) => state.prescription);
 
@@ -43,7 +44,7 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
             id_advice: 0,
             name: val,
             is_new: true,
-            id_doctor: localStorage.getItem("id_doctor"),
+            id_doctor: selectedDoctorId,
             type: "Advice",
           };
           actions.saveUpdateTag(name, req, (res) => {
@@ -64,7 +65,7 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
             adviceGroupId: 0,
             advGroupName: groupName,
             adviceDetails: adviceDetails.toString(),
-            id_doctor: localStorage.getItem("id_doctor"),
+            id_doctor: selectedDoctorId,
           };
           dispatch(
             saveAdviceGroup(req, () => {

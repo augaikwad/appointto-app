@@ -112,6 +112,7 @@ const LastVisits = () => {
   const dispatch = useDispatch();
   const { allPrescriptions } = useSelector((state) => state.prescription);
   const { patientById } = useSelector((state) => state.patients);
+  const { selectedDoctor } = useSelector((state) => state.user);
 
   useEffect(() => {
     if (patientById !== null) {
@@ -125,7 +126,7 @@ const LastVisits = () => {
         <b className="pr-5">
           {format(new Date(item.prescriptionDate), "dd-MMM-yyyy")}
         </b>{" "}
-        By: {localStorage.getItem("id_doctor")}
+        By: {`${selectedDoctor.first_name} ${selectedDoctor.last_name}`}
       </>
     );
   };

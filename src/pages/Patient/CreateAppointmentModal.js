@@ -43,7 +43,9 @@ const CreateAppointmentModal = ({ onHide }) => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { doctorsByClinicId } = useSelector((state) => state.user);
+  const { doctorsByClinicId, selectedDoctor } = useSelector(
+    (state) => state.user
+  );
 
   const { dashboardListFilters, appointmentModal } = useSelector(
     (state) => state.appointments
@@ -54,7 +56,7 @@ const CreateAppointmentModal = ({ onHide }) => {
     defaultValues: formattedFormData(formValues),
   });
 
-  const { reset, setValue, handleSubmit } = form;
+  const { reset, setValue, handleSubmit, watch } = form;
 
   useEffect(() => {
     reset(formattedFormData(formValues));
@@ -142,6 +144,20 @@ const CreateAppointmentModal = ({ onHide }) => {
                 dateFormat="hh:mmaa"
                 showTimeSelect
                 showTimeSelectOnly
+                minTime={moment(new Date())
+                  .set({
+                    hour: 9,
+                    minute: 0,
+                    second: 0,
+                  })
+                  .toDate()}
+                maxTime={moment(new Date())
+                  .set({
+                    hour: 22,
+                    minute: 45,
+                    second: 0,
+                  })
+                  .toDate()}
                 timeIntervals={15}
                 timeCaption="Time"
                 inputOnChange={(val) => {
@@ -161,6 +177,16 @@ const CreateAppointmentModal = ({ onHide }) => {
                 dateFormat="hh:mmaa"
                 showTimeSelect
                 showTimeSelectOnly
+                minTime={moment(new Date(watch("start_time")))
+                  .add(15, "m")
+                  .toDate()}
+                maxTime={moment(new Date())
+                  .set({
+                    hour: 23,
+                    minute: 0,
+                    second: 0,
+                  })
+                  .toDate()}
                 timeIntervals={15}
                 timeCaption="Time"
                 rules={{
