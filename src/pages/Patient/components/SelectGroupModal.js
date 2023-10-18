@@ -63,7 +63,7 @@ const SelectGroupModal = ({
                   group[items].map((item, i) => {
                     return (
                       <div
-                        key={item[itemId]}
+                        key={`${ind}-${group[id]}-${item[itemId]}-${i}`}
                         className="badge badge-primary mr-2 mb-2"
                       >
                         {item.name}

@@ -21,7 +21,6 @@ import {
   MaskedField,
 } from "../../../components/Forms";
 import { useHistory } from "react-router-dom";
-import { PrescriptionContext } from "../../../context/Prescription";
 import cogoToast from "cogo-toast";
 import PrescriptionPrint from "../components/PrescriptionPrint";
 import { useReactToPrint } from "react-to-print";
@@ -33,6 +32,11 @@ import {
   getPrescriptions,
   savePrescription,
 } from "../../../store/actions/prescriptionActions";
+import {
+  getAppointmentById,
+  updateAppointment,
+  getDashboardAppointments,
+} from "../../../store/actions/appointmentActions";
 import moment from "moment";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
@@ -44,6 +48,7 @@ const Prescription = () => {
   const { id_doctor } = useSelector((state) => state.user.details);
   const { patientById } = useSelector((state) => state.patients);
   const { prescriptionForm } = useSelector((state) => state.prescription);
+  const { dashboardListFilters } = useSelector((state) => state.appointments);
 
   const printRef = useRef(null);
   const [printData, setPrintData] = useState([]);
@@ -82,6 +87,22 @@ const Prescription = () => {
     }
   }, [patientById]);
 
+  const handleUpdateAppointment = () => {
+    if (id_appointment && id_appointment > 0) {
+      dispatch(
+        getAppointmentById(id_appointment, (res) => {
+          let req = { ...res };
+          req.appointment_status = "Completed";
+          dispatch(
+            updateAppointment(req, () => {
+              dispatch(getDashboardAppointments(dashboardListFilters));
+            })
+          );
+        })
+      );
+    }
+  };
+
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
   });
@@ -116,6 +137,7 @@ const Prescription = () => {
       dispatch(
         savePrescription(formData, (res) => {
           const btnId = e.target.id;
+          handleUpdateAppointment();
           dispatch(getPrescriptions({ PatientId: res.patientId }));
           if (btnId === "SaveNext") {
             history.push({

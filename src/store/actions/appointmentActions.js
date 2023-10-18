@@ -83,3 +83,20 @@ export const getAppointmentsForCalendar = (request) => async (dispatch) => {
     console.error("Error fetching user data:", error);
   }
 };
+
+export const getAppointmentById = (id, callback) => async (dispatch) => {
+  try {
+    const response = await service.get(
+      "Appointment/get-appointment-by-id?AppointmentId=" + id
+    );
+    const { response_code, payload } = response.data;
+    if (response_code === 2000) {
+      if (callback) {
+        callback(payload);
+      }
+    }
+  } catch (error) {
+    // Handle error here
+    console.error("Error fetching user data:", error);
+  }
+};

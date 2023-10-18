@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { Button, Form } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
@@ -7,13 +7,13 @@ import InputMask from "react-input-mask";
 import MedicineNameField from "./MedicineNameField";
 import CommonMedicineTable from "./CommonMedicineTable";
 import { AutocompleteField, Modal } from "../../../components";
-import { PrescriptionContext } from "../../../context/Prescription";
 import { typeOptions, unitOptions } from "../../../utils/constants";
 import cogoToast from "cogo-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getRxGroups,
   saveRxGroup,
+  setPreviousPrescription,
 } from "../../../store/actions/prescriptionActions";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
@@ -137,10 +137,13 @@ const CreateGroupModal = ({
   onCreateGroup = () => {},
   onHide = () => {},
 }) => {
+  const dispatch = useDispatch();
+  const { id_doctor } = useSelector((state) => state.user.details);
   const [groupName, setGroupName] = useState("");
 
   const callback = () => {
     setGroupName("");
+    dispatch(getRxGroups(id_doctor));
     onHide();
   };
 
@@ -191,13 +194,12 @@ const timingOptions = [
 const NewMedTable = ({ control, setValue }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+
   const { id_doctor } = useSelector((state) => state.user.details);
   const { rxGroups } = useSelector((state) => state.prescription);
 
   const [open, setOpen] = useState(false);
   const [rxGroupModalShow, setRxGroupModalShow] = useState(false);
-
-  const [state, actions] = useContext(PrescriptionContext);
 
   useEffect(() => {
     dispatch(getRxGroups(id_doctor));
@@ -493,7 +495,7 @@ const NewMedTable = ({ control, setValue }) => {
             const slicedArray = medicinesArray.slice(0, -1);
 
             let request = {
-              id_doctor: parseInt(localStorage.getItem("id_doctor")),
+              id_doctor: id_doctor,
               rxGroupName: groupName,
             };
             let group = [];
@@ -578,9 +580,14 @@ const NewMedTable = ({ control, setValue }) => {
                       e.preventDefault();
                       setGroupToForm(group);
                       setRxGroupModalShow(false);
-                      actions.setPreviousPrescription(group.rxGroupId, () => {
-                        dispatch(getRxGroups(id_doctor));
-                      });
+                      dispatch(
+                        setPreviousPrescription(
+                          { RxGroupId: group.rxGroupId, id_doctor },
+                          () => {
+                            dispatch(getRxGroups(id_doctor));
+                          }
+                        )
+                      );
                     }}
                   >
                     Select

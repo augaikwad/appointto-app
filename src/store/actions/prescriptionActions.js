@@ -202,7 +202,7 @@ export const getMedicinesByDoctorId = (id_doctor) => async (dispatch) => {
 export const getRxGroups = (id_doctor, callback) => async (dispatch) => {
   try {
     const response = await service.post(
-      "Prescription/GetRxGroup?DoctorId" + id_doctor
+      "Prescription/GetRxGroup?DoctorId=" + id_doctor
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -263,6 +263,37 @@ export const savePrescription = (req, callback) => async (dispatch) => {
     const { response_code, payload, message } = response.data;
     if (response_code === 2000) {
       cogoToast.success(message, toastOption);
+      if (callback) {
+        callback(payload);
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+  }
+};
+
+export const saveUpdateTag = (category, req, callback) => async (dispatch) => {
+  try {
+    const response = await service.post("Prescription/Save" + category, req);
+    const { response_code, payload } = response.data;
+    if (response_code === 2000) {
+      if (callback) {
+        callback(payload);
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+  }
+};
+
+export const setPreviousPrescription = (req, callback) => async (dispatch) => {
+  try {
+    const queryString = new URLSearchParams(req);
+    const response = await service.post(
+      "Prescription/setprevious?" + queryString
+    );
+    const { response_code, payload } = response.data;
+    if (response_code === 2000) {
       if (callback) {
         callback(payload);
       }

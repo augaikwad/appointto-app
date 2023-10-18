@@ -1,12 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CreateSelectTagsAutoComplete from "./CreateSelectTagsAutoComplete";
-import { PrescriptionContext } from "../../../context/Prescription";
 import { useFormContext } from "react-hook-form";
 import SelectGroupModal from "./SelectGroupModal";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getInvestigations,
   getInvestigationsGroup,
+  saveInvestigationsGroup,
+  saveUpdateTag,
 } from "../../../store/actions/prescriptionActions";
 
 const InvestigationsTags = ({ name = "lstinvestigations" }) => {
@@ -16,7 +17,7 @@ const InvestigationsTags = ({ name = "lstinvestigations" }) => {
   const { investigations, investigationsGroup } = useSelector(
     (state) => state.prescription
   );
-  const [, actions] = useContext(PrescriptionContext);
+
   const [open, setOpen] = useState(false);
   const { setValue, getValues } = useFormContext();
 
@@ -47,12 +48,14 @@ const InvestigationsTags = ({ name = "lstinvestigations" }) => {
             id_doctor: selectedDoctorId,
             type: "Investigations",
           };
-          actions.saveUpdateTag(name, req, (res) => {
-            dispatch(getInvestigations(id_doctor));
+          dispatch(
+            saveUpdateTag(name, req, (res) => {
+              dispatch(getInvestigations(id_doctor));
 
-            let val = getValues(name) || [];
-            setValue(name, [...val, ...[res]]);
-          });
+              let val = getValues(name) || [];
+              setValue(name, [...val, ...[res]]);
+            })
+          );
           return val;
         }}
         onCreateGroup={(groupName, callback) => {
@@ -67,10 +70,12 @@ const InvestigationsTags = ({ name = "lstinvestigations" }) => {
             investigationDetails: idArray.toString(),
             id_doctor: selectedDoctorId,
           };
-          actions.saveInvestigationsGroup(req, () => {
-            dispatch(getInvestigationsGroup(id_doctor));
-            callback();
-          });
+          dispatch(
+            saveInvestigationsGroup(req, () => {
+              dispatch(getInvestigationsGroup(id_doctor));
+              callback();
+            })
+          );
         }}
         selectGroupBtnClick={() => {
           setOpen(true);

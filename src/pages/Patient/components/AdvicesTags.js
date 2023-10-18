@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CreateSelectTagsAutoComplete from "./CreateSelectTagsAutoComplete";
-import { PrescriptionContext } from "../../../context/Prescription";
 import { useFormContext } from "react-hook-form";
 import SelectGroupModal from "./SelectGroupModal";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,6 +7,7 @@ import {
   getAdvices,
   getAdviceGroup,
   saveAdviceGroup,
+  saveUpdateTag,
 } from "../../../store/actions/prescriptionActions";
 
 const AdvicesTags = ({ name = "lstadvice" }) => {
@@ -16,7 +16,6 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
   const { id_doctor } = useSelector((state) => state.user.details);
   const { advices, adviceGroup } = useSelector((state) => state.prescription);
 
-  const [state, actions] = useContext(PrescriptionContext);
   const [open, setOpen] = useState(false);
   const { setValue, getValues } = useFormContext();
 
@@ -47,12 +46,14 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
             id_doctor: selectedDoctorId,
             type: "Advice",
           };
-          actions.saveUpdateTag(name, req, (res) => {
-            dispatch(getAdvices(id_doctor));
+          dispatch(
+            saveUpdateTag(name, req, (res) => {
+              dispatch(getAdvices(id_doctor));
 
-            let val = getValues(name) || [];
-            setValue(name, [...val, ...[res]]);
-          });
+              let val = getValues(name) || [];
+              setValue(name, [...val, ...[res]]);
+            })
+          );
           return val;
         }}
         onCreateGroup={(groupName, callback) => {
