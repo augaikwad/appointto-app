@@ -46,6 +46,16 @@ const useStyles = createUseStyles({
         color: "#00bd44",
       },
     },
+    "&.Cancelled > .rbc-event": {
+      backgroundColor: "#ebebeb",
+      "& .faIcon": {
+        color: "#adadad",
+      },
+      "& b,& span": {
+        textDecoration: "line-through",
+        color: "#919191",
+      },
+    },
   },
   customEventContent: {
     position: "relative",

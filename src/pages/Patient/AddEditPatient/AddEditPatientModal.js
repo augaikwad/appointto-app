@@ -59,8 +59,6 @@ const AddEditPatientModal = () => {
   const refreshDashboardList = () => {
     if (["/dashboard", "/"].includes(location.pathname)) {
       dispatch(getDashboardAppointments(dashboardListFilters));
-    } else {
-      dispatch(getPatientById({ PatientId: patientById.id_patient }));
     }
   };
 
@@ -72,6 +70,10 @@ const AddEditPatientModal = () => {
       })
     );
     dispatch(setActiveTab(activeTab + 1));
+
+    if (location.pathname === `/patient/${response.id_patient}`) {
+      dispatch(getPatientById({ PatientId: response.id_patient }));
+    }
   };
 
   const handleSave = (data) => {

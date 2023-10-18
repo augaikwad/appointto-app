@@ -1,4 +1,5 @@
 import { initialState } from "../../reducers/patientSlice";
+import moment from "moment";
 
 const arrayToString = (array) => {
   let string = "";
@@ -19,6 +20,10 @@ const arrayOfObjectToString = (array) => {
 
 export const formattedObjForPatientSave = (data) => {
   let obj = { ...data };
+
+  if (data.dob !== null) {
+    obj.dob = moment(data.dob).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+  }
   obj.medicalPrecondition = arrayToString(data.medicalPrecondition);
   obj.allergies = arrayOfObjectToString(data.allergies);
   obj.current_medicine = arrayOfObjectToString(data.current_medicine);
