@@ -37,6 +37,7 @@ import {
   updateAppointment,
   getDashboardAppointments,
 } from "../../../store/actions/appointmentActions";
+import { navigateTo } from "../../../store/reducers/navigationSlice";
 import moment from "moment";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
@@ -140,12 +141,14 @@ const Prescription = () => {
           handleUpdateAppointment();
           dispatch(getPrescriptions({ PatientId: res.patientId }));
           if (btnId === "SaveNext") {
-            history.push({
-              pathname: "/patient/" + patientById.id_patient,
-              state: {
-                selectedTab: 2,
-              },
-            });
+            dispatch(
+              navigateTo({
+                to: "/patient/" + patientById.id_patient,
+                state: {
+                  selectedTab: 2,
+                },
+              })
+            );
           } else if (btnId === "SavePrint") {
             setPrintData(res);
             handlePrint();
@@ -317,6 +320,8 @@ const Prescription = () => {
                               "nextVisitDate",
                               new Date(moment().add(value, "days"))
                             );
+                          } else {
+                            setValue("nextVisitDate", new Date());
                           }
                         }}
                       />
