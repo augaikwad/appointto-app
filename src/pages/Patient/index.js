@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 import { BillingContext } from "../../context/Billing";
 import AmountWithCurrancy from "../../components/AmountWithCurrancy";
 import { useDispatch, useSelector } from "react-redux";
+import { getAllBillingDataAction } from "../../store/actions/billingActions";
 
 const useStyles = createUseStyles({
   tabContent: {
@@ -65,11 +66,11 @@ const History = () => {
 
 const Patient = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
 
+  const { id_doctor } = useSelector((state) => state.user.details);
   const { patientById } = useSelector((state) => state.patients);
-
-  const [billState, billActions] = useContext(BillingContext);
-  const { billSummary } = billState;
+  const { billSummary } = useSelector((state) => state.billings);
 
   const location = useLocation();
   const { selectedTab } = location.state;
@@ -82,17 +83,17 @@ const Patient = () => {
     }
   }, [selectedTab]);
 
-  // useEffect(() => {
-  //   if (patientData === null) {
-  //     actions.getPatientById(location.pathname.split("/")[2], (res) => {
-  //       billActions.getAllBillingDataAction({
-  //         id_doctor: parseInt(localStorage.getItem("id_doctor")),
-  //         id_patient: res.id_patient,
-  //         id_clinic: res.id_clinic,
-  //       });
-  //     });
-  //   }
-  // }, [patientData]);
+  useEffect(() => {
+    if (patientById) {
+      dispatch(
+        getAllBillingDataAction({
+          id_doctor: id_doctor,
+          id_patient: patientById.id_patient,
+          id_clinic: patientById.id_clinic,
+        })
+      );
+    }
+  }, []);
 
   const tabs = [
     { name: "Profile", component: <Profile /> },

@@ -1,22 +1,28 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Modal } from "../../../components";
 import { TextField, SelectField } from "../../../components/Forms";
 import { FormProvider, useForm } from "react-hook-form";
 import { Button } from "react-bootstrap";
-import { BillingContext } from "../../../context/Billing";
-import { PatientContext } from "../../../context/Patient";
+import { useDispatch, useSelector } from "react-redux";
+import { setPaymentModal } from "../../../store/reducers/billingSlice";
+import {
+  addPayment,
+  getAllBillingDataAction,
+} from "../../../store/actions/billingActions";
 
 const AddEditPaymentModal = () => {
-  const [state, actions] = useContext(BillingContext);
-  const { paymentModal } = state;
-  const { open, isAdd, formValue } = paymentModal;
+  const dispatch = useDispatch();
 
-  const [patientState, patientActions] = useContext(PatientContext);
-  const { patientData } = patientState;
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { patientById } = useSelector((state) => state.patients);
+  const { paymentModal } = useSelector((state) => state.billings);
+
+  const { open, isAdd, formValue } = paymentModal;
 
   const form = useForm({
     defaultValues: formValue,
   });
+
   const { handleSubmit, reset } = form;
 
   useEffect(() => {
@@ -27,18 +33,22 @@ const AddEditPaymentModal = () => {
 
   const onHide = () => {
     reset();
-    actions.setPaymentModal({ open: false });
+    dispatch(setPaymentModal({ open: false }));
   };
 
   const onSubmit = (data) => {
-    actions.addPayment(data, () => {
-      actions.getAllBillingDataAction({
-        id_doctor: parseInt(localStorage.getItem("id_doctor")),
-        id_patient: patientData.id_patient,
-        id_clinic: patientData.id_clinic,
-      });
-      onHide();
-    });
+    dispatch(
+      addPayment(data, () => {
+        dispatch(
+          getAllBillingDataAction({
+            id_doctor: id_doctor,
+            id_patient: patientById.id_patient,
+            id_clinic: patientById.id_clinic,
+          })
+        );
+        onHide();
+      })
+    );
   };
 
   const FooterAction = () => {

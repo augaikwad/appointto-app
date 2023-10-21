@@ -26,11 +26,11 @@ export const getTreatmentList = (id_doctor) => async (dispatch) => {
 export const createBill = (req, callback) => async (dispatch) => {
   try {
     const response = await service.post("Bill/Create", req);
-    const { response_code, message } = response.data;
+    const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
       cogoToast.success(message, toastOption);
       if (callback) {
-        callback();
+        callback(payload);
       }
     } else {
       cogoToast.error(message, toastOption);
@@ -44,11 +44,11 @@ export const createBill = (req, callback) => async (dispatch) => {
 export const updateBill = (req, callback) => async (dispatch) => {
   try {
     const response = await service.post("Bill/Update", req);
-    const { response_code, message } = response.data;
+    const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
       cogoToast.success(message, toastOption);
       if (callback) {
-        callback();
+        callback(payload);
       }
     } else {
       cogoToast.error(message, toastOption);
@@ -135,18 +135,39 @@ export const saveTreatment = (req, callback) => async (dispatch) => {
   }
 };
 
-export const getAllBillingDataAction = (req) => {
-  getBillSummary({
-    id_doctor: req.id_doctor,
-    id_patient: req.id_patient,
-    id_clinic: req.id_clinic,
-  });
-  getAllBillData({
-    id_doctor: req.id_doctor,
-    id_patient: req.id_patient,
-  });
-  getTransactionSummary({
-    id_doctor: req.id_doctor,
-    id_patient: req.id_patient,
-  });
+export const getAllBillingDataAction = (req) => async (dispatch) => {
+  dispatch(
+    getBillSummary({
+      id_doctor: req.id_doctor,
+      id_patient: req.id_patient,
+      id_clinic: req.id_clinic,
+    })
+  );
+  dispatch(
+    getAllBillData({
+      id_doctor: req.id_doctor,
+      id_patient: req.id_patient,
+    })
+  );
+  dispatch(
+    getTransactionSummary({
+      id_doctor: req.id_doctor,
+      id_patient: req.id_patient,
+    })
+  );
+};
+
+export const addPayment = (req, callback) => async (dispatch) => {
+  try {
+    const response = await service.post("Bill/AddPayment", req);
+    const { response_code, payload } = response.data;
+    if (response_code === 2000) {
+      if (callback) {
+        callback(payload);
+      }
+    }
+  } catch (error) {
+    // Handle error here
+    console.error("Error fetching user data:", error);
+  }
 };

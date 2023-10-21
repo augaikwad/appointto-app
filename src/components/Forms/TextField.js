@@ -30,7 +30,7 @@ const TextField = ({
 
   const handleOnKeyDown = (e) => {
     if (type === "number") {
-      const preventKeys = ["e", "E", "-", "+"];
+      const preventKeys = ["e", "E", "-", "+", "ArrowUp", "ArrowDown"];
       if (preventKeys.includes(e.key)) {
         e.preventDefault();
       }
@@ -38,6 +38,12 @@ const TextField = ({
 
     if (onKeyDown) {
       onKeyDown(e);
+    }
+  };
+
+  const handleWheel = (e) => {
+    if (type === "number") {
+      e.target.blur();
     }
   };
 
@@ -50,6 +56,7 @@ const TextField = ({
         placeholder={placeholder}
         size={size}
         onKeyDown={handleOnKeyDown}
+        onWheel={handleWheel}
         {...register(name, rules)}
         {...restProps}
       />

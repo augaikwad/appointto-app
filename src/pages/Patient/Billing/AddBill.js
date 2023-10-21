@@ -98,6 +98,14 @@ const AddBill = () => {
     return <div className="text-right">{`Rs ${cell}`}</div>;
   };
 
+  const getDiscountFormatter = (cell, row) => {
+    return (
+      <div className="text-right">{`${
+        row.discount_type === 0 ? `Rs ${cell}` : `${cell}%`
+      } `}</div>
+    );
+  };
+
   const getStatusFormatter = (cell, row) => {
     return (
       <Form.Check
@@ -162,14 +170,14 @@ const AddBill = () => {
             <i className="fa fa-pencil"></i>
           </Button>
         </Tooltip>
-        <Tooltip text="Print" placement="top">
+        {/* <Tooltip text="Print" placement="top">
           <button
             type="button"
             className={`${classes.listActionBtn} btn btn-inverse-info btn-icon`}
           >
             <i className="fa fa-print"></i>
           </button>
-        </Tooltip>
+        </Tooltip> */}
         <Tooltip text="Delete Payment" placement="auto">
           <Button
             size="sm"
@@ -243,7 +251,7 @@ const AddBill = () => {
       dataField: "discount_value",
       text: "Discount",
       headerAlign: "center",
-      formatter: getAmountFormatter,
+      formatter: getDiscountFormatter,
       align: "right",
       headerAttrs: {
         width: 80,

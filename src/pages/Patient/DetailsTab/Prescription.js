@@ -20,7 +20,6 @@ import {
   DatePickerField,
   MaskedField,
 } from "../../../components/Forms";
-import { useHistory } from "react-router-dom";
 import cogoToast from "cogo-toast";
 import PrescriptionPrint from "../components/PrescriptionPrint";
 import { useReactToPrint } from "react-to-print";
@@ -43,7 +42,6 @@ import moment from "moment";
 const toastOption = { hideAfter: 5, position: "top-right" };
 
 const Prescription = () => {
-  const history = useHistory();
   const dispatch = useDispatch();
 
   const { id_doctor } = useSelector((state) => state.user.details);
@@ -169,6 +167,27 @@ const Prescription = () => {
   };
 
   const [toothChartShow, setToothChartShow] = useState(false);
+
+  const calculateNextVisitDays = (selectedDate) => {
+    const startMoment = moment(new Date());
+    const endMoment = moment(selectedDate);
+
+    const daysDifference = endMoment.diff(startMoment, "days");
+    const monthsDifference = endMoment.diff(startMoment, "months");
+    const yearsDifference = endMoment.diff(startMoment, "years");
+
+    if (daysDifference < 30) {
+      console.log(`${daysDifference} day${daysDifference !== 1 ? "s" : ""}`);
+    } else if (monthsDifference < 12) {
+      return console.log(
+        `${monthsDifference} month${monthsDifference !== 1 ? "s" : ""}`
+      );
+    } else {
+      return console.log(
+        `${yearsDifference} year${yearsDifference !== 1 ? "s" : ""}`
+      );
+    }
+  };
 
   return (
     <>
@@ -352,7 +371,14 @@ const Prescription = () => {
                   </div>
                 </div>
                 <div className="col-lg-6">
-                  <DatePickerField label="Select Date" name="nextVisitDate" />
+                  <DatePickerField
+                    label="Select Date"
+                    name="nextVisitDate"
+                    inputOnChange={(val) => {
+                      calculateNextVisitDays(val);
+                      return val;
+                    }}
+                  />
                 </div>
               </div>
             </div>

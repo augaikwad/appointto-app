@@ -5,6 +5,7 @@ import {
   DatePickerField,
   SelectField,
   CreatableReactSelect,
+  ReactSelectField,
 } from "../../../components/Forms";
 import { FormProvider, useForm } from "react-hook-form";
 import { Form, Button } from "react-bootstrap";
@@ -20,14 +21,18 @@ import {
   setBillModal,
   initialState,
 } from "../../../store/reducers/billingSlice";
+import cogoToast from "cogo-toast";
+
+const toastOption = { hideAfter: 5, position: "top-right" };
 
 const AddEditBillModal = () => {
   const dispatch = useDispatch();
 
+  const { doctorsByClinicId } = useSelector((state) => state.user);
   const { id_doctor, id_clinic } = useSelector((state) => state.user.details);
   const { treatmentList, billModal } = useSelector((state) => state.billings);
   const { patientById } = useSelector((state) => state.patients);
-
+  console.log("doctorsByClinicId ==", doctorsByClinicId);
   const { open, isAdd, formValue } = billModal;
 
   const form = useForm({
@@ -52,19 +57,20 @@ const AddEditBillModal = () => {
   }, [isAdd]);
 
   const submitCallback = (res) => {
-    reset(initialState.billModal.formValue);
     dispatch(
       getAllBillingDataAction({
         id_doctor: res.id_doctor,
-        id_patient: res.id_patient,
-        id_clinic: id_clinic,
+        id_patient: patientById.id_patient,
+        id_clinic: res.id_clinic,
       })
     );
+    reset(initialState.billModal.formValue);
     dispatch(setBillModal({ open: false }));
   };
 
   const onSubmit = (data) => {
     let formData = { ...data };
+    // formData.doctor_name = `${data.doctor_name.first_name} ${data.doctor_name.last_name}`;
     if (formData.bill_id === 0) {
       formData.id_patient = patientById.id_patient;
       formData.id_doctor = id_doctor;
@@ -128,6 +134,19 @@ const AddEditBillModal = () => {
               <DatePickerField label="Date" name="bill_date" showYearDropdown />
             </div>
             <div className="col-lg-6">
+              {/* <ReactSelectField
+                label="Dr. Name"
+                name="doctor_name"
+                labelField="first_name"
+                valueField="id_doctor"
+                options={doctorsByClinicId}
+                formatOptionLabel={(item) => {
+                  return `${item.first_name} ${item.last_name}`;
+                }}
+                rules={{
+                  required: "Please select Doctor",
+                }}
+              /> */}
               <TextField
                 label="Dr. Name"
                 name="doctor_name"
@@ -150,38 +169,48 @@ const AddEditBillModal = () => {
                   };
                 }}
                 onCreateOption={(val) => {
-                  let req = {
-                    treatment_name: val,
-                    treatment_id: 0,
-                    id_doctor: parseInt(localStorage.getItem("id_doctor")),
-                  };
-                  dispatch(
-                    saveTreatment(req, (response) => {
-                      setValue("treatment", response);
-                      dispatch(getTreatmentList(id_doctor));
-                    })
+                  const findItem = treatmentList.some(
+                    (item) => item.treatment_name === val
                   );
+                  if (!findItem) {
+                    let req = {
+                      treatment_name: val,
+                      treatment_id: 0,
+                      id_doctor: id_doctor,
+                    };
+                    dispatch(
+                      saveTreatment(req, (response) => {
+                        setValue("treatment", response);
+                        dispatch(getTreatmentList(id_doctor));
+                      })
+                    );
+                  } else {
+                    cogoToast.error(
+                      "Treatment name already exist!",
+                      toastOption
+                    );
+                  }
                 }}
                 rules={{
                   required: "Please select Treatment",
                 }}
                 isMulti={false}
               />
-              {/* <ReactSelectField
-                label="Name of Treatment"
-                name="treatment"
-                labelField="treatment_name"
-                valueField="treatment_id"
-                options={treatmentList}
-                rules={{
-                  required: "Please select Treatment",
-                }}
-              /> */}
             </div>
             <div className="col-lg-6">
               <div className="row">
                 <div className="col-lg-6">
-                  <TextField label="Qty" name="quantity" type="number" />
+                  <TextField
+                    label="Qty"
+                    name="quantity"
+                    type="number"
+                    onBlur={(e) => {
+                      let watchRate = watch("rate");
+                      if (watchRate > 0) {
+                        setValue("gross_amount", watchRate * e.target.value);
+                      }
+                    }}
+                  />
                 </div>
                 <div className="col-lg-6">
                   <TextField
@@ -192,16 +221,22 @@ const AddEditBillModal = () => {
                       let watchQty = watch("quantity");
                       if (watchQty > 0) {
                         setValue("gross_amount", watchQty * e.target.value);
-                      } else {
-                        alert("Please enter Quantity");
                       }
+                    }}
+                    rules={{
+                      required: true,
                     }}
                   />
                 </div>
               </div>
             </div>
             <div className="col-lg-6">
-              <TextField label="Amount" name="gross_amount" type="number" />
+              <TextField
+                label="Amount"
+                name="gross_amount"
+                type="number"
+                readOnly={true}
+              />
             </div>
             <div className="col-lg-6">
               <Form.Group>

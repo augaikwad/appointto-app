@@ -1,11 +1,10 @@
-import React, { useContext } from "react";
+import React from "react";
 import { format } from "date-fns";
 import CommonBillingList from "./CommonBillingList";
-import { BillingContext } from "../../../context/Billing";
+import { useSelector } from "react-redux";
 
 const PaymentReceived = () => {
-  const [state, actions] = useContext(BillingContext);
-  const { transactionSummary } = state;
+  const { transactionSummary } = useSelector((state) => state.billings);
 
   const getDateFormatted = (cell, row) => {
     return format(new Date(cell), "dd/MM/yyyy");

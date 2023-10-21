@@ -66,6 +66,7 @@ const CreatableReactSelect = ({
       <Controller
         name={name}
         control={control}
+        rules={rules}
         render={({ field }) => {
           return (
             <CreatableSelect

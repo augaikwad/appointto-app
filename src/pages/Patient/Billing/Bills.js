@@ -1,11 +1,20 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState } from "react";
 import { Form } from "react-bootstrap";
 import { Tooltip } from "../../../components";
 import CommonBillingList from "./CommonBillingList";
 import { createUseStyles } from "react-jss";
-import { BillingContext } from "../../../context/Billing";
-import { PatientContext } from "../../../context/Patient";
 import { format } from "date-fns";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteBill,
+  getAllBillData,
+  getBillSummary,
+} from "../../../store/actions/billingActions";
+import {
+  setBillModal,
+  setPaymentModal,
+  initialState,
+} from "../../../store/reducers/billingSlice";
 
 const useStyles = createUseStyles({
   th: {
@@ -74,12 +83,11 @@ const useStyles = createUseStyles({
 
 const Bills = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
 
-  const [state, actions] = useContext(BillingContext);
-  const { allBillData } = state;
-
-  const [patientState, patientActions] = useContext(PatientContext);
-  const { patientData } = patientState;
+  const { id_doctor } = useSelector((state) => state.user.details);
+  const { allBillData } = useSelector((state) => state.billings);
+  const { patientById } = useSelector((state) => state.patients);
 
   const getDateFormatted = (cell, row) => {
     return format(new Date(cell), "dd/MM/yyyy");
@@ -87,6 +95,14 @@ const Bills = () => {
 
   const getAmountFormatter = (cell, row) => {
     return <div className="text-right">{`Rs ${cell}`}</div>;
+  };
+
+  const getDiscountFormatter = (cell, row) => {
+    return (
+      <div className="text-right">{`${
+        row.discount_type === 0 ? `Rs ${cell}` : `${cell}%`
+      } `}</div>
+    );
   };
 
   const getStatusFormatter = (cell, row) => {
@@ -112,11 +128,16 @@ const Bills = () => {
             className={`${classes.listActionBtn} btn btn-inverse-info btn-icon `}
             disabled={row.is_Completed === 1}
             onClick={() => {
-              actions.setPaymentModal({
-                open: true,
-                isAdd: true,
-                formValue: { bill_id: row.bill_id },
-              });
+              dispatch(
+                setPaymentModal({
+                  open: true,
+                  isAdd: true,
+                  formValue: {
+                    ...initialState.paymentModal.formValue,
+                    bill_id: row.bill_id,
+                  },
+                })
+              );
             }}
           >
             <i className="fa fa-plus"></i>
@@ -126,41 +147,49 @@ const Bills = () => {
           <button
             className={`${classes.listActionBtn} btn btn-inverse-info btn-icon `}
             onClick={() => {
-              actions.setBillModal({
-                open: true,
-                isAdd: false,
-                formValue: row,
-              });
+              dispatch(
+                setBillModal({
+                  open: true,
+                  isAdd: false,
+                  formValue: row,
+                })
+              );
             }}
           >
             <i className="fa fa-pencil"></i>
           </button>
         </Tooltip>
-        <Tooltip text="Print" placement="top">
+        {/* <Tooltip text="Print" placement="top">
           <button
             type="button"
             className={`${classes.listActionBtn} btn btn-inverse-info btn-icon `}
           >
             <i className="fa fa-print"></i>
           </button>
-        </Tooltip>
+        </Tooltip> */}
         <Tooltip text="Delete Payment" placement="auto">
           <button
             type="button"
             className={`${classes.listActionBtn} btn btn-inverse-danger btn-icon`}
             onClick={() => {
               let req = { bill_id: row.bill_id };
-              actions.deleteBill(req, () => {
-                actions.getAllBillData({
-                  id_doctor: row.id_doctor,
-                  id_patient: row.id_patient,
-                });
-                actions.getBillSummary({
-                  id_doctor: parseInt(localStorage.getItem("id_doctor")),
-                  id_patient: patientData.id_patient,
-                  id_clinic: patientData.id_clinic,
-                });
-              });
+              dispatch(
+                deleteBill(req, () => {
+                  dispatch(
+                    getAllBillData({
+                      id_doctor: row.id_doctor,
+                      id_patient: row.id_patient,
+                    })
+                  );
+                  dispatch(
+                    getBillSummary({
+                      id_doctor: id_doctor,
+                      id_patient: patientById.id_patient,
+                      id_clinic: patientById.id_clinic,
+                    })
+                  );
+                })
+              );
             }}
           >
             <i className="fa fa-trash"></i>
@@ -173,6 +202,7 @@ const Bills = () => {
   const [selectedRows, setSelectedRows] = useState([]);
 
   const handleOnSelect = (row, isSelect) => {
+    console.log("handleOnSelect === ", row, isSelect);
     if (isSelect) {
       setSelectedRows([...selectedRows, ...[row]]);
     } else {
@@ -224,7 +254,7 @@ const Bills = () => {
       dataField: "discount_value",
       text: "Discount",
       headerAlign: "center",
-      formatter: getAmountFormatter,
+      formatter: getDiscountFormatter,
       align: "right",
     },
     {
@@ -247,12 +277,12 @@ const Bills = () => {
     <CommonBillingList
       columns={columns}
       data={allBillData}
-      selectRow={{
-        mode: "checkbox",
-        clickToSelect: false,
-        onSelect: handleOnSelect,
-        onSelectAll: handleOnSelectAll,
-      }}
+      // selectRow={{
+      //   mode: "checkbox",
+      //   clickToSelect: true,
+      //   onSelect: handleOnSelect,
+      //   onSelectAll: handleOnSelectAll,
+      // }}
     />
   );
 };
