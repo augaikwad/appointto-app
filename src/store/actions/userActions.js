@@ -66,16 +66,18 @@ export const getDoctorsByClinicId =
       if (response_code === 2000) {
         dispatch(setDoctorsByClinicId(payload));
 
-        let idDoctor = id_doctor;
-        if (idDoctor === 0) {
-          idDoctor = payload[0].id_doctor;
-        }
+        if (id_doctor) {
+          let idDoctor = id_doctor;
+          if (idDoctor === 0) {
+            idDoctor = payload[0].id_doctor;
+          }
 
-        dispatch(setSelectedDoctorId(idDoctor));
-        dispatch(
-          setSelectedDoctor(payload.find((dr) => dr.id_doctor === idDoctor))
-        );
-        dispatch(setDashboardListFilters({ id_doctor: idDoctor }));
+          dispatch(setSelectedDoctorId(idDoctor));
+          dispatch(
+            setSelectedDoctor(payload.find((dr) => dr.id_doctor === idDoctor))
+          );
+          dispatch(setDashboardListFilters({ id_doctor: idDoctor }));
+        }
 
         if (callback) {
           callback(payload);

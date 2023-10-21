@@ -86,6 +86,8 @@ const useStyles = createUseStyles({
 const AddBill = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+
+  const { doctorsByClinicId } = useSelector((state) => state.user);
   const { id_doctor } = useSelector((state) => state.user.details);
   const { patientById } = useSelector((state) => state.patients);
   const { billSummary, allBillData } = useSelector((state) => state.billings);
@@ -158,11 +160,14 @@ const AddBill = () => {
             size="sm"
             className={`${classes.listActionBtn} btn-inverse-info btn-icon`}
             onClick={() => {
+              let doctorName = doctorsByClinicId.find(
+                (item) => item.id_doctor === row.id_doctor
+              );
               dispatch(
                 setBillModal({
                   open: true,
                   isAdd: false,
-                  formValue: row,
+                  formValue: { ...row, doctor_name: doctorName },
                 })
               );
             }}
@@ -332,7 +337,21 @@ const AddBill = () => {
                     <tr>
                       <th className={classes.th}></th>
                       <td className={`${classes.td} text-right`}>
-                        <button className="btn btn-sm btn-primary">
+                        <button
+                          className="btn btn-sm btn-primary"
+                          onClick={() => {
+                            dispatch(
+                              setPaymentModal({
+                                open: true,
+                                isAdd: true,
+                                formValue: {
+                                  ...billingInitState.paymentModal.formValue,
+                                  amount: billSummary.balanceBillAmount,
+                                },
+                              })
+                            );
+                          }}
+                        >
                           Pay{" "}
                           <AmountWithCurrancy
                             amount={billSummary.balanceBillAmount}

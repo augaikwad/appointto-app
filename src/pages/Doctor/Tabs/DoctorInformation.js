@@ -214,7 +214,7 @@ const DoctorInformation = () => {
               }}
             />
           </div>
-          <div className="col-lg-4">
+          {/* <div className="col-lg-4">
             <SelectField
               label="Role"
               name="role"
@@ -223,7 +223,7 @@ const DoctorInformation = () => {
                 { label: "Visiting Doctor", value: "Visitor" },
               ]}
             />
-          </div>
+          </div> */}
           <div className="col-lg-4">
             <TextField
               label="Consultation Fees"

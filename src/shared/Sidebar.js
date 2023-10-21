@@ -94,13 +94,12 @@ class Sidebar extends Component {
               <span className="menu-title">Appointments</span>
             </Link>
           </li>
-          <li
+          {/* <li
             className={
               this.isPathActive("/reports") ? "nav-item active" : "nav-item"
             }
           >
             <Link className="nav-link" to="/widgets">
-              {/* <img src={Reports} className="menu-icon" /> */}
               <i className="fa fa-file-text menu-font-icon"></i>
               <span className="menu-title">Reports</span>
             </Link>
@@ -111,7 +110,6 @@ class Sidebar extends Component {
             }
           >
             <Link className="nav-link" to="/widgets">
-              {/* <img src={Dental} className="menu-icon" /> */}
               <i className="mdi mdi-tooth menu-font-icon"></i>
               <span className="menu-title">Lab Work</span>
             </Link>
@@ -122,11 +120,10 @@ class Sidebar extends Component {
             }
           >
             <Link className="nav-link" to="/widgets">
-              {/* <img src={Stock} className="menu-icon" /> */}
               <i className="fa fa-cubes menu-font-icon"></i>
               <span className="menu-title">Inventory</span>
             </Link>
-          </li>
+          </li> */}
           <li
             className={
               this.isPathActive("/settings") ? "nav-item active" : "nav-item"

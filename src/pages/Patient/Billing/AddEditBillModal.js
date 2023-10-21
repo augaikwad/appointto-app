@@ -32,7 +32,7 @@ const AddEditBillModal = () => {
   const { id_doctor, id_clinic } = useSelector((state) => state.user.details);
   const { treatmentList, billModal } = useSelector((state) => state.billings);
   const { patientById } = useSelector((state) => state.patients);
-  console.log("doctorsByClinicId ==", doctorsByClinicId);
+
   const { open, isAdd, formValue } = billModal;
 
   const form = useForm({
@@ -70,11 +70,11 @@ const AddEditBillModal = () => {
 
   const onSubmit = (data) => {
     let formData = { ...data };
-    // formData.doctor_name = `${data.doctor_name.first_name} ${data.doctor_name.last_name}`;
+    formData.doctor_name = `${data.doctor_name.first_name} ${data.doctor_name.last_name}`;
     if (formData.bill_id === 0) {
       formData.id_patient = patientById.id_patient;
-      formData.id_doctor = id_doctor;
-      formData.id_clinic = id_clinic;
+      formData.id_doctor = data.doctor_name.id_doctor;
+      formData.id_clinic = data.doctor_name.id_clinic;
       dispatch(createBill(formData, submitCallback));
     } else {
       dispatch(updateBill(formData, submitCallback));
@@ -134,7 +134,7 @@ const AddEditBillModal = () => {
               <DatePickerField label="Date" name="bill_date" showYearDropdown />
             </div>
             <div className="col-lg-6">
-              {/* <ReactSelectField
+              <ReactSelectField
                 label="Dr. Name"
                 name="doctor_name"
                 labelField="first_name"
@@ -146,14 +146,14 @@ const AddEditBillModal = () => {
                 rules={{
                   required: "Please select Doctor",
                 }}
-              /> */}
-              <TextField
+              />
+              {/* <TextField
                 label="Dr. Name"
                 name="doctor_name"
                 rules={{
                   required: "Please enter Doctor Name",
                 }}
-              />
+              /> */}
             </div>
             <div className="col-lg-6">
               <CreatableReactSelect

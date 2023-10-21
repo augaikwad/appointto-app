@@ -202,7 +202,6 @@ const Bills = () => {
   const [selectedRows, setSelectedRows] = useState([]);
 
   const handleOnSelect = (row, isSelect) => {
-    console.log("handleOnSelect === ", row, isSelect);
     if (isSelect) {
       setSelectedRows([...selectedRows, ...[row]]);
     } else {

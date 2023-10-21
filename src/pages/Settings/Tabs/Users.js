@@ -19,6 +19,7 @@ import {
 } from "../../../store/actions/settingActions";
 import { setAddEditUserModal } from "../../../store/reducers/settingSlice";
 import { getSpeciality } from "../../../store/actions/doctorActions";
+import { getDoctorsByClinicId } from "../../../store/actions/userActions";
 
 const useStyles = createUseStyles({
   userSettingContainer: {},
@@ -50,6 +51,7 @@ const getFormattedRequestForCreateDocUser = (data) => {
       dob,
       userRole,
       id_clinic,
+      UserId,
     } = data;
     req = {
       first_name,
@@ -65,6 +67,7 @@ const getFormattedRequestForCreateDocUser = (data) => {
       id_clinic,
       dob: moment(new Date(dob)).format("YYYY-MM-DD"),
       role: userRole,
+      UserId,
     };
   }
   return req;
@@ -116,7 +119,7 @@ const AddEditUser = () => {
     if (name === "NextBtn") {
       if (lastStep === 2 && step === 1) {
         dispatch(
-          registerUser({ ...data, id_clinic: id_clinic }, () => {
+          registerUser({ ...data, id_clinic: id_clinic }, (res) => {
             dispatch(getUsers(id_clinic));
             const nextFormData = {
               first_name: data.firstName,
@@ -124,6 +127,7 @@ const AddEditUser = () => {
               mobile_number: data.mobileNumber,
               email_id: data.emailId,
               role: data.userRole,
+              UserId: res.id_user,
             };
             reset({ ...data, ...nextFormData });
           })
@@ -144,11 +148,15 @@ const AddEditUser = () => {
           })
         );
       } else if (lastStep === 2) {
-        let request = getFormattedRequestForCreateDocUser(data);
+        let request = getFormattedRequestForCreateDocUser({
+          ...data,
+          id_clinic,
+        });
         dispatch(
           registerDoctor(request, () => {
             dispatch(setAddEditUserModal({ open: false }));
             dispatch(getUsers(id_clinic));
+            dispatch(getDoctorsByClinicId({ id_clinic }, null));
           })
         );
       }
