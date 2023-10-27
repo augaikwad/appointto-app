@@ -1,7 +1,11 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
+import { FontAwesomeIcon } from "../components";
+import { useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { navigateTo } from "../store/reducers/navigationSlice";
 
-class Sidebar extends Component {
+class Sidebar_Old extends Component {
   state = {};
 
   toggleMenuState(menuState) {
@@ -62,8 +66,8 @@ class Sidebar extends Component {
             }
           >
             <Link className="nav-link" to="/dashboard">
-              {/* <img src={Dashboard} className="menu-icon" /> */}
-              <i className="fa fa-th-large menu-font-icon"></i>
+              <FontAwesomeIcon className="fa-th-large menu-font-icon" />
+              {/* <i className="fa fa-th-large menu-font-icon"></i> */}
               <span className="menu-title">Dashboard</span>
             </Link>
           </li>
@@ -162,5 +166,70 @@ class Sidebar extends Component {
     });
   }
 }
+
+const Sidebar = () => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const sidebarItems = [
+    {
+      to: { pathname: "/dashboard", state: { isInit: true } },
+      icon: "fa-th-large",
+      label: "Dashboard",
+    },
+    {
+      to: { pathname: "/patients", state: { isInit: true } },
+      icon: "fa-users",
+      label: "Patients",
+    },
+    {
+      to: { pathname: "/appointments", state: { isInit: true } },
+      icon: "fa-calendar",
+      label: "Appointments",
+    },
+    {
+      to: { pathname: "/reports", state: { isInit: true } },
+      icon: "fa-file-text",
+      label: "Reports",
+      isHidden: true,
+    },
+    {
+      to: { pathname: "/settings", state: { isInit: true } },
+      icon: "fa-cog",
+      label: "Settings",
+    },
+  ];
+
+  const isPathActive = (path) => {
+    return location.pathname.startsWith(path);
+  };
+
+  return (
+    <nav className="sidebar sidebar-offcanvas short-sidebar" id="sidebar">
+      <ul className="nav">
+        {sidebarItems.map((item) => {
+          return (
+            <li
+              key={item.label}
+              className={`nav-item ${
+                isPathActive(item.to.pathname) ? "active" : ""
+              } ${item?.isHidden ? "hide" : ""}`}
+              onClick={() => {
+                dispatch(navigateTo(item.to));
+              }}
+            >
+              {/* <Link className="nav-link" to={item.to}> */}
+              <a className="nav-link">
+                <FontAwesomeIcon className={`${item.icon} menu-font-icon`} />
+                <span className="menu-title">{item.label}</span>
+              </a>
+
+              {/* </Link> */}
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+};
 
 export default withRouter(Sidebar);

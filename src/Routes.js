@@ -17,9 +17,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 
 function Routes({ setIsFullPageLayout }) {
   const location = useLocation();
-  const { currentRoute, currentRouteState } = useSelector(
-    (state) => state.navigation
-  );
+  const { currentRoute } = useSelector((state) => state.navigation);
 
   const fullPageLayoutRoutes = [
     "/login",
@@ -46,7 +44,7 @@ function Routes({ setIsFullPageLayout }) {
         <RouteGuard exact path="/appointments" component={AppointmentsList} />
         <RouteGuard exact path="/settings" component={Settings} />
       </Switch>
-      <Redirect to={{ pathname: currentRoute, state: currentRouteState }} />
+      <Redirect to={currentRoute} />
     </>
   );
 }

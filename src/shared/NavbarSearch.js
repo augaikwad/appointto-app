@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { AsyncTypeahead } from "react-bootstrap-typeahead";
 import { createUseStyles } from "react-jss";
 import CreateAppointmentModal from "../pages/Patient/CreateAppointmentModal";
@@ -12,7 +12,11 @@ import {
   getDashboardAppointments,
 } from "../store/actions/appointmentActions";
 import { getGlobalList } from "../store/actions/patientActions";
-import { setPatientModal } from "../store/reducers/patientSlice";
+import {
+  setPatientModal,
+  setGlobalList,
+  setClearGlobalSearchInput,
+} from "../store/reducers/patientSlice";
 
 const useStyles = createUseStyles({
   customMenuItem: {
@@ -26,27 +30,40 @@ const useStyles = createUseStyles({
 
 const NavbarSearch = () => {
   const classes = useStyles();
-  const globalSearchRef = useRef();
   const dispatch = useDispatch();
-
   const { id_doctor, id_clinic } = useSelector((state) => state.user.details);
   const { appointmentModal, dashboardListFilters } = useSelector(
     (state) => state.appointments
   );
-  const { globalPatientList, patientModal } = useSelector(
-    (state) => state.patients
-  );
+  const { globalPatientList, patientModal, clearGlobalSearchInput } =
+    useSelector((state) => state.patients);
+  const [globalSearchLoading, setGlobalSearchLoading] = useState(false);
+  const [globalSearchOpt, setGlobalSearchOpt] = useState([]);
 
   const handleDebounceChange = debounce((val) => {
+    setGlobalSearchLoading(true);
     dispatch(
-      getGlobalList({
-        id_clinic,
-        Keywords: val,
-        start_record: 1,
-        end_record: 10,
-      })
+      getGlobalList(
+        {
+          id_clinic,
+          Keywords: val,
+          start_record: 1,
+          end_record: 10,
+        },
+        () => {
+          setGlobalSearchLoading(false);
+        }
+      )
     );
   }, 1000);
+
+  useEffect(() => {
+    if (clearGlobalSearchInput) {
+      dispatch(setGlobalList([]));
+      setGlobalSearchOpt([]);
+      dispatch(setClearGlobalSearchInput(false));
+    }
+  }, [clearGlobalSearchInput]);
 
   return (
     <>
@@ -64,8 +81,11 @@ const NavbarSearch = () => {
           filterBy={["patient_name", "mobile_number"]}
           id="globalSearch"
           name="globalSearch"
+          selected={globalSearchOpt}
           onSearch={handleDebounceChange}
           options={globalPatientList?.item || []}
+          onChange={(selected) => setGlobalSearchOpt(selected)}
+          isLoading={globalSearchLoading}
           renderMenuItemChildren={(option, props, index) => {
             return (
               <div className={classes.customMenuItem} key={index}>
@@ -115,7 +135,6 @@ const NavbarSearch = () => {
           }}
           placeholder="Search & Add Patients"
           className="globalSearchField"
-          ref={globalSearchRef}
         />
         <div className="input-group-append">
           <button

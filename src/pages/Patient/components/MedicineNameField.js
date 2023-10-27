@@ -24,6 +24,17 @@ const useStyles = createUseStyles({
     marginTop: "-3px",
     position: "relative",
     textAlign: "left",
+    "&.compositionName": {
+      display: "block",
+      width: 320,
+      textOverflow: "ellipsis",
+      overflow: "hidden",
+      textWrap: "nowrap",
+      "&:hover": {
+        textWrap: "wrap",
+        lineHeight: 1.3,
+      },
+    },
   },
   reactSelect: {
     "& > div": { border: "none", boxShadow: "none" },

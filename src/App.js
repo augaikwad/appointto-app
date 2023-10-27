@@ -13,6 +13,7 @@ import BillingContextProvider from "./context/Billing";
 import { useDispatch, useSelector } from "react-redux";
 import { setAuthToken } from "./helpers/setAuthToken";
 import { navigateTo } from "./store/reducers/navigationSlice";
+import "font-awesome/css/font-awesome.min.css";
 
 function App(props) {
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ function App(props) {
     if (token) {
       setAuthToken(token);
     } else {
-      dispatch(navigateTo("/login"));
+      dispatch(navigateTo({ pathname: "/login" }));
     }
   }, []);
 

@@ -104,6 +104,16 @@ const Prescription = () => {
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
+    onAfterPrint: () => {
+      dispatch(
+        navigateTo({
+          pathname: "/patient/" + patientById.id_patient,
+          state: {
+            selectedTab: 2,
+          },
+        })
+      );
+    },
   });
 
   const onSubmit = (data, e) => {
@@ -141,7 +151,7 @@ const Prescription = () => {
           if (btnId === "SaveNext") {
             dispatch(
               navigateTo({
-                to: "/patient/" + patientById.id_patient,
+                pathname: "/patient/" + patientById.id_patient,
                 state: {
                   selectedTab: 2,
                 },

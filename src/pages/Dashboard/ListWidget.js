@@ -75,7 +75,9 @@ const ListWidget = () => {
   const handleButtonClick = (patientId, pageState) => {
     dispatch(
       getPatientById({ PatientId: patientId }, () => {
-        dispatch(navigateTo({ to: `/patient/${patientId}`, state: pageState }));
+        dispatch(
+          navigateTo({ pathname: `/patient/${patientId}`, state: pageState })
+        );
       })
     );
   };

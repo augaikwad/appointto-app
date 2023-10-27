@@ -4,6 +4,7 @@ import {
   setAppointmentsForCalendar,
 } from "../reducers/appointmentsSlice";
 import moment from "moment";
+import { setClearGlobalSearchInput } from "../reducers/patientSlice";
 
 import cogoToast from "cogo-toast";
 const toastOption = { hideAfter: 5, position: "top-right" };
@@ -44,6 +45,7 @@ export const createAppointment = (req, callback) => async (dispatch) => {
     } else {
       cogoToast.error(message, toastOption);
     }
+    dispatch(setClearGlobalSearchInput(true));
   } catch (error) {
     // Handle error here
     console.error("Error fetching user data:", error);

@@ -177,7 +177,9 @@ function Login(props) {
         const { id_clinic, id_doctor } = res;
         dispatch(
           getDoctorsByClinicId({ id_clinic }, id_doctor, () => {
-            dispatch(navigateTo("/dashboard"));
+            dispatch(
+              navigateTo({ pathname: "/dashboard", state: { isInit: true } })
+            );
           })
         );
       })

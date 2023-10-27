@@ -9,6 +9,7 @@ import Card from "./Card";
 import VerticalTabs from "./VerticalTabs";
 import Modal from "./Modal";
 import Tooltip from "./Tooltip";
+import FontAwesomeIcon from "./common/FontAwesomeIcon";
 
 export {
   InputField,
@@ -22,4 +23,5 @@ export {
   VerticalTabs,
   Modal,
   Tooltip,
+  FontAwesomeIcon,
 };

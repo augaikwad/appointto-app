@@ -58,6 +58,7 @@ export const initialState = {
   isAptModalOpen: false,
   patientDocuments: null,
   globalPatientList: [],
+  clearGlobalSearchInput: false,
   patientListFilter: {
     id_clinic: 0,
     Keywords: "",
@@ -97,6 +98,9 @@ const patientSlice = createSlice({
         state.patientModal = action.payload;
       }
     },
+    setClearGlobalSearchInput: (state, action) => {
+      state.clearGlobalSearchInput = action.payload;
+    },
   },
 });
 
@@ -107,6 +111,7 @@ export const {
   setPatientListFilters,
   setPatientModal,
   setActiveTab,
+  setClearGlobalSearchInput,
 } = patientSlice.actions;
 
 export default patientSlice.reducer;

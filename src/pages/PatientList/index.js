@@ -134,7 +134,7 @@ const PatientList = () => {
       getPatientById({ PatientId: patientId }, (res) => {
         dispatch(
           navigateTo({
-            to: `/patient/${patientId}`,
+            pathname: `/patient/${patientId}`,
             state: { selectedTab: tab },
           })
         );
