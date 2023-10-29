@@ -6,8 +6,12 @@ import { persistStore } from "redux-persist";
 import store from "../store";
 import LogoLarge from "../assets/images/logo-large.svg";
 import LogoMini from "../assets/images/logo-mini.svg";
+import { useDispatch } from "react-redux";
+import { navigateTo } from "../store/reducers/navigationSlice";
+import { resetRegistration } from "../store/reducers/doctorSlice";
 
 function Navbar(props) {
+  const dispatch = useDispatch();
   let { pathname } = useLocation();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -40,9 +44,6 @@ function Navbar(props) {
       <div className="navbar-menu-wrapper d-flex align-items-stretch justify-content-end">
         {isLoggedIn ? (
           <>
-            {/* <button className="navbar-toggler navbar-toggler align-self-center" type="button" onClick={ () => document.body.classList.toggle('sidebar-icon-only') }>
-            <span className="ti-layout-grid2"></span>
-          </button> */}
             <ul className="navbar-nav nav-middle-section mr-lg-2">
               <li className="nav-item nav-search d-none d-lg-block">
                 <NavbarSearch />
@@ -100,15 +101,16 @@ function Navbar(props) {
           <>
             <ul className="navbar-nav nav-actions navbar-nav-right">
               <li className="nav-item nav-login">
-                <Link
-                  to="/login"
+                <a
                   onClick={() => {
+                    sessionStorage.clear();
                     localStorage.clear();
-                    window.location.reload(false);
+                    dispatch(resetRegistration());
+                    dispatch(navigateTo({ pathname: "/login" }));
                   }}
                 >
                   Login
-                </Link>
+                </a>
               </li>
             </ul>
           </>

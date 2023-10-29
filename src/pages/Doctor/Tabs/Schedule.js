@@ -1,12 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DateTimePickerField } from "../../../components/Forms";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import moment from "moment";
-import { DoctorContext } from "../../../context/Doctor";
-import { useHistory } from "react-router-dom";
 import { hasError } from "../../../helpers/hasError";
+import { useSelector, useDispatch } from "react-redux";
+import { updateScheduleInfo } from "../../../store/actions/doctorActions";
+import {
+  resetRegistration,
+  setRegistrationActiveTab,
+} from "../../../store/reducers/doctorSlice";
+import { navigateTo } from "../../../store/reducers/navigationSlice";
 
 const useStyles = createUseStyles({
   customErrorMsg: {
@@ -53,9 +58,13 @@ const useStyles = createUseStyles({
 
 const Schedule = () => {
   const classes = useStyles();
-  const history = useHistory();
+  const disptach = useDispatch();
 
-  const [open, setOpen] = React.useState(false);
+  const { registrationActiveTab, clinicInfo } = useSelector(
+    (state) => state.doctors
+  );
+
+  const [open, setOpen] = useState(false);
 
   const [days, setDays] = React.useState([
     { name: "Sunday", selected: false, start_time: "-", end_time: "-" },
@@ -66,9 +75,6 @@ const Schedule = () => {
     { name: "Friday", selected: false, start_time: "-", end_time: "-" },
     { name: "Saturday", selected: false, start_time: "-", end_time: "-" },
   ]);
-
-  const [states, actions] = useContext(DoctorContext);
-  const { registrationActiveTab, clinicInfo } = states;
 
   const form = useForm();
 
@@ -151,18 +157,20 @@ const Schedule = () => {
       object.updated_by = null;
     });
 
-    actions.updateScheduleInfo(newDays, () => {
-      setOpen(true);
-    });
+    disptach(
+      updateScheduleInfo(newDays, () => {
+        setOpen(true);
+      })
+    );
   };
 
   const TankYouNotification = () => {
     useEffect(() => {
       if (open) {
         setTimeout(() => {
-          actions.resetOTPData();
-          localStorage.clear();
-          history.push("login");
+          disptach(resetRegistration());
+          sessionStorage.clear();
+          disptach(navigateTo({ pathname: "login" }));
           setOpen(false);
         }, 2000);
       }
@@ -312,11 +320,11 @@ const Schedule = () => {
                 <div className="float-right pt-3">
                   <Button
                     className="btn btn-sm btn-primary"
-                    onClick={() =>
-                      actions.setRegistrationActiveTab(
-                        registrationActiveTab - 1
-                      )
-                    }
+                    onClick={() => {
+                      disptach(
+                        setRegistrationActiveTab(registrationActiveTab - 1)
+                      );
+                    }}
                   >
                     Previous
                   </Button>

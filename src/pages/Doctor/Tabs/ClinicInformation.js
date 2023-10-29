@@ -1,20 +1,20 @@
-import React, { useContext } from "react";
+import React from "react";
 import moment from "moment";
 import { debounce } from "lodash";
 import TextField from "../../../components/Forms/TextField";
 import ReactSelectField from "../../../components/Forms/ReactSelectField";
 import { Button } from "react-bootstrap";
 import { useForm, FormProvider } from "react-hook-form";
-import { DoctorContext } from "../../../context/Doctor";
-import { GlobalContext } from "../../../context/Global";
+import { useSelector, useDispatch } from "react-redux";
+import { updateClinicInfo } from "../../../store/actions/doctorActions";
+import { setRegistrationActiveTab } from "../../../store/reducers/doctorSlice";
+import { getCities } from "../../../store/actions/globalActions";
 
 const ClinicInformation = () => {
-  const [states, actions] = useContext(DoctorContext);
+  const disptach = useDispatch();
 
-  const { registrationActiveTab } = states;
-
-  const [globalState, globalActions] = useContext(GlobalContext);
-  const { cities } = globalState;
+  const { registrationActiveTab } = useSelector((state) => state.doctors);
+  const { cities } = useSelector((state) => state.global);
 
   const form = useForm({
     defaultValues: {
@@ -38,15 +38,14 @@ const ClinicInformation = () => {
     formData.updated_by = 0;
 
     const callback = () => {
-      actions.setRegistrationActiveTab(registrationActiveTab + 1);
+      disptach(setRegistrationActiveTab(registrationActiveTab + 1));
     };
-
-    actions.updateClinicInfo(formData, callback);
+    disptach(updateClinicInfo(formData, callback));
   };
 
   const handleDebounceChange = debounce((val) => {
     if (val && val.length >= 1) {
-      globalActions.getCities(val);
+      disptach(getCities(val));
     }
   }, 1000);
 
@@ -179,9 +178,9 @@ const ClinicInformation = () => {
             <div className="float-right">
               <Button
                 className="btn btn-sm btn-primary"
-                onClick={() =>
-                  actions.setRegistrationActiveTab(registrationActiveTab - 1)
-                }
+                onClick={() => {
+                  disptach(setRegistrationActiveTab(registrationActiveTab - 1));
+                }}
               >
                 Previous
               </Button>

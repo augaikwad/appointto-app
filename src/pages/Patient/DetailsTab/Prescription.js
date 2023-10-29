@@ -247,7 +247,7 @@ const Prescription = () => {
                 </div>
               </div>
             </div>
-            <div className="col-lg-1">
+            {/* <div className="col-lg-1">
               <Tooltip text="Add New Vital" placement="top">
                 <button
                   className="btn btn-sm btn-primary btn-icon"
@@ -265,7 +265,7 @@ const Prescription = () => {
                 onHide={() => setShow(false)}
                 footerActions={<FooterActions />}
               />
-            </div>
+            </div> */}
           </div>
           <div className="row">
             <div className="col-lg-5">

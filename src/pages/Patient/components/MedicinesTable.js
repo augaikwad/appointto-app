@@ -212,7 +212,7 @@ const NewMedTable = ({ control, setValue }) => {
     "Years",
   ]);
 
-  const { register, watch } = useFormContext();
+  const { register, watch, formState, getValues } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "prescribedMedicines",
@@ -308,7 +308,7 @@ const NewMedTable = ({ control, setValue }) => {
     );
   };
 
-  const durationFormatter = ({ name }) => {
+  const durationFormatter = ({ name, index }) => {
     return (
       <AutocompleteField
         id="DurationAutocomplete"
@@ -335,6 +335,9 @@ const NewMedTable = ({ control, setValue }) => {
           if (key == "Backspace") {
             setValue(name, "");
           }
+        }}
+        rules={{
+          required: index < fields.length - 1,
         }}
       />
     );
@@ -413,6 +416,20 @@ const NewMedTable = ({ control, setValue }) => {
     setValue("prescribedMedicines", formattedValue);
   };
 
+  const isMedicineFormValid = () => {
+    const slicedValues = getValues().prescribedMedicines.slice(0, -1);
+    if (slicedValues.length > 0) {
+      return !slicedValues.some(
+        (item) =>
+          item.duration === undefined ||
+          item.duration === null ||
+          item.duration === ""
+      );
+    }
+
+    return true;
+  };
+
   return (
     <>
       <div className={`table-responsive ${classes.tableContainer}`}>
@@ -443,7 +460,7 @@ const NewMedTable = ({ control, setValue }) => {
                   {headerColumns &&
                     headerColumns.map((col, ind) => {
                       const { formatter } = col;
-                      const name = `prescribedMedicines[${index}].${col.field}`;
+                      const name = `prescribedMedicines.${index}.${col.field}`;
 
                       let isFilled = false;
                       if (col.field === "medicineName" && !!field[col.field]) {
@@ -531,7 +548,14 @@ const NewMedTable = ({ control, setValue }) => {
           className={`btn btn-sm btn-link ${classes.btn}`}
           onClick={(e) => {
             e.preventDefault();
-            setOpen(true);
+            if (isMedicineFormValid()) {
+              setOpen(true);
+            } else {
+              cogoToast.error(
+                "Please fill all values for Medicines",
+                toastOption
+              );
+            }
           }}
         >
           Save Rx Group

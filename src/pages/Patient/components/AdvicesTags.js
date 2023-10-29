@@ -9,6 +9,8 @@ import {
   saveAdviceGroup,
   saveUpdateTag,
 } from "../../../store/actions/prescriptionActions";
+import cogoToast from "cogo-toast";
+const toastOption = { hideAfter: 5, position: "top-right" };
 
 const AdvicesTags = ({ name = "lstadvice" }) => {
   const dispatch = useDispatch();
@@ -17,6 +19,7 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
   const { advices, adviceGroup } = useSelector((state) => state.prescription);
 
   const [open, setOpen] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState([]);
   const { setValue, getValues } = useFormContext();
 
   useEffect(() => {
@@ -89,14 +92,25 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
           itemId: "id_advice",
         }}
         onGroupSelect={(group) => {
-          let value = getValues(name) || [];
+          const isGrpPresent = selectedGroup.some(
+            (itm) => itm.adviceGroupId === group.adviceGroupId
+          );
+          if (isGrpPresent) {
+            cogoToast.warn(
+              "Group already selected, Please select other group.",
+              toastOption
+            );
+          } else {
+            setSelectedGroup([...selectedGroup, ...[group]]);
+            let value = getValues(name) || [];
 
-          if (group.adviceDetails.length > 0) {
-            value = [...value, ...group.adviceDetails];
+            if (group.adviceDetails.length > 0) {
+              value = [...value, ...group.adviceDetails];
+            }
+            setValue(name, value);
+
+            setOpen(false);
           }
-          setValue(name, value);
-
-          setOpen(false);
         }}
         onHide={() => setOpen(false)}
       />

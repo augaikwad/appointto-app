@@ -4,7 +4,6 @@ import Routes from "./Routes";
 import Layout from "./shared/Layout";
 import Loader from "./shared/Loader";
 import GlobalContextProvider from "./context/Global";
-import DoctorContextProvider from "./context/Doctor";
 import PatientContextProvider from "./context/Patient";
 import AuthContextProvider from "./context/Auth";
 import AppointmentContextProvider from "./context/Appointment";
@@ -19,10 +18,10 @@ function App(props) {
   const dispatch = useDispatch();
 
   const isLoading = useSelector((state) => state.global.loading);
-
   useEffect(() => {
     //check jwt token
     const token = sessionStorage.getItem("token");
+    console.log("App === ", token);
     if (token) {
       setAuthToken(token);
     } else {
@@ -37,19 +36,17 @@ function App(props) {
       <Loader open={isLoading} />
       <GlobalContextProvider>
         <AuthContextProvider>
-          <DoctorContextProvider>
-            <PatientContextProvider>
-              <AppointmentContextProvider>
-                <PrescriptionContextProvider>
-                  <BillingContextProvider>
-                    <Layout isFullPageLayout={isFullPageLayout}>
-                      <Routes setIsFullPageLayout={setIsFullPageLayout} />
-                    </Layout>
-                  </BillingContextProvider>
-                </PrescriptionContextProvider>
-              </AppointmentContextProvider>
-            </PatientContextProvider>
-          </DoctorContextProvider>
+          <PatientContextProvider>
+            <AppointmentContextProvider>
+              <PrescriptionContextProvider>
+                <BillingContextProvider>
+                  <Layout isFullPageLayout={isFullPageLayout}>
+                    <Routes setIsFullPageLayout={setIsFullPageLayout} />
+                  </Layout>
+                </BillingContextProvider>
+              </PrescriptionContextProvider>
+            </AppointmentContextProvider>
+          </PatientContextProvider>
         </AuthContextProvider>
       </GlobalContextProvider>
     </Router>

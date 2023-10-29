@@ -1,16 +1,22 @@
 import React, { useEffect } from "react";
 import CountUp from "react-countup";
+import { useLocation } from "react-router-dom";
 import { Card } from "../../components";
 import ListFilters from "./ListFilters";
 import ListWidget from "./ListWidget";
 import moment from "moment";
 import { useSelector, useDispatch } from "react-redux";
 import { getDashboardAppointments } from "../../store/actions/appointmentActions";
+import {
+  setDashboardListFilters,
+  initialState as aptInitState,
+} from "../../store/reducers/appointmentsSlice";
 
 function Dashboard() {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
-  const { id_doctor, user_name } = user.details;
+  const location = useLocation();
+  const { isInit } = location.state;
+  const { id_doctor, user_name } = useSelector((state) => state.user.details);
   const {
     dashboardListFilters,
     appointmentCount,
@@ -20,7 +26,13 @@ function Dashboard() {
   } = useSelector((state) => state.appointments);
 
   useEffect(() => {
-    dispatch(getDashboardAppointments(dashboardListFilters));
+    if (isInit) {
+      const filters = { ...aptInitState.dashboardListFilters, id_doctor };
+      dispatch(getDashboardAppointments(filters));
+      dispatch(setDashboardListFilters(filters));
+    } else {
+      dispatch(getDashboardAppointments(dashboardListFilters));
+    }
   }, []);
 
   const counts = [

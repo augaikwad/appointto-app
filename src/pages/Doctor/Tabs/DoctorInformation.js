@@ -1,24 +1,31 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import TextField from "../../../components/Forms/TextField";
 import RadioField from "../../../components/Forms/RadioField";
 import { DatePickerField } from "../../../components/Forms";
 import SelectField from "../../../components/Forms/SelectField";
 import { Button } from "react-bootstrap";
 import { useForm, FormProvider } from "react-hook-form";
-import { DoctorContext } from "../../../context/Doctor";
 import moment from "moment";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  getSpeciality,
+  getQualifications,
+  updateDoctorInfo,
+} from "../../../store/actions/doctorActions";
+import { setRegistrationActiveTab } from "../../../store/reducers/doctorSlice";
 
 const DoctorInformation = () => {
-  const [states, actions] = useContext(DoctorContext);
+  const disptach = useDispatch();
+
   const { registrationActiveTab, speciality, qualifications, signupUserData } =
-    states;
+    useSelector((state) => state.doctors);
 
   useEffect(() => {
     if (speciality.length === 0) {
-      actions.getSpeciality();
+      disptach(getSpeciality());
     }
     if (qualifications.length === 0) {
-      actions.getQualifications();
+      disptach(getQualifications());
     }
   }, [speciality, qualifications]);
 
@@ -59,10 +66,9 @@ const DoctorInformation = () => {
     formData.userId = "";
 
     const callback = () => {
-      actions.setRegistrationActiveTab(registrationActiveTab + 1);
+      disptach(setRegistrationActiveTab(registrationActiveTab + 1));
     };
-
-    actions.updateDoctorInfo(formData, callback);
+    disptach(updateDoctorInfo(formData, callback));
   };
 
   return (
@@ -183,6 +189,7 @@ const DoctorInformation = () => {
               name="id_speciality"
               labelField="specialityName"
               valueField="idSpeciality"
+              placeholder="Please Select Speciality"
               options={speciality}
               rules={{
                 required: "Please select Speciality",

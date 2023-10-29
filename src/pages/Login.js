@@ -1,20 +1,28 @@
-import React, { useState, useContext } from "react";
-import { Link, useHistory } from "react-router-dom";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import LoginLayout from "../shared/LoginLayout";
 import { Modal } from "../components";
 import { useForm, FormProvider } from "react-hook-form";
 import { TextField, TextFieldWithIcon } from "../components/Forms";
-import { AuthContext } from "../context/Auth";
-import { DoctorContext } from "../context/Doctor";
 import { login } from "../store/actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
 import { getDoctorsByClinicId } from "../store/actions/userActions";
 import { navigateTo } from "../store/reducers/navigationSlice";
+import {
+  getOTPForResetPassword,
+  verifyOTP,
+  resetPassword,
+  resendOTP,
+} from "../store/actions/doctorActions";
+import { resetRegistration } from "../store/reducers/doctorSlice";
 
 const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
-  const [state, actions] = useContext(DoctorContext);
-  const { forgetPasswordStep, otpData, verifyOTPData } = state;
+  const dispatch = useDispatch();
+
+  const { forgetPasswordStep, otpData, verifyOTPData } = useSelector(
+    (state) => state.doctors
+  );
   const form = useForm({
     defaultValues: {
       mobile_no: "",
@@ -25,15 +33,17 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
   const onSubmit = (data, e) => {
     let req = { ...data };
     if (forgetPasswordStep === 1) {
-      actions.getOTPForResetPassword({
-        ...req,
-        country_code: "91",
-        otp_for: 2,
-      });
+      dispatch(
+        getOTPForResetPassword({
+          ...req,
+          country_code: "91",
+          otp_for: 2,
+        })
+      );
     } else if (forgetPasswordStep === 2) {
       let otpDataObj = { ...otpData };
       otpDataObj.otp_for = 2;
-      actions.verifyOTP({ ...req, ...otpDataObj });
+      dispatch(verifyOTP({ ...req, ...otpDataObj }));
     } else if (forgetPasswordStep === 3) {
       const confirmReq = {
         mobileNumber: data.mobile_no,
@@ -42,16 +52,17 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
         confirmPassword: data.confirmPassword,
         reset_password_token: verifyOTPData.reset_password_token,
       };
-
-      actions.resetPassword(confirmReq, () => {
-        reset({ mobile_no: "" });
-        actions.resetOTPData();
-        onHide();
-      });
+      dispatch(
+        resetPassword(confirmReq, () => {
+          reset({ mobile_no: "" });
+          dispatch(resetRegistration());
+          onHide();
+        })
+      );
     }
   };
 
-  const resendOTP = () => {
+  const handleResendOTP = () => {
     let formValues = getValues();
     const req = {
       mobile_no: formValues.mobile_no,
@@ -59,7 +70,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
       req_token: otpData.req_token,
       otp_for: 2,
     };
-    actions.resendOTP(req);
+    dispatch(resendOTP(req));
   };
 
   return (
@@ -68,7 +79,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
       show={show}
       onHide={() => {
         reset({ mobile_no: "" });
-        actions.resetOTPData();
+        dispatch(resetRegistration());
         onHide();
       }}
       size="sm"
@@ -119,7 +130,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
                 <Button
                   variant="link"
                   className="btn-sm"
-                  onClick={() => resendOTP()}
+                  onClick={() => handleResendOTP()}
                 >
                   Resend OTP
                 </Button>
@@ -164,7 +175,6 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
 
 function Login(props) {
   const dispatch = useDispatch();
-  const [, docActions] = useContext(DoctorContext);
 
   const [isForgotPassModalOpen, setIsForgotPassModalOpen] = useState(false);
 
@@ -240,7 +250,7 @@ function Login(props) {
             </div>
             <Button
               onClick={() => {
-                docActions.resetOTPData();
+                dispatch(resetRegistration());
                 setIsForgotPassModalOpen(true);
               }}
               variant="link"
@@ -259,7 +269,7 @@ function Login(props) {
               to="/otpConfirmation"
               className="text-primary"
               onClick={() => {
-                docActions.resetOTPData();
+                dispatch(resetRegistration());
               }}
             >
               <b>Register now for Free</b>

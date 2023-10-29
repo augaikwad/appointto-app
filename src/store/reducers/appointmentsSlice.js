@@ -59,7 +59,6 @@ const appointmentsSlice = createSlice({
       state.totalCount = totalCount;
     },
     setDashboardListFilters: (state, action) => {
-      //working
       const { dashboardListFilters } = state;
       const { payload } = action;
       state.dashboardListFilters = formattedFilters({

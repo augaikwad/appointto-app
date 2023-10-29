@@ -1,14 +1,15 @@
-import React, { useContext } from "react";
+import React from "react";
 import Navbar from "../../shared/Navbar";
 import { VerticalTabs, Card } from "../../components";
 import ClinicInformation from "./Tabs/ClinicInformation";
 import DoctorInformation from "./Tabs/DoctorInformation";
 import Schedule from "./Tabs/Schedule";
-import { DoctorContext } from "../../context/Doctor";
+import { useSelector, useDispatch } from "react-redux";
+import { setRegistrationActiveTab } from "../../store/reducers/doctorSlice";
 
 const Registration = () => {
-  const [state, actions] = useContext(DoctorContext);
-  const { registrationActiveTab } = state;
+  const dispatch = useDispatch();
+  const { registrationActiveTab } = useSelector((state) => state.doctors);
 
   const tabs = [
     { name: "Doctor Information", component: <DoctorInformation /> },
@@ -27,9 +28,9 @@ const Registration = () => {
                 <VerticalTabs
                   tabs={tabs}
                   selectedTab={registrationActiveTab}
-                  setSelectedTab={(key) =>
-                    actions.setRegistrationActiveTab(key)
-                  }
+                  setSelectedTab={(key) => {
+                    dispatch(setRegistrationActiveTab(key));
+                  }}
                 />
               </Card>
             </div>

@@ -1,15 +1,19 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Button } from "react-bootstrap";
 import { useForm, FormProvider } from "react-hook-form";
 import LogoLarge from "../../assets/images/logo-large.svg";
-
-import { DoctorContext } from "../../context/Doctor";
 import TextFieldWithIcon from "../../components/Forms/TextFieldWithIcon";
 import TextField from "../../components/Forms/TextField";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getOTP,
+  verifyOTP,
+  resendOTP,
+} from "../../store/actions/doctorActions";
 
 function MobileOTP(props) {
-  const [states, actions] = useContext(DoctorContext);
-  const { otpData } = states;
+  const dispatch = useDispatch();
+  const { otpData } = useSelector((state) => state.doctors);
 
   const form = useForm();
   const {
@@ -21,20 +25,20 @@ function MobileOTP(props) {
   const onSubmit = (data) => {
     let req = { ...data };
     if (otpData === null) {
-      actions.getOTP({ ...req, country_code: "91" });
+      dispatch(getOTP({ ...req, country_code: "91" }));
     } else {
-      actions.verifyOTP({ ...req, ...otpData });
+      dispatch(verifyOTP({ ...req, ...otpData }));
     }
   };
 
-  const resendOTP = () => {
+  const handleResendOTP = () => {
     let formValues = getValues();
     const req = {
       mobile_no: formValues.mobile_no,
       country_code: "91",
       req_token: otpData.req_token,
     };
-    actions.resendOTP(req);
+    dispatch(resendOTP(req));
   };
 
   return (
@@ -95,7 +99,10 @@ function MobileOTP(props) {
                       />
                       <div className="my-2 d-flex justify-content-between align-items-center">
                         Didn't receive OTP?{" "}
-                        <Button variant="link" onClick={() => resendOTP()}>
+                        <Button
+                          variant="link"
+                          onClick={() => handleResendOTP()}
+                        >
                           Resend OTP
                         </Button>
                       </div>

@@ -131,7 +131,12 @@ const AddEditBillModal = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="row">
             <div className="col-lg-6">
-              <DatePickerField label="Date" name="bill_date" showYearDropdown />
+              <DatePickerField
+                label="Date"
+                name="bill_date"
+                maxDate={new Date()}
+                showYearDropdown
+              />
             </div>
             <div className="col-lg-6">
               <ReactSelectField

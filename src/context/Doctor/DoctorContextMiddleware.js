@@ -143,7 +143,7 @@ export const applyDoctorContextMiddleware =
               if (data.response_code === 2000) {
                 cogoToast.success(data.message, toastOption);
                 //set JWT token to local
-                localStorage.setItem("token", data.payload.token);
+                sessionStorage.setItem("token", data.payload.token);
                 dispatch({
                   type: actionTypes.SIGNUP_USER_SUCCESS,
                   payload: action.request,

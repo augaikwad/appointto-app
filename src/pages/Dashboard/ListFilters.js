@@ -41,7 +41,7 @@ const ListFilters = () => {
 
   useEffect(() => {
     reset(dashboardListFilters);
-  }, []);
+  }, [dashboardListFilters]);
 
   const filterList = (name, value) => {
     let req = getValues();

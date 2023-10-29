@@ -1,20 +1,20 @@
-import React, { useContext, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import React, { useEffect } from "react";
 import LogoLarge from "../../assets/images/logo-large.svg";
 import { useForm, FormProvider } from "react-hook-form";
 import TextField from "../../components/Forms/TextField";
 import { Button } from "react-bootstrap";
-import { DoctorContext } from "../../context/Doctor";
+import { useSelector, useDispatch } from "react-redux";
+import { navigateTo } from "../../store/reducers/navigationSlice";
+import { signupUser } from "../../store/actions/doctorActions";
 
 function Register(props) {
-  const history = useHistory();
+  const dispatch = useDispatch();
 
-  const [states, actions] = useContext(DoctorContext);
-  const { otpData, verifyOTPData } = states;
+  const { otpData, verifyOTPData } = useSelector((state) => state.doctors);
 
   useEffect(() => {
     if (otpData === null && verifyOTPData === null) {
-      history.push("/login");
+      dispatch(navigateTo({ pathname: "/login" }));
     }
   }, [otpData, verifyOTPData]);
 
@@ -36,7 +36,7 @@ function Register(props) {
       registrationToken: verifyOTPData.registration_token,
     };
 
-    actions.signupUser(req);
+    dispatch(signupUser(req));
   };
 
   return (
@@ -124,7 +124,9 @@ function Register(props) {
                     Already have an account?{" "}
                     <Button
                       variant="link"
-                      onClick={() => history.push("/login")}
+                      onClick={() => {
+                        dispatch(navigateTo({ pathname: "/login" }));
+                      }}
                     >
                       Login
                     </Button>
