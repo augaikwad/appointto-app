@@ -92,6 +92,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
                 label="Mobile Number"
                 name="mobile_no"
                 type="number"
+                maxLength="10"
                 placeholder="Enter 10 Digit Mobile Number"
                 rules={{
                   required: "Please enter 10 digit mobile number",

@@ -118,7 +118,7 @@ export const signupUser = (request) => async (dispatch) => {
     if (response_code === 2000) {
       cogoToast.success(message, toastOption);
       sessionStorage.setItem("token", payload.token);
-      dispatch(setSignupUserData(payload));
+      dispatch(setSignupUserData(request));
       dispatch(navigateTo({ pathname: "/registration" }));
     } else {
       cogoToast.error(message, toastOption);
@@ -183,10 +183,7 @@ export const updateClinicInfo = (request, callback) => async (dispatch) => {
 
 export const updateScheduleInfo = (request, callback) => async (dispatch) => {
   try {
-    const response = await service.post(
-      "Doctor/add_clinic_information",
-      request
-    );
+    const response = await service.post("Doctor/add-clinic-schedule", request);
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
       cogoToast.success(message, toastOption);

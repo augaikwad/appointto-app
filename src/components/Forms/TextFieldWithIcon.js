@@ -14,7 +14,7 @@ const TextFieldWithIcon = ({
   labelWidth,
   rules = {},
   icon = "ti-mobile",
-  onKeyDown,
+  onKeyPress,
   ...restProps
 }) => {
   const {
@@ -30,13 +30,18 @@ const TextFieldWithIcon = ({
     required: rules.hasOwnProperty("required"),
   };
 
-  const handleOnKeyDown = (e) => {
-    const preventKeys = ["e", "E", "-", "+"];
-    if (preventKeys.includes(e.key)) {
-      e.preventDefault();
+  const handleOnKeyPress = (e) => {
+    const { value, maxLength } = e.target;
+
+    if (type === "number") {
+      const preventKeys = ["e", "E", "-", "+"];
+      if (value.length >= maxLength || preventKeys.includes(e.key)) {
+        e.preventDefault();
+      }
     }
-    if (onKeyDown) {
-      onKeyDown();
+
+    if (onKeyPress) {
+      onKeyPress(e);
     }
   };
 
@@ -55,7 +60,7 @@ const TextFieldWithIcon = ({
           placeholder={placeholder}
           size={size}
           style={{ borderLeft: "none" }}
-          onKeyDown={handleOnKeyDown}
+          onKeyPress={handleOnKeyPress}
           {...register(name, rules)}
           {...restProps}
         />
