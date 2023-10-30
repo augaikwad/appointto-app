@@ -5,6 +5,9 @@ import { TextField } from "../../components/Forms";
 import { Row, Col, Button } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Swal from "sweetalert2";
+import "sweetalert2/src/sweetalert2.scss";
+
 import {
   faPrescription,
   faWallet,
@@ -23,6 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getPatientsList,
   getPatientById,
+  deletePatient,
 } from "../../store/actions/patientActions";
 import { navigateTo } from "../../store/reducers/navigationSlice";
 import { createAppointment } from "../../store/actions/appointmentActions";
@@ -85,6 +89,12 @@ const useStyles = createUseStyles({
     "& > form": {
       flex: 1,
     },
+  },
+  confirmButton: {
+    color: "#fff !important",
+  },
+  cancelButton: {
+    color: "#fff !important",
   },
 });
 
@@ -347,9 +357,29 @@ const PatientList = () => {
                         <IconButton
                           tooltipText="Delete Patient"
                           btnClasses={classes.deletePatientBtn}
-                          // btnOnClick={() =>
-                          //   // handleButtonClick(item.id_patient, 0)
-                          // }
+                          btnOnClick={() => {
+                            Swal.fire({
+                              title: "Are you sure wants to delete?",
+                              text: "Once deleted, Information cannot be recovered!",
+                              icon: "question",
+                              showCancelButton: true,
+                              confirmButtonText: "Yes, delete it!",
+                              customClass: {
+                                confirmButton: classes.confirmButton,
+                                cancelButton: classes.cancelButton,
+                              },
+                            }).then((result) => {
+                              if (result.isConfirmed) {
+                                dispatch(
+                                  deletePatient(item.id_patient, () => {
+                                    dispatch(
+                                      getPatientsList(patientListFilter)
+                                    );
+                                  })
+                                );
+                              }
+                            });
+                          }}
                           icon={faTrashCan}
                         />
                       </td>

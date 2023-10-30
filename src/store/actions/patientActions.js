@@ -148,3 +148,22 @@ export const getDocuments = (PatientId, callback) => async (dispatch) => {
     console.error("Error fetching user data:", error);
   }
 };
+
+export const deletePatient = (id, callback) => async (dispatch) => {
+  try {
+    const response = await service.post(
+      `Patient/delete-patient-general?PatientId=${id}`
+    );
+    const { response_code, payload, message } = response.data;
+    if (response_code === 2000) {
+      cogoToast.success(message, toastOption);
+      if (callback) {
+        callback(payload);
+      }
+    } else {
+      cogoToast.error(message, toastOption);
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+  }
+};

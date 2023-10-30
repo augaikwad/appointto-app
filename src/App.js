@@ -12,6 +12,7 @@ import BillingContextProvider from "./context/Billing";
 import { useDispatch, useSelector } from "react-redux";
 import { setAuthToken } from "./helpers/setAuthToken";
 import { navigateTo } from "./store/reducers/navigationSlice";
+import "ti-icons/css/themify-icons.css";
 import "font-awesome/css/font-awesome.min.css";
 
 function App(props) {
