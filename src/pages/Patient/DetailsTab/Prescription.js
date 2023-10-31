@@ -347,7 +347,12 @@ const Prescription = () => {
                           if (!isNaN(value) && value > 0) {
                             setValue(
                               "nextVisitDate",
-                              new Date(moment().add(value, "days"))
+                              new Date(
+                                moment().add(
+                                  value,
+                                  watch("nextVisitUnit").toLowerCase()
+                                )
+                              )
                             );
                           } else {
                             setValue("nextVisitDate", new Date());
@@ -363,7 +368,6 @@ const Prescription = () => {
                           { label: "Weeks", value: "Weeks" },
                           { label: "Months", value: "Months" },
                         ]}
-                        placeholder="Select"
                         onChange={(e) => {
                           const value = e.target.value;
                           const nextVisit = watch("nextVisitAfter");

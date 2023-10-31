@@ -14,6 +14,7 @@ import {
   setMedicines,
   setPrescriptions,
 } from "../reducers/prescriptionSlice";
+import { tagsCategory } from "../../utils/constants";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
@@ -274,7 +275,10 @@ export const savePrescription = (req, callback) => async (dispatch) => {
 
 export const saveUpdateTag = (category, req, callback) => async (dispatch) => {
   try {
-    const response = await service.post("Prescription/Save" + category, req);
+    const response = await service.post(
+      "Prescription/Save" + tagsCategory[category],
+      req
+    );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
       if (callback) {
