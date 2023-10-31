@@ -171,3 +171,21 @@ export const addPayment = (req, callback) => async (dispatch) => {
     console.error("Error fetching user data:", error);
   }
 };
+
+export const payAllPayment = (req, callback) => async (dispatch) => {
+  try {
+    const response = await service.post("Bill/AddAllPayment", req);
+    const { response_code, payload, message } = response.data;
+    if (response_code === 2000) {
+      cogoToast.success(message, toastOption);
+      if (callback) {
+        callback(payload);
+      }
+    } else {
+      cogoToast.error(message, toastOption);
+    }
+  } catch (error) {
+    // Handle error here
+    console.error("Error fetching user data:", error);
+  }
+};

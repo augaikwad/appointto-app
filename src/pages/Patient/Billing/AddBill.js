@@ -337,26 +337,33 @@ const AddBill = () => {
                     <tr>
                       <th className={classes.th}></th>
                       <td className={`${classes.td} text-right`}>
-                        <button
-                          className="btn btn-sm btn-primary"
-                          onClick={() => {
-                            dispatch(
-                              setPaymentModal({
-                                open: true,
-                                isAdd: true,
-                                formValue: {
-                                  ...billingInitState.paymentModal.formValue,
-                                  amount: billSummary.balanceBillAmount,
-                                },
-                              })
-                            );
-                          }}
-                        >
-                          Pay{" "}
+                        {billSummary.balanceBillAmount === 0 ? (
                           <AmountWithCurrancy
                             amount={billSummary.balanceBillAmount}
                           />
-                        </button>
+                        ) : (
+                          <button
+                            className="btn btn-sm btn-primary"
+                            onClick={() => {
+                              dispatch(
+                                setPaymentModal({
+                                  open: true,
+                                  isAdd: true,
+                                  isFullPayment: true,
+                                  formValue: {
+                                    ...billingInitState.paymentModal.formValue,
+                                    amount: billSummary.balanceBillAmount,
+                                  },
+                                })
+                              );
+                            }}
+                          >
+                            Pay{" "}
+                            <AmountWithCurrancy
+                              amount={billSummary.balanceBillAmount}
+                            />
+                          </button>
+                        )}
                       </td>
                     </tr>
                   </tbody>

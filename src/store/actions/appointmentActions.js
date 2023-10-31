@@ -36,11 +36,11 @@ export const getDashboardAppointments = (request) => async (dispatch) => {
 export const createAppointment = (req, callback) => async (dispatch) => {
   try {
     const response = await service.post("Appointment/Create", req);
-    const { response_code, message } = response.data;
+    const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
       cogoToast.success(message, toastOption);
       if (callback) {
-        callback();
+        callback(payload);
       }
     } else {
       cogoToast.error(message, toastOption);

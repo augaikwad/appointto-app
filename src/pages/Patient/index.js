@@ -99,7 +99,7 @@ const Patient = () => {
     { name: "Profile", component: <Profile /> },
     { name: "Prescription", component: <Prescription /> },
     { name: "Billing", component: <Billings /> },
-    { name: "History", component: <History /> },
+    // { name: "History", component: <History /> },
   ];
 
   return (

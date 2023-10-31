@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPaymentModal } from "../../../store/reducers/billingSlice";
 import {
   addPayment,
+  payAllPayment,
   getAllBillingDataAction,
 } from "../../../store/actions/billingActions";
 
@@ -17,7 +18,7 @@ const AddEditPaymentModal = () => {
   const { patientById } = useSelector((state) => state.patients);
   const { paymentModal } = useSelector((state) => state.billings);
 
-  const { open, isAdd, formValue } = paymentModal;
+  const { open, isAdd, formValue, isFullPayment } = paymentModal;
 
   const form = useForm({
     defaultValues: formValue,
@@ -37,18 +38,31 @@ const AddEditPaymentModal = () => {
   };
 
   const onSubmit = (data) => {
-    dispatch(
-      addPayment(data, () => {
-        dispatch(
-          getAllBillingDataAction({
-            id_doctor: id_doctor,
-            id_patient: patientById.id_patient,
-            id_clinic: patientById.id_clinic,
-          })
-        );
-        onHide();
-      })
-    );
+    const callback = () => {
+      dispatch(
+        getAllBillingDataAction({
+          id_doctor: id_doctor,
+          id_patient: patientById.id_patient,
+          id_clinic: patientById.id_clinic,
+        })
+      );
+      onHide();
+    };
+
+    if (isFullPayment) {
+      dispatch(
+        payAllPayment(
+          {
+            ...data,
+            patient_id: patientById.id_patient,
+            doctor_id: 0,
+          },
+          callback
+        )
+      );
+    } else {
+      dispatch(addPayment(data, callback));
+    }
   };
 
   const FooterAction = () => {
@@ -84,6 +98,7 @@ const AddEditPaymentModal = () => {
                 label="Payment Recieved"
                 name="amount"
                 type="number"
+                readOnly={isFullPayment}
                 rules={{
                   required: "Please enter amount",
                 }}

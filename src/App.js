@@ -22,7 +22,6 @@ function App(props) {
   useEffect(() => {
     //check jwt token
     const token = sessionStorage.getItem("token");
-    console.log("App === ", token);
     if (token) {
       setAuthToken(token);
     } else {

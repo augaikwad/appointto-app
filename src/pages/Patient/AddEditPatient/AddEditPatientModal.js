@@ -95,8 +95,14 @@ const AddEditPatientModal = () => {
     req.reason = "Consultation";
     req.id_doctor = id_doctor;
     dispatch(
-      createAppointment(req, () => {
+      createAppointment(req, (res) => {
         refreshDashboardList();
+        dispatch(
+          setPatientModal({
+            ...patientModal,
+            formValue: { ...formValue, id_patient: res.id_patient },
+          })
+        );
       })
     );
   };
@@ -122,6 +128,12 @@ const AddEditPatientModal = () => {
     if (formValue.id_patient === 0) {
       dispatch(
         addPatientGeneralInfo(formData, (response) => {
+          dispatch(
+            setPatientModal({
+              ...patientModal,
+              formValue: { ...formValue, id_patient: response.id_patient },
+            })
+          );
           dispatch(
             setAppointmentModal({
               ...aptInitState.appointmentModal,

@@ -6,6 +6,7 @@ import Bills from "../Billing/Bills";
 import { createUseStyles } from "react-jss";
 import AddEditPaymentModal from "../Billing/AddEditPaymentModal";
 import AddEditBillModal from "../Billing/AddEditBillModal";
+import { useSelector } from "react-redux";
 
 const useStyles = createUseStyles({
   navItem: {
@@ -35,6 +36,8 @@ const useStyles = createUseStyles({
 const Billings = () => {
   const classes = useStyles();
 
+  const { paymentModal, billModal } = useSelector((state) => state.billings);
+
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
@@ -45,8 +48,8 @@ const Billings = () => {
 
   return (
     <>
-      <AddEditPaymentModal />
-      <AddEditBillModal />
+      {paymentModal.open && <AddEditPaymentModal />}
+      {billModal.open && <AddEditBillModal />}
       <div className="row">
         <div className="col-lg-12">
           <div className="tab-pills-horizontal">
