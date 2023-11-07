@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Tooltip } from "../../../components";
-import { useForm, FormProvider } from "react-hook-form";
+import { Tooltip, InputField, Modal } from "../../../components";
+import Field from "../../../components/form/Field";
+import Select from "react-select";
+import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { Button, Alert } from "react-bootstrap";
 import ComplaintsTags from "../components/ComplaintsTags";
 import ObservationTags from "../components/ObservationTags";
@@ -12,7 +14,7 @@ import AdvicesTags from "../components/AdvicesTags";
 import LastVisits from "../components/LastVisits";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTooth } from "@fortawesome/free-solid-svg-icons";
-import AddNewVitalModal from "../components/AddNewVitalModal";
+// import AddNewVitalModal from "../components/AddNewVitalModal";
 import ToothChartModal from "../components/ToothChartModal";
 import {
   TextField,
@@ -41,6 +43,43 @@ import moment from "moment";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
+const AddNewVitalModal = ({
+  show = false,
+  onHide = () => {},
+  newVitalState,
+  footerActions,
+}) => {
+  const [value, setValue] = useState(null);
+  return (
+    <Modal
+      title="Add New Vital"
+      show={show}
+      onHide={() => {
+        setValue(null);
+        onHide();
+      }}
+      size="sm"
+      footerActions={footerActions}
+    >
+      <Field label="Select Vital">
+        <Select
+          isSearchable={false}
+          menuPosition="fixed"
+          value={value}
+          options={[
+            { label: "Height", value: "height" },
+            { label: "Weight", value: "weight" },
+          ]}
+          onChange={(val) => {
+            newVitalState.setValue(val);
+            setValue(val);
+          }}
+        />
+      </Field>
+    </Modal>
+  );
+};
+
 const Prescription = () => {
   const dispatch = useDispatch();
 
@@ -52,6 +91,7 @@ const Prescription = () => {
   const printRef = useRef(null);
   const [printData, setPrintData] = useState([]);
   const [hasAllergies, setHasAllergies] = useState(false);
+  const [newVital, setNewVital] = useState(null);
 
   const location = useLocation();
   const { id_appointment } = location.state;
@@ -63,6 +103,7 @@ const Prescription = () => {
   const form = useForm({
     defaultValues: {
       ...prescriptionForm,
+      vitals: [],
       prescribedMedicines: [
         {
           type: "",
@@ -77,7 +118,12 @@ const Prescription = () => {
     },
   });
 
-  const { handleSubmit, reset, control, setValue, watch } = form;
+  const { handleSubmit, reset, control, setValue, watch, formState } = form;
+
+  const { fields, append } = useFieldArray({
+    control,
+    name: "vitals",
+  });
 
   useEffect(() => {
     if (patientById !== null) {
@@ -143,6 +189,14 @@ const Prescription = () => {
       });
       formData.prescribedMedicines = prescribedMed;
 
+      if (formData.vitals.length > 0) {
+        formData.vitals.forEach((vital) => {
+          formData[vital.name] = vital.value;
+        });
+      }
+
+      delete formData.vitals;
+
       dispatch(
         savePrescription(formData, (res) => {
           const btnId = e.target.id;
@@ -170,8 +224,32 @@ const Prescription = () => {
   const [show, setShow] = useState(false);
   const FooterActions = () => {
     return (
-      <button className="btn btn-sm btn-primary" onClick={() => setShow(false)}>
-        Save
+      <button
+        className="btn btn-sm btn-primary"
+        onClick={() => {
+          if (newVital) {
+            const isAlreadySelected = fields.some(
+              (item) => item.name === newVital.value
+            );
+            if (!isAlreadySelected) {
+              append({
+                label: newVital.label,
+                name: newVital.value.replace(/\s/g, "").toLowerCase(),
+              });
+              setNewVital(null);
+              setShow(false);
+            } else {
+              cogoToast.error(
+                "Vital already selected, Please select other option.",
+                toastOption
+              );
+            }
+          } else {
+            cogoToast.error("Please select Vital", toastOption);
+          }
+        }}
+      >
+        Add
       </button>
     );
   };
@@ -246,8 +324,22 @@ const Prescription = () => {
                   />
                 </div>
               </div>
+              <div className="row">
+                {fields.map((field, index) => {
+                  return (
+                    <div className="col-lg-3">
+                      <TextField
+                        label={field.label}
+                        name={`vitals.${index}.value`}
+                        inline={true}
+                        labelWidth="60px"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            {/* <div className="col-lg-1">
+            <div className="col-lg-1">
               <Tooltip text="Add New Vital" placement="top">
                 <button
                   className="btn btn-sm btn-primary btn-icon"
@@ -263,9 +355,13 @@ const Prescription = () => {
               <AddNewVitalModal
                 show={show}
                 onHide={() => setShow(false)}
+                newVitalState={{
+                  value: newVital,
+                  setValue: setNewVital,
+                }}
                 footerActions={<FooterActions />}
               />
-            </div> */}
+            </div>
           </div>
           <div className="row">
             <div className="col-lg-5">

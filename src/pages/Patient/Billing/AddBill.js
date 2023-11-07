@@ -87,7 +87,9 @@ const AddBill = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const { doctorsByClinicId } = useSelector((state) => state.user);
+  const { doctorsByClinicId, selectedDoctor, selectedDoctorId } = useSelector(
+    (state) => state.user
+  );
   const { id_doctor } = useSelector((state) => state.user.details);
   const { patientById } = useSelector((state) => state.patients);
   const { billSummary, allBillData } = useSelector((state) => state.billings);
@@ -306,7 +308,10 @@ const AddBill = () => {
                     setBillModal({
                       open: true,
                       isAdd: true,
-                      formValue: billingInitState.billModal.formValue,
+                      formValue: {
+                        ...billingInitState.billModal.formValue,
+                        doctor_name: selectedDoctor,
+                      },
                     })
                   );
                 }}

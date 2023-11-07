@@ -49,6 +49,7 @@ const MedicineNameField = ({
   onChange,
   setValue,
   ind,
+  rules = {},
 }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -130,6 +131,7 @@ const MedicineNameField = ({
           setComposition(val.composition);
           onChange(val);
         }}
+        rules={rules}
         onInputChange={(value) => {
           if (value.length > 2) {
             dispatch(searchMedicines(value));

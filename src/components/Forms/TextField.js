@@ -29,7 +29,13 @@ const TextField = ({
   };
 
   const handleOnKeyDown = (e) => {
+    const { value, maxLength } = e.target;
+
     if (type === "number") {
+      if (maxLength && maxLength != -1 && maxLength <= value.length) {
+        e.preventDefault();
+      }
+
       const preventKeys = ["e", "E", "-", "+", "ArrowUp", "ArrowDown"];
       if (preventKeys.includes(e.key)) {
         e.preventDefault();

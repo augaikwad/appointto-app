@@ -88,7 +88,7 @@ const AddEditUser = () => {
     defaultValues: formData,
   });
 
-  const { handleSubmit, watch, reset } = form;
+  const { handleSubmit, watch, reset, setValue } = form;
 
   const [rolesOpt, setRolesOpt] = useState([]);
   const [lastStep, setLastStep] = useState(0);
@@ -102,6 +102,14 @@ const AddEditUser = () => {
     2: ["ADMIN", "CASHIER", "RECEPTIONIST"],
   };
 
+  const setDefault = (userTypeId) => {
+    const findBy = userTypeId === 1 ? "VISITING DOCTOR" : "RECEPTIONIST";
+    const defaultValue = userRoles.find(
+      (item) => item.normalizedName === findBy
+    );
+    setValue("userRole", defaultValue.name);
+  };
+
   useEffect(() => {
     const { userTypeId } = formData;
     if (userTypeId && !isNaN(userTypeId)) {
@@ -109,6 +117,8 @@ const AddEditUser = () => {
       const filteredOpt = userRoles.filter((role) =>
         filterBy.includes(role.normalizedName)
       );
+      setDefault(userTypeId);
+
       setRolesOpt(filteredOpt);
       setLastStep(userTypeId === 2 ? 1 : 2);
     }

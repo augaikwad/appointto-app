@@ -17,6 +17,7 @@ export const initialState = {
 
   prescriptionForm: {
     prescriptionId: 0,
+    vitals: [],
     bp: null,
     tempratureInFahrenhiet: null,
     oxizenSaturation: null,

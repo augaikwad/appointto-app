@@ -15,6 +15,8 @@ import {
   saveRxGroup,
   setPreviousPrescription,
 } from "../../../store/actions/prescriptionActions";
+import { hasError } from "../../../helpers/hasError";
+import clsx from "clsx";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
@@ -56,6 +58,12 @@ const useStyles = createUseStyles({
         "& > i.fa": {
           fontSize: "12px",
         },
+      },
+    },
+    "&.error, &.error *": {
+      background: "#ffe6e6",
+      "div.rbt-input-hint": {
+        background: "transparent !important",
       },
     },
   },
@@ -189,6 +197,26 @@ const timingOptions = [
     value: "Afterfood",
     label: "After Food",
   },
+  {
+    value: "EmptyStomach",
+    label: "Empty Stomach",
+  },
+  {
+    value: "BeforeBreakfast",
+    label: "Before Breakfast",
+  },
+  {
+    value: "AfterBreakfast",
+    label: "After Breakfast",
+  },
+  {
+    value: "SOS",
+    label: "SOS",
+  },
+  {
+    value: "BedTime",
+    label: "Bed Time",
+  },
 ];
 
 const NewMedTable = ({ control, setValue }) => {
@@ -218,13 +246,14 @@ const NewMedTable = ({ control, setValue }) => {
     name: "prescribedMedicines",
   });
 
-  const typeFormatter = ({ name }) => {
+  const typeFormatter = ({ name, index }) => {
     return (
       <ReactSelectField
         name={name}
         options={typeOptions}
         menuPortalTarget={document.body}
         className={classes.reactSelect}
+        rules={{ required: index < fields.length - 1 }}
         placeholder=""
         components={{
           DropdownIndicator: () => null,
@@ -234,12 +263,7 @@ const NewMedTable = ({ control, setValue }) => {
     );
   };
 
-  const medicineNameFormatter = ({ name, index, key, field }) => {
-    let isFilled = false;
-    if (!!field[key]) {
-      isFilled = true;
-    }
-
+  const medicineNameFormatter = ({ name, index, key, field, isFilled }) => {
     const props = {
       objKey: key,
       index,
@@ -252,6 +276,7 @@ const NewMedTable = ({ control, setValue }) => {
     return (
       <MedicineNameField
         {...props}
+        rules={{ required: index < fields.length - 1 }}
         onChange={(val) => {
           setValue(name, val);
           if (fields.length - 1 === index) {
@@ -262,11 +287,12 @@ const NewMedTable = ({ control, setValue }) => {
     );
   };
 
-  const doseFormatter = ({ name }) => {
+  const doseFormatter = ({ name, index }) => {
     return (
       <Controller
         control={control}
         name={name}
+        rules={{ required: index < fields.length - 1 }}
         render={({ field }) => (
           <InputMask
             {...field}
@@ -278,13 +304,14 @@ const NewMedTable = ({ control, setValue }) => {
     );
   };
 
-  const unitFormatter = ({ name }) => {
+  const unitFormatter = ({ name, index }) => {
     return (
       <ReactSelectField
         name={name}
         options={unitOptions}
         menuPortalTarget={document.body}
         className={classes.reactSelect}
+        rules={{ required: index < fields.length - 1 }}
         components={{
           DropdownIndicator: () => null,
           IndicatorSeparator: () => null,
@@ -293,13 +320,14 @@ const NewMedTable = ({ control, setValue }) => {
     );
   };
 
-  const timingFormatter = ({ name }) => {
+  const timingFormatter = ({ name, index }) => {
     return (
       <ReactSelectField
         name={name}
         options={timingOptions}
         menuPortalTarget={document.body}
         className={classes.reactSelect}
+        rules={{ required: index < fields.length - 1 }}
         components={{
           DropdownIndicator: () => null,
           IndicatorSeparator: () => null,
@@ -466,13 +494,15 @@ const NewMedTable = ({ control, setValue }) => {
                       if (col.field === "medicineName" && !!field[col.field]) {
                         isFilled = true;
                       }
+                      const isError = Boolean(hasError(name, formState.errors));
 
                       return (
                         <td
                           key={col.field}
-                          className={`${classes.td} ${
-                            isFilled ? "nameFilled" : ""
-                          }`}
+                          className={clsx(classes.td, {
+                            nameFilled: isFilled,
+                            error: isError,
+                          })}
                         >
                           {formatter && typeof formatter === "function"
                             ? formatter({
@@ -480,6 +510,7 @@ const NewMedTable = ({ control, setValue }) => {
                                 index,
                                 key: col.field,
                                 field,
+                                isFilled,
                               })
                             : col.field}
                         </td>

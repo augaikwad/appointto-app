@@ -46,15 +46,15 @@ const AddEditBillModal = () => {
     dispatch(getTreatmentList(id_doctor));
   }, []);
 
-  useEffect(() => {
-    if (!isAdd) {
-      let formData = { ...formValue };
-      formData.bill_date = new Date(formValue.bill_date);
-      reset(formData);
-    } else {
-      reset(initialState.billModal.formValue);
-    }
-  }, [isAdd]);
+  // useEffect(() => {
+  //   if (!isAdd) {
+  //     let formData = { ...formValue };
+  //     formData.bill_date = new Date(formValue.bill_date);
+  //     reset(formData);
+  //   } else {
+  //     reset(initialState.billModal.formValue);
+  //   }
+  // }, [isAdd, formValue]);
 
   const submitCallback = (res) => {
     dispatch(
