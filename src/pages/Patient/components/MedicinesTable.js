@@ -17,6 +17,7 @@ import {
 } from "../../../store/actions/prescriptionActions";
 import { hasError } from "../../../helpers/hasError";
 import clsx from "clsx";
+import { eachRight } from "lodash";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
@@ -288,20 +289,69 @@ const NewMedTable = ({ control, setValue }) => {
   };
 
   const doseFormatter = ({ name, index }) => {
+    const handleOnKeyDown = (e) => {
+      const acceptedKeys = [
+        "1",
+        "0",
+        " ",
+        "Backspace",
+        // "ArrowLeft",
+        // "ArrowRight",
+      ];
+      if (!acceptedKeys.includes(e.key)) {
+        e.preventDefault();
+      }
+    };
+
+    const handleOnChange = (e) => {
+      const { value } = e.target;
+      let newVal = [];
+
+      for (let i = 0; i < value.length; i++) {
+        if (value[i] === "0" || value[i] === "1") {
+          newVal.push(value[i]);
+        } else if (value[i] === " ") {
+          newVal.push(0);
+        }
+      }
+      const stringVal = newVal.join("-");
+      setValue(name, stringVal);
+    };
+
     return (
       <Controller
-        control={control}
         name={name}
+        control={control}
+        defaultValue=""
         rules={{ required: index < fields.length - 1 }}
         render={({ field }) => (
-          <InputMask
+          <input
             {...field}
-            mask="9-9-9"
+            type="text"
             className="form-control no-border"
+            onKeyDown={(e) => handleOnKeyDown(e)}
+            onChange={(e) => {
+              field.onChange(e);
+              handleOnChange(e);
+            }}
           />
         )}
       />
     );
+    // return (
+    //   <Controller
+    //     control={control}
+    //     name={name}
+    //     rules={{ required: index < fields.length - 1 }}
+    //     render={({ field }) => (
+    //       <InputMask
+    //         {...field}
+    //         mask="9-9-9"
+    //         className="form-control no-border"
+    //       />
+    //     )}
+    //   />
+    // );
   };
 
   const unitFormatter = ({ name, index }) => {
