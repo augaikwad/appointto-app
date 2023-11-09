@@ -241,6 +241,8 @@ const NewMedTable = ({ control, setValue }) => {
     "Years",
   ]);
 
+  const [durationOpt, setDurationOpt] = useState([]);
+
   const { register, watch, formState, getValues } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -388,37 +390,64 @@ const NewMedTable = ({ control, setValue }) => {
 
   const durationFormatter = ({ name, index }) => {
     return (
-      <AutocompleteField
-        id="DurationAutocomplete"
+      <ReactSelectField
         name={name}
-        control={control}
-        className="medicinesAutocomplete"
-        data={durationData}
-        minLength={1}
-        inputProps={{ name: name }}
-        onChange={(val) => setValue(name, val[0])}
+        options={durationOpt}
+        menuPortalTarget={document.body}
+        className={classes.reactSelect}
+        rules={{ required: index < fields.length - 1 }}
+        components={{
+          DropdownIndicator: () => null,
+          IndicatorSeparator: () => null,
+        }}
         onInputChange={(val) => {
-          if (!isNaN(val)) {
-            let tempDur = [...durationData].map((data) => {
-              let splitedText = data.trim().split(" ");
-              let text = splitedText[splitedText.length - 1];
-              let elem = val + " " + text;
-              return elem;
+          const suggestions = ["Days", "Weeks", "Months", "Years"];
+          const newDurationOpt = [];
+          if (val.length > 0 && !isNaN(val)) {
+            suggestions.forEach((sug) => {
+              newDurationOpt.push({
+                label: `${val} ${sug}`,
+                value: `${val} ${sug}`,
+              });
             });
-            setDurationData(tempDur);
           }
-        }}
-        onKeyDown={(e) => {
-          const key = e.key;
-          if (key == "Backspace") {
-            setValue(name, "");
-          }
-        }}
-        rules={{
-          required: index < fields.length - 1,
+          setDurationOpt(newDurationOpt);
         }}
       />
     );
+
+    // return (
+    //   <AutocompleteField
+    //     id="DurationAutocomplete"
+    //     name={name}
+    //     control={control}
+    //     className="medicinesAutocomplete"
+    //     data={durationData}
+    //     minLength={1}
+    //     inputProps={{ name: name }}
+    //     onChange={(val) => setValue(name, val[0])}
+    //     onInputChange={(val) => {
+    //       if (!isNaN(val)) {
+    //         let tempDur = [...durationData].map((data) => {
+    //           let splitedText = data.trim().split(" ");
+    //           let text = splitedText[splitedText.length - 1];
+    //           let elem = val + " " + text;
+    //           return elem;
+    //         });
+    //         setDurationData(tempDur);
+    //       }
+    //     }}
+    //     onKeyDown={(e) => {
+    //       const key = e.key;
+    //       if (key == "Backspace") {
+    //         setValue(name, "");
+    //       }
+    //     }}
+    //     rules={{
+    //       required: index < fields.length - 1,
+    //     }}
+    //   />
+    // );
   };
 
   const noteFormatter = ({ name }) => {
@@ -444,7 +473,7 @@ const NewMedTable = ({ control, setValue }) => {
     {
       field: "type",
       label: "Type",
-      width: "60px",
+      width: "80px",
       formatter: typeFormatter,
     },
     {

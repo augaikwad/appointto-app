@@ -179,7 +179,7 @@ const Prescription = () => {
           medicineId: med.medicineName.medicineId,
           Dose: med.dose,
           Timing: med.timing.value,
-          Duration: med.duration,
+          Duration: med.duration.value,
         };
         if (med.note !== "") {
           medObj.Note = med.note;
@@ -296,7 +296,7 @@ const Prescription = () => {
                     name="bp"
                     mask="111/111"
                     inline={true}
-                    labelWidth="60px"
+                    labelWidth="80px"
                   />
                 </div>
                 <div className="col-lg-3">
@@ -304,7 +304,7 @@ const Prescription = () => {
                     label="TEMP"
                     name="tempratureInFahrenhiet"
                     inline={true}
-                    labelWidth="60px"
+                    labelWidth="80px"
                   />
                 </div>
                 <div className="col-lg-3">
@@ -312,7 +312,7 @@ const Prescription = () => {
                     label="SPO2"
                     name="oxizenSaturation"
                     inline={true}
-                    labelWidth="60px"
+                    labelWidth="80px"
                   />
                 </div>
                 <div className="col-lg-3">
@@ -320,7 +320,7 @@ const Prescription = () => {
                     label="PR"
                     name="pr"
                     inline={true}
-                    labelWidth="60px"
+                    labelWidth="80px"
                   />
                 </div>
               </div>
@@ -332,7 +332,7 @@ const Prescription = () => {
                         label={field.label}
                         name={`vitals.${index}.value`}
                         inline={true}
-                        labelWidth="60px"
+                        labelWidth="80px"
                       />
                     </div>
                   );
