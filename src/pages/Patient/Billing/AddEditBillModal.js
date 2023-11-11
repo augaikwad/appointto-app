@@ -41,10 +41,22 @@ const AddEditBillModal = () => {
 
   const { handleSubmit, watch, setValue, register, reset } = form;
   const watchDiscountType = watch("discount_type");
+  const watchQty = watch("quantity");
+  const watchRate = watch("rate");
+  const watchDiscountValue = watch("discount_value");
 
   useEffect(() => {
     dispatch(getTreatmentList(id_doctor));
   }, []);
+
+  useEffect(() => {
+    let totalAmount = watchQty * watchRate;
+    let discountedAmount =
+      watchDiscountType === 0
+        ? totalAmount - watchDiscountValue
+        : totalAmount * (1 - watchDiscountValue / 100);
+    setValue("gross_amount", discountedAmount);
+  }, [watchQty, watchRate, watchDiscountValue, watchDiscountType]);
 
   // useEffect(() => {
   //   if (!isAdd) {
@@ -209,12 +221,11 @@ const AddEditBillModal = () => {
                     label="Qty"
                     name="quantity"
                     type="number"
-                    onBlur={(e) => {
-                      let watchRate = watch("rate");
-                      if (watchRate > 0) {
-                        setValue("gross_amount", watchRate * e.target.value);
-                      }
-                    }}
+                    // onBlur={(e) => {
+                    //   if (watchRate > 0) {
+                    //     setValue("gross_amount", watchRate * e.target.value);
+                    //   }
+                    // }}
                   />
                 </div>
                 <div className="col-lg-6">
@@ -222,12 +233,11 @@ const AddEditBillModal = () => {
                     label="Rate"
                     name="rate"
                     type="number"
-                    onBlur={(e) => {
-                      let watchQty = watch("quantity");
-                      if (watchQty > 0) {
-                        setValue("gross_amount", watchQty * e.target.value);
-                      }
-                    }}
+                    // onBlur={(e) => {
+                    //   if (watchQty > 0) {
+                    //     setValue("gross_amount", watchQty * e.target.value);
+                    //   }
+                    // }}
                     rules={{
                       required: true,
                     }}
