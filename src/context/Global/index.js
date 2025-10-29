@@ -1,6 +1,5 @@
 import React, { useReducer, createContext } from "react";
 import { applyGlobalContextMiddleware } from "./GlobalContextMiddleware";
-import { withRouter } from "react-router-dom";
 
 export const GlobalContext = createContext();
 
@@ -81,4 +80,4 @@ const GlobalContextProvider = (props) => {
   );
 };
 
-export default withRouter(GlobalContextProvider);
+export default GlobalContextProvider;

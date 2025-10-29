@@ -1,5 +1,5 @@
 import React, { useEffect, lazy } from "react";
-import { Switch, Route, useLocation, Redirect } from "react-router-dom";
+import { Switch, Route, useLocation } from "react-router-dom";
 import RouteGuard from "./shared/RouteGuard";
 
 const Login = lazy(() => import("./pages/Login"));
@@ -29,7 +29,7 @@ function Routes({ setIsFullPageLayout }) {
   }, [fullPageLayoutRoutes]);
 
   return (
-    <Switch>
+    <Routes>
       <Route exact path="/login" component={Login} />
       <Route exact path="/otpConfirmation" component={MobileOTP} />
       <Route exact path="/signup" component={Signup} />
@@ -40,8 +40,8 @@ function Routes({ setIsFullPageLayout }) {
       <RouteGuard exact path="/patients" component={PatientsList} />
       <RouteGuard exact path="/appointments" component={AppointmentsList} />
       <RouteGuard exact path="/settings" component={Settings} />
-      <Redirect to="/dashboard" />
-    </Switch>
+      {/* <Redirect to="/dashboard" /> */}
+    </Routes>
   );
 }
 

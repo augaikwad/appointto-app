@@ -1,6 +1,5 @@
 import React, { useReducer, createContext } from "react";
 import { compose } from "recompose";
-import { withRouter } from "react-router-dom";
 import withContext from "../../hoc/withContext";
 import { GlobalContext } from "../Global";
 
@@ -234,6 +233,5 @@ const mapActionsToProps = (actions) => {
 };
 
 export default compose(
-  withContext(GlobalContext, mapStateToProps, mapActionsToProps),
-  withRouter
+  withContext(GlobalContext, mapStateToProps, mapActionsToProps)
 )(BillingContextProvider);

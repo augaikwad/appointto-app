@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 /* === Plugin styles === */
-
+@import "~bootstrap/scss/bootstrap";
 @import "~react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 @import "~chartist/dist/chartist.min.css";
 @import "~nouislider/distribute/nouislider.min.css";
@@ -19,7 +19,7 @@
 @import "./assets/styles/variables";
 @import "~compass-mixins/lib/compass";
 @import "~compass-mixins/lib/animate";
-@import "~bootstrap/scss/bootstrap";
+
 @import "./assets/styles/fonts";
 @import "./assets/styles/functions";
 
@@ -27,7 +27,7 @@
 @import "~ti-icons/css/themify-icons.css";
 @import "~@mdi/font/scss/materialdesignicons";
 @import "~font-awesome/scss/font-awesome";
-@import "~flag-icon-css/sass/flag-icon";
+// @import "~flag-icon-css/sass/flag-icon";
 @import "~simple-line-icons/scss/simple-line-icons";
 @import "~simple-line-icons/scss/simple-line-icons";
 @import "~typicons.font/src/font/typicons.css";

@@ -1,5 +1,4 @@
 import React, { useState, Suspense, useEffect } from "react";
-import { useHistory } from "react-router-dom";
 import Routes from "./Routes";
 import Layout from "./shared/Layout";
 import Loader from "./shared/Loader";
@@ -15,8 +14,6 @@ import SettingsContextProvider from "./context/Settings";
 import { setAuthToken } from "./helpers/setAuthToken";
 
 function App(props) {
-  const history = useHistory();
-
   useEffect(() => {
     //check jwt token
     const token = localStorage.getItem("token");

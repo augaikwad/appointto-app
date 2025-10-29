@@ -9,7 +9,7 @@ import {
   faCalendarDays,
 } from "@fortawesome/free-solid-svg-icons";
 import CreateAppointmentModal from "../Patient/CreateAppointmentModal";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Tooltip } from "../../components";
 import { AppointmentContext } from "../../context/Appointment";
 import { PatientContext } from "../../context/Patient";
@@ -45,7 +45,7 @@ const useStyles = createUseStyles({
 const ListWidget = () => {
   const classes = useStyles();
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [state, actions] = useContext(AppointmentContext);
   const { appointmentList, appointmentStatusList } = state;
@@ -72,8 +72,8 @@ const ListWidget = () => {
         id_patient: res.id_patient,
         id_clinic: res.id_clinic,
       });
-      history.push({
-        pathname: "/patient/" + patientId,
+
+      navigate(`/patient/${patientId}`, {
         state: {
           selectedTab: tab,
         },

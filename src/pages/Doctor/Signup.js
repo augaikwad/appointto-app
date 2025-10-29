@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LogoLarge from "../../assets/images/logo-large.svg";
 import { useForm, FormProvider } from "react-hook-form";
 import TextField from "../../components/Forms/TextField";
@@ -7,14 +7,14 @@ import { Button } from "react-bootstrap";
 import { DoctorContext } from "../../context/Doctor";
 
 function Register(props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [states, actions] = useContext(DoctorContext);
   const { otpData, verifyOTPData } = states;
 
   useEffect(() => {
     if (otpData === null && verifyOTPData === null) {
-      history.push("/login");
+      navigate("/login");
     }
   }, [otpData, verifyOTPData]);
 
@@ -122,10 +122,7 @@ function Register(props) {
                   </div>
                   <div className="my-2 d-flex justify-content-between align-items-center">
                     Already have an account?{" "}
-                    <Button
-                      variant="link"
-                      onClick={() => history.push("/login")}
-                    >
+                    <Button variant="link" onClick={() => navigate("/login")}>
                       Login
                     </Button>
                   </div>

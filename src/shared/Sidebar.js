@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 class Sidebar extends Component {
   state = {};
@@ -163,4 +163,4 @@ class Sidebar extends Component {
   }
 }
 
-export default withRouter(Sidebar);
+export default Sidebar;

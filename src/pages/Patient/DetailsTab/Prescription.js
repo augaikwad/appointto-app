@@ -19,7 +19,7 @@ import {
   SelectField,
   DatePickerField,
 } from "../../../components/Forms";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { PrescriptionContext } from "../../../context/Prescription";
 import { PatientContext } from "../../../context/Patient";
 import { SettingsContext } from "../../../context/Settings";
@@ -32,7 +32,7 @@ import moment from "moment";
 const toastOption = { hideAfter: 5, position: "top-right" };
 
 const Prescription = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const printRef = useRef(null);
   const [printData, setPrintData] = useState([]);
   const [hasAllergies, setHasAllergies] = useState(false);
@@ -110,8 +110,7 @@ const Prescription = () => {
         const btnId = e.target.id;
         actions.getPrescriptions({ PatientId: res.patientId });
         if (btnId === "SaveNext") {
-          history.push({
-            pathname: "/patient/" + patientData.id_patient,
+          navigate(`/patient/${patientData.id_patient}`, {
             state: {
               selectedTab: 2,
             },

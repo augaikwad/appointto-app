@@ -5,7 +5,7 @@ import { Button } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import moment from "moment";
 import { DoctorContext } from "../../../context/Doctor";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { hasError } from "../../../helpers/hasError";
 
 const useStyles = createUseStyles({
@@ -53,7 +53,7 @@ const useStyles = createUseStyles({
 
 const Schedule = () => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [open, setOpen] = React.useState(false);
 
@@ -162,7 +162,7 @@ const Schedule = () => {
         setTimeout(() => {
           actions.resetOTPData();
           localStorage.clear();
-          history.push("login");
+          navigate("login");
           setOpen(false);
         }, 2000);
       }
