@@ -186,7 +186,7 @@ const ListWidget = () => {
                         tooltipText={`${
                           item.checked_in === 0
                             ? "Mark as Checked In"
-                            : "Checked In"
+                            : "Arrived"
                         }`}
                         btnClasses={`${
                           item.checked_in === 0

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { PatientContext } from "../../../context/Patient";
 
@@ -6,9 +6,12 @@ import { TextField, DatePickerField } from "../../../components/Forms";
 import SelectField from "../../../components/Forms/SelectField";
 import RadioField from "../../../components/Forms/RadioField";
 import moment from "moment";
+import { Button } from "react-bootstrap";
 
 const General = (props) => {
   const [state, actions] = useContext(PatientContext);
+
+  const [isMoreFieldVisible, setIsMoreFieldVisible] = useState(false);
 
   const { patient, activeTab } = state;
 
@@ -117,42 +120,66 @@ const General = (props) => {
               ]}
             />
           </div>
-          <div className="col-lg-6">
-            <TextField label="Address" name="address" />
-          </div>
-          <div className="col-lg-6">
-            <TextField label="Area" name="area" />
-          </div>
+
+          {isMoreFieldVisible && (
+            <>
+              <div className="col-lg-6">
+                <TextField label="Address" name="address" />
+              </div>
+              <div className="col-lg-6">
+                <TextField label="Area" name="area" />
+              </div>
+            </>
+          )}
+
           <div className="col-lg-4">
             <TextField label="City" name="city" />
           </div>
+
+          {isMoreFieldVisible && (
+            <>
+              <div className="col-lg-4">
+                <TextField label="State" name="state" />
+              </div>
+              <div className="col-lg-4">
+                <TextField label="Pin Code" name="pincode" type="number" />
+              </div>
+              <div className="col-lg-4">
+                <TextField label="Referred By" name="reffered_by" />
+              </div>
+              <div className="col-lg-4">
+                <TextField
+                  label="Email Id"
+                  name="email_id"
+                  rules={{
+                    pattern: {
+                      value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+                      message: "Please enter correct email",
+                    },
+                  }}
+                />
+              </div>
+              <div className="col-lg-4">
+                <TextField
+                  label="Emergency Contact"
+                  name="emergency_contact"
+                  type="number"
+                />
+              </div>
+            </>
+          )}
+
           <div className="col-lg-4">
-            <TextField label="State" name="state" />
-          </div>
-          <div className="col-lg-4">
-            <TextField label="Pin Code" name="pincode" type="number" />
-          </div>
-          <div className="col-lg-4">
-            <TextField label="Referred By" name="reffered_by" />
-          </div>
-          <div className="col-lg-4">
-            <TextField
-              label="Email Id"
-              name="email_id"
-              rules={{
-                pattern: {
-                  value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
-                  message: "Please enter correct email",
-                },
+            <Button
+              size="sm"
+              variant="link"
+              style={{ marginTop: 18 }}
+              onClick={() => {
+                setIsMoreFieldVisible(!isMoreFieldVisible);
               }}
-            />
-          </div>
-          <div className="col-lg-4">
-            <TextField
-              label="Emergency Contact"
-              name="emergency_contact"
-              type="number"
-            />
+            >
+              {`${isMoreFieldVisible ? "Less" : "More"}...`}
+            </Button>
           </div>
         </div>
       </div>

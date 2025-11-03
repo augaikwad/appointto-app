@@ -279,9 +279,9 @@ const AddEditBillModal = () => {
                 label="Payment Recieved"
                 name="amount_received"
                 type="number"
-                rules={{
-                  required: "Please enter amount",
-                }}
+                // rules={{
+                //   required: "Please enter amount",
+                // }}
               />
             </div>
             <div className="col-lg-6">

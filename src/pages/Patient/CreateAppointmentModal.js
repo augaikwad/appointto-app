@@ -58,9 +58,28 @@ const CreateAppointmentModal = ({ onHide }) => {
 
   const { reset, setValue, handleSubmit, watch } = form;
 
+  // useEffect(() => {
+  //   reset(formattedFormData(formValues));
+  // }, [appointmentModal.form]);
+
   useEffect(() => {
-    reset(formattedFormData(formValues));
-  }, [appointmentModal.form]);
+    if (isAdd) {
+      const now = new Date();
+
+      reset(
+        formattedFormData({
+          ...formValues,
+          date: now,
+          day: moment(now).format("dddd"),
+          start_time: now,
+          end_time: moment(now).add(15, "m").toDate(),
+          reason: "Follow Up",
+        })
+      );
+    } else {
+      reset(formattedFormData(formValues));
+    }
+  }, [isAdd, appointmentModal.form]);
 
   const callback = () => {
     onHide();

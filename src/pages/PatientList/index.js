@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, withRouter } from "react-router-dom";
 import { Card } from "../../components";
 import { TextField } from "../../components/Forms";
 import { Row, Col, Button } from "react-bootstrap";
@@ -394,4 +394,4 @@ const PatientList = () => {
   );
 };
 
-export default PatientList;
+export default withRouter(PatientList);
