@@ -184,9 +184,7 @@ const ListWidget = () => {
                     <td className={classes.td} width={56}>
                       <IconButton
                         tooltipText={`${
-                          item.checked_in === 0
-                            ? "Mark as Checked In"
-                            : "Arrived"
+                          item.checked_in === 0 ? "Mark as Arrived" : "Arrived"
                         }`}
                         btnClasses={`${
                           item.checked_in === 0
