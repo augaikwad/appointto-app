@@ -348,6 +348,7 @@ const Prescription = () => {
                     e.preventDefault();
                     setShow(true);
                   }}
+                  tabindex="-1"
                 >
                   <i className="fa fa-plus"></i>
                 </button>

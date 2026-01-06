@@ -30,6 +30,7 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
   return (
     <>
       <CreateSelectTagsAutoComplete
+        tabindex={2}
         name={name}
         label="Advice"
         options={advices}

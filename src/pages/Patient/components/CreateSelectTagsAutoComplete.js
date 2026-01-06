@@ -49,6 +49,7 @@ const CreateSelectTagsAutoComplete = ({
             onClick={() => {
               setValue(name, []);
             }}
+            tabindex="-1"
           >
             <i className="fa fa-undo"></i>
           </Button>
@@ -64,6 +65,7 @@ const CreateSelectTagsAutoComplete = ({
         size="sm"
         className={classes.btn}
         onClick={onClick}
+        tabindex="-1"
       >
         {label}
       </Button>

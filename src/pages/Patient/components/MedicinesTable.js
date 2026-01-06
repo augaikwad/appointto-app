@@ -667,6 +667,7 @@ const NewMedTable = ({ control, setValue }) => {
               );
             }
           }}
+          tabindex="-1"
         >
           Save Rx Group
         </button>
@@ -676,6 +677,7 @@ const NewMedTable = ({ control, setValue }) => {
             e.preventDefault();
             setRxGroupModalShow(true);
           }}
+          tabindex="-1"
         >
           Rx Group <i className="fa fa-angle-down"></i>
         </button>
@@ -690,6 +692,7 @@ const NewMedTable = ({ control, setValue }) => {
               cogoToast.warn("No Previos Rx. Group found", toastOption);
             }
           }}
+          tabindex="-1"
         >
           Prev. Rx Group
         </button>

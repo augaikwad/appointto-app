@@ -97,7 +97,7 @@ const AddEditPatientModal = (props) => {
     req.id_doctor = id_doctor;
     dispatch(
       createAppointment(req, (res) => {
-        // refreshDashboardList();
+        refreshDashboardList();
         dispatch(
           setPatientModal({
             ...patientModal,
@@ -174,11 +174,11 @@ const AddEditPatientModal = (props) => {
         })
       );
     }
+    refreshDashboardList();
     history.push({
       pathname: "/dashboard",
       state: { isInit: true },
     });
-    // refreshDashboardList();
   };
 
   const onSubmit = (data, e) => {
