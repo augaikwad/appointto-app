@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Tab, Row, Col, Nav } from "react-bootstrap";
 import { Card } from "../../components";
-import { PrescriptionSetting, Users } from "./Tabs";
+import { PrescriptionSetting, Users, Appointment } from "./Tabs";
 import { createUseStyles } from "react-jss";
 import { useDispatch, useSelector } from "react-redux";
 import { getPrintingSetting } from "../../store/actions/settingActions";
@@ -73,6 +73,7 @@ const Index = () => {
   const tabs = [
     { name: "Users", component: <Users /> },
     { name: "Prescription", component: <PrescriptionSetting /> },
+    // { name: "Appointment", component: <Appointment /> },
   ];
 
   return (

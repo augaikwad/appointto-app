@@ -59,7 +59,7 @@ const ListWidget = () => {
   const { appointmentStatuses } = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (appointmentStatuses === null) {
+    if (appointmentStatuses.length === 0) {
       dispatch(getAppointmentStatusList());
     }
   }, [appointmentStatuses]);

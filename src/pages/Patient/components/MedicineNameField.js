@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Modal, InputField } from "../../../components";
-import { ReactSelectField } from "../../../components/Forms";
+import CreatableSelect from "react-select/creatable";
 import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 import cogoToast from "cogo-toast";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getMedicinesByDoctorId,
   searchMedicines,
 } from "../../../store/actions/prescriptionActions";
+import useAxios from "../../../hooks/useAxios";
 
 const useStyles = createUseStyles({
   nameEditBtn: {},
@@ -61,27 +62,30 @@ const MedicineNameField = ({
 
   const [show, setShow] = useState(false);
 
-  const [composition, setComposition] = useState(null);
-  const [medicineName, setMedicineName] = useState("");
-
   const { watch } = useFormContext();
   const medicineWatch = watch(name);
 
-  useEffect(() => {
-    if (composition == null || composition !== medicineWatch.composition) {
-      setComposition(medicineWatch.composition);
-    }
-  }, [composition]);
+  const [composition, setComposition] = useState("");
 
   useEffect(() => {
+    if (medicineWatch && medicineWatch?.composition) {
+      setComposition(medicineWatch?.composition);
+    }
+  }, [medicineWatch]);
+
+  const fetchDoctorsMedicines = () => {
     dispatch(getMedicinesByDoctorId(id_doctor));
+  };
+
+  useEffect(() => {
+    fetchDoctorsMedicines();
   }, []);
 
   const getTitle = () => {
     return (
       <>
         <span style={{ fontWeight: 300 }}>Generic name </span>
-        <b>{medicineName}</b>
+        <b>{medicineWatch.medicineName}</b>
       </>
     );
   };
@@ -94,7 +98,7 @@ const MedicineNameField = ({
           className={classes.buttonMinWidth}
           onClick={(e) => {
             e.preventDefault();
-            setValue(`medicines[${ind}].composition`, composition);
+            setValue(`${name}.composition`, composition);
             cogoToast.success("Generic Name added successfully", {
               position: "top-right",
             });
@@ -117,30 +121,58 @@ const MedicineNameField = ({
     );
   };
 
+  const getOptions = (opts) => {
+    return opts.map((op) => ({
+      value: op.medicineId,
+      label: op.medicineName,
+      ...op,
+    }));
+  };
+
+  const { fetchData: addMedicine } = useAxios();
+
+  const handleAddMedicine = (payload) => {
+    addMedicine(
+      {
+        url: "Medicine/add-medicine",
+        method: "post",
+        data: payload,
+      },
+      (status, res) => {
+        if (status === 200) {
+          fetchDoctorsMedicines();
+          setValue(`${name}`, getOptions([res.payload])[0]);
+          onChange(getOptions([res.payload])[0]);
+        }
+      }
+    );
+  };
+
   return (
     <>
-      <ReactSelectField
+      <CreatableReactSelectField
         name={name}
-        labelField="medicineName"
-        valueField="medicineId"
-        options={[...doctorMedicines, ...medicines]}
-        menuPortalTarget={document.body}
-        className={classes.reactSelect}
-        onChange={(val) => {
-          setMedicineName(val.medicineName);
-          setComposition(val.composition);
-          onChange(val);
-        }}
-        rules={rules}
+        options={getOptions([...doctorMedicines, ...medicines])}
         onInputChange={(value) => {
           if (value.length > 2) {
             dispatch(searchMedicines(value));
           }
         }}
-        components={{
-          DropdownIndicator: () => null,
-          IndicatorSeparator: () => null,
+        onCreateOption={(val) => {
+          let req = {
+            medicineId: 0,
+            medicineName: val,
+            composition: val,
+            weightValue: 0,
+            id_doctor: id_doctor,
+            created_date: new Date(),
+          };
+          handleAddMedicine(req);
         }}
+        onChange={(val) => {
+          onChange(val);
+        }}
+        rules={rules}
       />
       {medicineWatch && Object.keys(medicineWatch).length && (
         <>
@@ -176,6 +208,48 @@ const MedicineNameField = ({
         </>
       )}
     </>
+  );
+};
+
+const CreatableReactSelectField = ({
+  name,
+  options = [],
+  optionLabel = "label",
+  optionValue = "value",
+  ...restProps
+}) => {
+  const classes = useStyles();
+  const { control } = useFormContext();
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <CreatableSelect
+          {...field} // Spreads: onChange, onBlur, value, ref
+          className={classes.reactSelect}
+          isClearable
+          options={options}
+          getOptionLabel={(option) => option[optionLabel]}
+          getOptionValue={(option) => option[optionValue]}
+          placeholder=""
+          getNewOptionData={(value, label) => {
+            return {
+              [optionLabel]: label,
+              [optionValue]: value,
+              __isNew__: true,
+            };
+          }}
+          formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
+          components={{
+            DropdownIndicator: () => null,
+            IndicatorSeparator: () => null,
+          }}
+          menuPortalTarget={document.body}
+          {...restProps}
+        />
+      )}
+    />
   );
 };
 

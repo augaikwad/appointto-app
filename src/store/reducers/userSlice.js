@@ -8,7 +8,7 @@ const userSlice = createSlice({
       id_clinic: 0,
       user_name: "",
     },
-    appointmentStatuses: null,
+    appointmentStatuses: [],
     doctorsByClinicId: null,
     selectedDoctorId: null,
     selectedDoctor: null,

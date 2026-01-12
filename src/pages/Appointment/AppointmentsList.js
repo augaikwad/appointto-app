@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card } from "../../components";
+import { Card, Tooltip } from "../../components";
 import { createUseStyles } from "react-jss";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
@@ -7,8 +7,14 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { getWeekRange, getMonthRange } from "../../utils/common";
 import Select from "react-select";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppointmentsForCalendar } from "../../store/actions/appointmentActions";
+import {
+  getAppointmentsForCalendar,
+  updateAppointment,
+} from "../../store/actions/appointmentActions";
 import { calendarDataFormatter } from "../../utils/common";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faTrash, faPencil } from "@fortawesome/free-solid-svg-icons";
+import { setAppointmentModal } from "../../store/reducers/appointmentsSlice";
 
 const localizer = momentLocalizer(moment);
 
@@ -60,19 +66,43 @@ const useStyles = createUseStyles({
   customEventContent: {
     position: "relative",
     color: "#555",
-    "& > b": {
-      fontSize: ".75em",
-      marginRight: 5,
+    display: "flex",
+    "& > div.title": {
+      flex: 1,
+      "& > b": {
+        fontSize: ".75em",
+        marginRight: 5,
+      },
+      "& > span": {
+        fontSize: ".80em",
+        fontWeight: 500,
+      },
+      "& > i.faIcon": {
+        fontSize: 8,
+        verticalAlign: "middle",
+        marginRight: 5,
+        color: "#0276f8",
+      },
     },
-    "& > span": {
-      fontSize: ".80em",
-      fontWeight: 500,
-    },
-    "& > i.faIcon": {
-      fontSize: 8,
-      verticalAlign: "middle",
-      marginRight: 5,
-      color: "#0276f8",
+  },
+  action: {
+    flex: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    "& > button": {
+      padding: "1px 5px !important",
+      margin: 0,
+      width: "auto !important",
+      height: "auto !important",
+      outline: "none",
+      lineHeight: 1,
+      "&.edit": {
+        color: "blue",
+      },
+      "&.delete": {
+        color: "red",
+      },
     },
   },
   drDropdownFilter: {
@@ -81,6 +111,7 @@ const useStyles = createUseStyles({
   ml10: {
     marginLeft: 10,
   },
+  iconBtn: {},
 });
 
 const customStyles = {
@@ -95,6 +126,28 @@ const customStyles = {
     ...provided,
     zIndex: 6,
   }),
+};
+
+const IconButton = (props) => {
+  const classes = useStyles();
+  const {
+    tooltipText = "tooltip",
+    placement = "top",
+    icon,
+    btnClasses = "",
+    onClick = () => {},
+  } = props;
+  return (
+    <Tooltip text={tooltipText} placement={placement}>
+      <button
+        type="button"
+        className={`btn btn-rounded btn-icon ${classes.iconBtn} ${btnClasses}`}
+        onClick={() => onClick()}
+      >
+        <FontAwesomeIcon icon={icon} />
+      </button>
+    </Tooltip>
+  );
 };
 
 const AppointmentsList = () => {
@@ -147,12 +200,65 @@ const AppointmentsList = () => {
   };
 
   const EventComponent = ({ event }) => {
-    const { patient_first_name, patient_last_name, start_time } = event;
+    const {
+      patient_first_name,
+      patient_last_name,
+      start_time,
+      appointment_status,
+    } = event;
+
+    const handleEdit = () => {
+      dispatch(
+        setAppointmentModal({
+          isAdd: false,
+          show: true,
+          form: event,
+        })
+      );
+      getList({
+        id_doctor: doctor.id_doctor,
+        ...getDateRange(calendarView, calendarDate),
+      });
+    };
+
+    const handleCancel = () => {
+      const req = { ...event };
+      req.appointment_status = "Cancelled";
+      dispatch(
+        updateAppointment(req, () => {
+          getList({
+            id_doctor: doctor.id_doctor,
+            ...getDateRange(calendarView, calendarDate),
+          });
+        })
+      );
+    };
+
+    const isCancelled = appointment_status === "Cancelled";
+
     return (
       <div className={classes.customEventContent}>
-        <i className="fa fa-circle faIcon"></i>
-        <b>{`${start_time}`}</b>
-        <span>{`${patient_first_name} ${patient_last_name}`}</span>
+        <div className="title">
+          <i className="fa fa-circle faIcon"></i>
+          <b>{`${start_time}`}</b>
+          <span>{`${patient_first_name} ${patient_last_name}`}</span>
+        </div>
+        {!isCancelled && (
+          <div className={classes.action}>
+            <IconButton
+              tooltipText="Edit Appointment"
+              icon={faPencil}
+              btnClasses="edit"
+              onClick={handleEdit}
+            />
+            <IconButton
+              tooltipText="Cancel Appointment"
+              icon={faTrash}
+              btnClasses="delete"
+              onClick={handleCancel}
+            />
+          </div>
+        )}
       </div>
     );
   };

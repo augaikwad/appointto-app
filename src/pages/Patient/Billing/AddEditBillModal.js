@@ -84,9 +84,11 @@ const AddEditBillModal = () => {
     let formData = { ...data };
     formData.doctor_name = `${data.doctor_name.first_name} ${data.doctor_name.last_name}`;
     if (formData.bill_id === 0) {
+      const { amount_received } = formData;
       formData.id_patient = patientById.id_patient;
       formData.id_doctor = data.doctor_name.id_doctor;
       formData.id_clinic = data.doctor_name.id_clinic;
+      formData.amount_received = Number(amount_received);
       dispatch(createBill(formData, submitCallback));
     } else {
       dispatch(updateBill(formData, submitCallback));
