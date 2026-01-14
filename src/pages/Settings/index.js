@@ -73,7 +73,7 @@ const Index = () => {
   const tabs = [
     { name: "Users", component: <Users /> },
     { name: "Prescription", component: <PrescriptionSetting /> },
-    // { name: "Appointment", component: <Appointment /> },
+    { name: "Appointment", component: <Appointment /> },
   ];
 
   return (
