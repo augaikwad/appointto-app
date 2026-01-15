@@ -55,7 +55,7 @@ const AddEditPaymentModal = () => {
           {
             ...data,
             patient_id: patientById.id_patient,
-            doctor_id: 0,
+            doctor_id: id_doctor,
           },
           callback
         )

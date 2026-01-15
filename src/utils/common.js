@@ -76,3 +76,15 @@ export const areObjectsEqual = (objA, objB) => {
 
   return true;
 };
+
+export const getValueLabelOptions = (
+  opts,
+  labelField = "label",
+  valueField = "value"
+) => {
+  return opts.map((op) => ({
+    label: op[labelField],
+    value: op[valueField],
+    ...op,
+  }));
+};

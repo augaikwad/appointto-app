@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Modal } from "../../components";
 import {
@@ -6,6 +6,7 @@ import {
   DateTimePickerField,
   DatePickerField,
   SelectField,
+  CreatableReactSelectField,
 } from "../../components/Forms";
 import { useForm, FormProvider } from "react-hook-form";
 import moment from "moment";
@@ -16,6 +17,8 @@ import {
   updateAppointment,
   createAppointment,
 } from "../../store/actions/appointmentActions";
+import useAxios from "../../hooks/useAxios";
+import { getValueLabelOptions } from "../../utils/common";
 
 const getFormattedTime = (date, time) => {
   let oDate = "";
@@ -39,9 +42,19 @@ const formattedFormData = (data) => {
   return obj;
 };
 
+const getReasonObjByName = (name, reasons) => {
+  let obj = null;
+  if (name !== "" && reasons.length > 0) {
+    obj = reasons.find((item) => item.reason_name === name);
+  }
+  return obj;
+};
+
 const CreateAppointmentModal = ({ onHide }) => {
   const location = useLocation();
   const dispatch = useDispatch();
+
+  const [reasons, setReasons] = useState([]);
 
   const { doctorsByClinicId, selectedDoctor } = useSelector(
     (state) => state.user
@@ -50,6 +63,7 @@ const CreateAppointmentModal = ({ onHide }) => {
   const { dashboardListFilters, appointmentModal } = useSelector(
     (state) => state.appointments
   );
+
   const { form: formValues, show, isAdd } = appointmentModal;
 
   const form = useForm({
@@ -58,9 +72,30 @@ const CreateAppointmentModal = ({ onHide }) => {
 
   const { reset, setValue, handleSubmit, watch } = form;
 
-  // useEffect(() => {
-  //   reset(formattedFormData(formValues));
-  // }, [appointmentModal.form]);
+  const { fetchData: getReasons } = useAxios();
+
+  const getReasonList = (getReasonCallback) => {
+    getReasons(
+      {
+        url: `AppointmentReason/get-reasons-by-doctor?id_doctor=${formValues.id_doctor}`,
+        method: "get",
+      },
+      (status, res) => {
+        if (status === 200) {
+          setReasons(res.payload?.appointmentReasons || []);
+          if (getReasonCallback && typeof getReasonCallback === "function") {
+            getReasonCallback(res.payload?.appointmentReasons || []);
+          }
+        }
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (show) {
+      getReasonList();
+    }
+  }, [show]);
 
   useEffect(() => {
     if (isAdd) {
@@ -73,13 +108,23 @@ const CreateAppointmentModal = ({ onHide }) => {
           day: moment(now).format("dddd"),
           start_time: now,
           end_time: moment(now).add(15, "m").toDate(),
-          reason: "Follow Up",
+          reason: null,
         })
       );
     } else {
-      reset(formattedFormData(formValues));
+      const { reason } = formValues;
+      const tempFormValues = { ...formValues };
+      const filteredReason = getReasonObjByName(reason, reasons);
+      tempFormValues.reason = filteredReason
+        ? {
+            ...filteredReason,
+            label: filteredReason.reason_name,
+            value: filteredReason.id_reason,
+          }
+        : null;
+      reset(formattedFormData(tempFormValues));
     }
-  }, [isAdd, appointmentModal.form]);
+  }, [isAdd, appointmentModal, reasons]);
 
   const callback = () => {
     onHide();
@@ -95,6 +140,7 @@ const CreateAppointmentModal = ({ onHide }) => {
     formData.date = moment(new Date(formData.date)).format(
       "YYYY-MM-DDTHH:mm:ss.sssZ"
     );
+    formData.reason = data.reason.reason_name;
 
     if (isAdd) {
       dispatch(createAppointment(formData, callback));
@@ -113,6 +159,30 @@ const CreateAppointmentModal = ({ onHide }) => {
           {isAdd ? "Create" : "Save"}
         </Button>
       </div>
+    );
+  };
+
+  const { fetchData: createReason } = useAxios();
+
+  const handleAddReason = (req) => {
+    createReason(
+      {
+        url: "AppointmentReason/create-reason",
+        method: "post",
+        data: req,
+      },
+      (status, res) => {
+        if (status === 200) {
+          const { payload } = res;
+          if (payload) {
+            getReasonList();
+            const val = { ...payload };
+            val.label = payload.reason_name;
+            val.value = payload.id_reason;
+            setValue("reason", val);
+          }
+        }
+      }
     );
   };
 
@@ -214,11 +284,32 @@ const CreateAppointmentModal = ({ onHide }) => {
               />
             </div>
             <div className="col-lg-12">
-              <TextField
-                label="Reason"
+              <CreatableReactSelectField
                 name="reason"
+                label="Reason"
+                isMulti={false}
+                options={getValueLabelOptions(
+                  reasons,
+                  "reason_name",
+                  "id_reason"
+                )}
+                onCreateOption={(val) => {
+                  let req = {
+                    reason_name: val,
+                    id_doctor: formValues.id_doctor,
+                  };
+                  handleAddReason(req);
+                }}
+                onChange={(val) => {
+                  setValue("reason", val);
+                }}
+                menuPortalTarget={document.body}
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+                menuPosition="fixed"
                 rules={{
-                  required: "Please Enter Reason",
+                  required: "Please Select Reason",
                 }}
               />
             </div>

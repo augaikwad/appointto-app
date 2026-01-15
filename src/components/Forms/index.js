@@ -8,3 +8,4 @@ export { default as SelectField } from "./SelectField";
 export { default as TextFieldWithIcon } from "./TextFieldWithIcon";
 export { default as TextField } from "./TextField";
 export { default as MaskedField } from "./MaskedField";
+export { default as CreatableReactSelectField } from "./CreatableReactSelectField";

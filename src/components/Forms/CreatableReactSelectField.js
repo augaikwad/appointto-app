@@ -28,6 +28,7 @@ const CreatableReactSelectField = ({
       <Controller
         name={name}
         control={control}
+        rules={rules}
         render={({ field }) => (
           <CreatableSelect
             {...field} // Spreads: onChange, onBlur, value, ref

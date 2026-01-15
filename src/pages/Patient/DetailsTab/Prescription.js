@@ -83,7 +83,10 @@ const AddNewVitalModal = ({
 const Prescription = () => {
   const dispatch = useDispatch();
 
-  const { id_doctor } = useSelector((state) => state.user.details);
+  const { id_doctor, id_speciality } = useSelector(
+    (state) => state.user.details
+  );
+
   const { patientById } = useSelector((state) => state.patients);
   const { prescriptionForm } = useSelector((state) => state.prescription);
   const { dashboardListFilters } = useSelector((state) => state.appointments);
@@ -368,11 +371,13 @@ const Prescription = () => {
             <div className="col-lg-5">
               <ComplaintsTags />
             </div>
-            <div className="col-lg-5">
-              <ObservationTags />
-            </div>
-            <div className="col-lg-2">
-              {/* <div style={{ marginTop: 17 }}>
+            {id_speciality === 6 && (
+              <div className="col-lg-5">
+                <ObservationTags />
+              </div>
+            )}
+            {/* <div className="col-lg-2">
+              <div style={{ marginTop: 17 }}>
                 <button
                   className="btn btn-sm btn-link"
                   onClick={() => setToothChartShow(true)}
@@ -383,23 +388,24 @@ const Prescription = () => {
                   show={toothChartShow}
                   onHide={() => setToothChartShow(false)}
                 />
-              </div> */}
-            </div>
-          </div>
-          <div className="row">
+              </div> 
+            </div>*/}
+
             <div className="col-lg-5">
               <DiagnosisTags />
             </div>
-            <div className="col-lg-5">
-              <WorkDoneTags />
-            </div>
-            <div className="col-lg-2">
-              {/* <div style={{ marginTop: 17 }}>
+            {id_speciality === 6 && (
+              <div className="col-lg-5">
+                <WorkDoneTags />
+              </div>
+            )}
+            {/* <div className="col-lg-2">
+              <div style={{ marginTop: 17 }}>
                 <button className="btn btn-sm btn-link">
                   <FontAwesomeIcon icon={faTooth} /> Chart
                 </button>
-              </div> */}
-            </div>
+              </div> 
+            </div>*/}
           </div>
           <div className="row">
             <div className="col-lg-12">

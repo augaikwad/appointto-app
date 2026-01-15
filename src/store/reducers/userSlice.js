@@ -6,6 +6,7 @@ const userSlice = createSlice({
     details: {
       id_doctor: 0,
       id_clinic: 0,
+      id_speciality: 0,
       user_name: "",
     },
     appointmentStatuses: [],
