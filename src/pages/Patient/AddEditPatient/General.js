@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import ReactDOM from "react-dom";
 import { useFormContext } from "react-hook-form";
 import { PatientContext } from "../../../context/Patient";
 
@@ -68,6 +69,11 @@ const General = (props) => {
               inputOnChange={(date) => {
                 setValue("age", moment().diff(new Date(date), "years", false));
               }}
+              popperContainer={({ children }) =>
+                ReactDOM.createPortal(children, document.body)
+              }
+              dropdownMode="select"
+              popperClassName="datepicker-portal-fix"
             />
           </div>
           <div className="col-lg-4">

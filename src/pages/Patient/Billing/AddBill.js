@@ -141,8 +141,8 @@ const AddBill = () => {
       <div>
         <Tooltip text="Add Payment" placement="top">
           <button
-            type="button"
-            className={`${classes.listActionBtn} btn btn-inverse-info btn-icon`}
+            className={`btn btn-sm btn-primary`}
+            style={{ lineHeight: "1.4" }}
             disabled={row.is_Completed === 1}
             onClick={() => {
               dispatch(
@@ -154,7 +154,8 @@ const AddBill = () => {
               );
             }}
           >
-            <i className="fa fa-plus"></i>
+            Add Payment
+            {/* <i className="fa fa-plus"></i> */}
           </button>
         </Tooltip>
         <Tooltip text="Edit Bill" placement="top">

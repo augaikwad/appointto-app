@@ -169,18 +169,20 @@ const LastVisits = () => {
                                     .join(", ")}
                               </div>
                             </div>
-                            <div className="form-group inline-form-group">
-                              <label>Observations:</label>
-                              <div>
-                                {!!item.lstObservations &&
-                                  item.lstObservations.length > 0 &&
-                                  item.lstObservations
-                                    .map((elem) => {
-                                      return elem.name;
-                                    })
-                                    .join(", ")}
+                            {item.lstObservations && (
+                              <div className="form-group inline-form-group">
+                                <label>Observations:</label>
+                                <div>
+                                  {!!item.lstObservations &&
+                                    item.lstObservations.length > 0 &&
+                                    item.lstObservations
+                                      .map((elem) => {
+                                        return elem.name;
+                                      })
+                                      .join(", ")}
+                                </div>
                               </div>
-                            </div>
+                            )}
                             <div className="form-group inline-form-group">
                               <label>Diagnosis:</label>
                               <div>
@@ -193,18 +195,20 @@ const LastVisits = () => {
                                     .join(", ")}
                               </div>
                             </div>
-                            <div className="form-group inline-form-group">
-                              <label>Work Done:</label>
-                              <div>
-                                {!!item.lstWorkDone &&
-                                  item.lstWorkDone.length > 0 &&
-                                  item.lstWorkDone
-                                    .map((elem) => {
-                                      return elem.name;
-                                    })
-                                    .join(", ")}
+                            {item.lstWorkDone && (
+                              <div className="form-group inline-form-group">
+                                <label>Work Done:</label>
+                                <div>
+                                  {!!item.lstWorkDone &&
+                                    item.lstWorkDone.length > 0 &&
+                                    item.lstWorkDone
+                                      .map((elem) => {
+                                        return elem.name;
+                                      })
+                                      .join(", ")}
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </div>
                           <div className="col-lg-12 mb-3">
                             <h6>Medicines</h6>

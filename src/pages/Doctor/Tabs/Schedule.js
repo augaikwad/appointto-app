@@ -11,7 +11,7 @@ import {
   resetRegistration,
   setRegistrationActiveTab,
 } from "../../../store/reducers/doctorSlice";
-import { navigateTo } from "../../../store/reducers/navigationSlice";
+import { useHistory } from "react-router-dom";
 
 const useStyles = createUseStyles({
   customErrorMsg: {
@@ -59,9 +59,10 @@ const useStyles = createUseStyles({
 const Schedule = () => {
   const classes = useStyles();
   const disptach = useDispatch();
+  const history = useHistory();
 
   const { registrationActiveTab, clinicInfo } = useSelector(
-    (state) => state.doctors
+    (state) => state.doctors,
   );
 
   const [open, setOpen] = useState(false);
@@ -160,7 +161,7 @@ const Schedule = () => {
     disptach(
       updateScheduleInfo(newDays, () => {
         setOpen(true);
-      })
+      }),
     );
   };
 
@@ -170,7 +171,7 @@ const Schedule = () => {
         setTimeout(() => {
           disptach(resetRegistration());
           sessionStorage.clear();
-          disptach(navigateTo({ pathname: "login" }));
+          history.push("/login");
           setOpen(false);
         }, 2000);
       }
@@ -322,7 +323,7 @@ const Schedule = () => {
                     className="btn btn-sm btn-primary"
                     onClick={() => {
                       disptach(
-                        setRegistrationActiveTab(registrationActiveTab - 1)
+                        setRegistrationActiveTab(registrationActiveTab - 1),
                       );
                     }}
                   >

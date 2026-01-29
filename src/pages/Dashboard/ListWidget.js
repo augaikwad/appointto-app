@@ -19,7 +19,6 @@ import {
 } from "../../store/actions/appointmentActions";
 import { setAppointmentModal } from "../../store/reducers/appointmentsSlice";
 import { getPatientById } from "../../store/actions/patientActions";
-import { navigateTo } from "../../store/reducers/navigationSlice";
 
 const useStyles = createUseStyles({
   tr: {
@@ -51,6 +50,7 @@ const useStyles = createUseStyles({
 const ListWidget = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const { dashboardList, dashboardListFilters } = useSelector(
     (state) => state.appointments
@@ -75,9 +75,7 @@ const ListWidget = () => {
   const handleButtonClick = (patientId, pageState) => {
     dispatch(
       getPatientById({ PatientId: patientId }, () => {
-        dispatch(
-          navigateTo({ pathname: `/patient/${patientId}`, state: pageState })
-        );
+        history.push(`/patient/${patientId}`, pageState);
       })
     );
   };

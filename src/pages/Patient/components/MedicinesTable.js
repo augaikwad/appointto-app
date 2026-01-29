@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { Button, Form } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
@@ -17,7 +17,6 @@ import {
 } from "../../../store/actions/prescriptionActions";
 import { hasError } from "../../../helpers/hasError";
 import clsx from "clsx";
-import { eachRight } from "lodash";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
@@ -223,6 +222,7 @@ const timingOptions = [
 const NewMedTable = ({ control, setValue }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const unitRef = useRef(null);
 
   const { id_doctor } = useSelector((state) => state.user.details);
   const { rxGroups } = useSelector((state) => state.prescription);
@@ -243,8 +243,8 @@ const NewMedTable = ({ control, setValue }) => {
 
   const [durationOpt, setDurationOpt] = useState([]);
 
-  const { register, watch, formState, getValues } = useFormContext();
-  const { fields, append, remove } = useFieldArray({
+  const { register, watch, formState, getValues, setFocus } = useFormContext();
+  const { fields, append, remove, update } = useFieldArray({
     control,
     name: "prescribedMedicines",
   });
@@ -261,6 +261,11 @@ const NewMedTable = ({ control, setValue }) => {
         components={{
           DropdownIndicator: () => null,
           IndicatorSeparator: () => null,
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Tab" || e.keyCode === 9) {
+            setFocus(`prescribedMedicines.${index}.medicineName`);
+          }
         }}
       />
     );
@@ -281,6 +286,17 @@ const NewMedTable = ({ control, setValue }) => {
         {...props}
         rules={{ required: index < fields.length - 1 }}
         onChange={(val) => {
+          const vals = { ...val };
+          vals.type = vals?.type ? { label: val.type, value: val.type } : null;
+          vals.unit = vals?.unit ? { label: val.unit, value: val.unit } : null;
+          vals.timing = vals?.timing
+            ? { label: val.timing, value: val.timing }
+            : null;
+          vals.duration = vals?.duration
+            ? { label: val.duration, value: val.duration }
+            : null;
+
+          update(index, vals);
           setValue(name, val);
           if (fields.length - 1 === index) {
             append(initFields);
@@ -300,7 +316,10 @@ const NewMedTable = ({ control, setValue }) => {
         // "ArrowLeft",
         // "ArrowRight",
       ];
-      if (!acceptedKeys.includes(e.key)) {
+      if (e.key === "Tab" || e.keyCode === 9) {
+        unitRef.current?.focus();
+        setFocus(`prescribedMedicines.${index}.unit`);
+      } else if (!acceptedKeys.includes(e.key)) {
         e.preventDefault();
       }
     };
@@ -340,26 +359,13 @@ const NewMedTable = ({ control, setValue }) => {
         )}
       />
     );
-    // return (
-    //   <Controller
-    //     control={control}
-    //     name={name}
-    //     rules={{ required: index < fields.length - 1 }}
-    //     render={({ field }) => (
-    //       <InputMask
-    //         {...field}
-    //         mask="9-9-9"
-    //         className="form-control no-border"
-    //       />
-    //     )}
-    //   />
-    // );
   };
 
   const unitFormatter = ({ name, index }) => {
     return (
       <ReactSelectField
         name={name}
+        ref={unitRef}
         options={unitOptions}
         menuPortalTarget={document.body}
         className={classes.reactSelect}
@@ -367,6 +373,11 @@ const NewMedTable = ({ control, setValue }) => {
         components={{
           DropdownIndicator: () => null,
           IndicatorSeparator: () => null,
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Tab" || e.keyCode === 9) {
+            setFocus(`prescribedMedicines.${index}.timing`);
+          }
         }}
       />
     );
@@ -383,6 +394,11 @@ const NewMedTable = ({ control, setValue }) => {
         components={{
           DropdownIndicator: () => null,
           IndicatorSeparator: () => null,
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Tab" || e.keyCode === 9) {
+            setFocus(`prescribedMedicines.${index}.duration`);
+          }
         }}
       />
     );
@@ -412,6 +428,11 @@ const NewMedTable = ({ control, setValue }) => {
             });
           }
           setDurationOpt(newDurationOpt);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Tab" || e.keyCode === 9) {
+            setFocus(`prescribedMedicines.${index}.note`);
+          }
         }}
       />
     );
@@ -530,7 +551,7 @@ const NewMedTable = ({ control, setValue }) => {
         (item) =>
           item.duration === undefined ||
           item.duration === null ||
-          item.duration === ""
+          item.duration === "",
       );
     }
 
@@ -649,7 +670,7 @@ const NewMedTable = ({ control, setValue }) => {
                 if (callback && typeof callback === "function") {
                   callback();
                 }
-              })
+              }),
             );
           }}
           onHide={() => setOpen(false)}
@@ -663,7 +684,7 @@ const NewMedTable = ({ control, setValue }) => {
             } else {
               cogoToast.error(
                 "Please fill all values for Medicines",
-                toastOption
+                toastOption,
               );
             }
           }}
@@ -722,8 +743,8 @@ const NewMedTable = ({ control, setValue }) => {
                           { RxGroupId: group.rxGroupId, id_doctor },
                           () => {
                             dispatch(getRxGroups(id_doctor));
-                          }
-                        )
+                          },
+                        ),
                       );
                     }}
                   >

@@ -374,7 +374,7 @@ const AppointmentsList = () => {
             toolbar: CustomToolbar,
           }}
           popup={true}
-          step={15}
+          step={10}
         />
       </Card>
     </div>

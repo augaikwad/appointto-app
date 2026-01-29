@@ -19,6 +19,7 @@ const Modal = ({
   scrollable = true,
   dialogClassName = "",
   children,
+  ...restProps
 }) => {
   const classes = useStyles();
 
@@ -33,6 +34,7 @@ const Modal = ({
       className={classes.modal}
       dialogClassName={dialogClassName}
       backdropClassName="d-none"
+      {...restProps}
     >
       {title !== null && (
         <BSModal.Header closeButton>

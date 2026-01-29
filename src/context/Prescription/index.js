@@ -183,10 +183,10 @@ export const useActions = (state, dispatch) => ({
       type: actionTypes.GET_DOCTOR_MEDICINES,
     });
   },
-  searchMedicines: (key) => {
+  searchMedicines: (searchParam) => {
     dispatch({
       type: actionTypes.SEARCH_MEDICINES,
-      key: key,
+      searchParam: searchParam,
     });
   },
   savePrescription: (req, callback) => {
@@ -227,16 +227,16 @@ export const useActions = (state, dispatch) => ({
 const PrescriptionContextProvider = (props) => {
   const [state, dispatch] = useReducer(
     reducer(props.globalState),
-    initialState
+    initialState,
   );
   const actions = useActions(
     state,
     applyPrescriptionContextMiddleware(
       dispatch,
       props.history,
-      props.globalActions
+      props.globalActions,
     ),
-    props.globalActions
+    props.globalActions,
   );
   return (
     <PrescriptionContext.Provider value={[state, actions]}>
@@ -261,5 +261,5 @@ const mapActionsToProps = (actions) => {
 
 export default compose(
   withContext(GlobalContext, mapStateToProps, mapActionsToProps),
-  withRouter
+  withRouter,
 )(PrescriptionContextProvider);

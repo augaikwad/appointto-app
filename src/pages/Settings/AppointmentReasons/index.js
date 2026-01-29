@@ -71,38 +71,45 @@ const Index = () => {
     }
   };
 
+  const { fetchData: updateReason } = useAxios();
+  const { fetchData: createReason } = useAxios();
+
+  const handleSaveClick = () => {
+    const payload = { ...selectedReason };
+    if (isAdd) {
+      payload.id_doctor = id_doctor;
+
+      createReason(
+        {
+          url: "AppointmentReason/create-reason",
+          method: "post",
+          data: payload,
+        },
+        callback
+      );
+    } else {
+      updateReason(
+        {
+          url: "AppointmentReason/update-reason",
+          method: "post",
+          data: payload,
+        },
+        callback
+      );
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    // 'Enter' is the modern standard (replaces the old keyCode 13)
+    if (event.key === "Enter") {
+      handleSaveClick();
+      console.log("Enter key pressed!", event.target.value, isAdd);
+    }
+  };
+
   const FooterActions = () => {
-    const { fetchData: updateReason } = useAxios();
-    const { fetchData: createReason } = useAxios();
-
     return (
-      <Button
-        className="btn btn-sm btn-primary"
-        onClick={() => {
-          const payload = { ...selectedReason };
-          if (isAdd) {
-            payload.id_doctor = id_doctor;
-
-            createReason(
-              {
-                url: "AppointmentReason/create-reason",
-                method: "post",
-                data: payload,
-              },
-              callback
-            );
-          } else {
-            updateReason(
-              {
-                url: "AppointmentReason/update-reason",
-                method: "post",
-                data: payload,
-              },
-              callback
-            );
-          }
-        }}
-      >
+      <Button className="btn btn-sm btn-primary" onClick={handleSaveClick}>
         Save
       </Button>
     );
@@ -205,6 +212,7 @@ const Index = () => {
                   reason_name: e.target.value,
                 }));
               }}
+              onKeyDown={handleKeyDown}
             />
           </Col>
         </Row>

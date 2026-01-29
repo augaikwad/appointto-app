@@ -1,5 +1,5 @@
-.hide{
-    display:none !important;
+.hide {
+  display: none !important;
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -10,56 +10,60 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }
 
 #medicineAutoField,
 #TimingAutocomplete,
 #DurationAutocomplete {
-    // width: 450px !important;
+  // width: 450px !important;
+  padding: 0;
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 20%);
+
+  & > li {
     padding: 0;
-    box-shadow: 2px 2px 4px rgb(0 0 0 / 20%);
+    display: flex;
 
-    &>li {
-        padding: 0;
-        display: flex;
+    & > a {
+      padding: 0;
+      line-height: 28px;
+      font-size: 14px;
+      display: flex;
+      flex: 1;
 
-        &>a {
-            padding: 0;
-            line-height: 28px;
-            font-size: 14px;
-            display: flex;
-            flex: 1;
+      & > span {
+        padding: 0 10px;
+        flex: 1;
 
-            &>span {
-                padding: 0 10px;
-                flex: 1;
-
-                &:first-child {
-                    flex: 0;
-                    min-width: 50px
-                }
-            }
+        &:first-child {
+          flex: 0;
+          min-width: 50px;
         }
+      }
     }
+  }
 }
 
-.medicinesAutocomplete{
-    & .rbt-input-hint {
-        top: 3px !important;
-    }
+.medicinesAutocomplete {
+  & .rbt-input-hint {
+    top: 3px !important;
+  }
 }
 
-#SelectRxGroupModal{
-    width: 60% !important;
+#SelectRxGroupModal {
+  width: 60% !important;
 }
 
-#ToothChartModal{
-    width: 675px !important;
-    height: auto !important;
+#ToothChartModal {
+  width: 675px !important;
+  height: auto !important;
 }
 
-div.react-datepicker-popper{
-    background-color: #ffffff !important;
+div.react-datepicker-popper {
+  background-color: #ffffff !important;
+}
+
+div.react-datepicker-popper.datepicker-portal-fix {
+  z-index: 1052;
 }

@@ -26,7 +26,7 @@ import cogoToast from "cogo-toast";
 import PrescriptionPrint from "../components/PrescriptionPrint";
 import { useReactToPrint } from "react-to-print";
 import { allowOnlyNumbers } from "../../../utils/common";
-import { useLocation } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getPrintingSetting } from "../../../store/actions/settingActions";
 import {
@@ -38,7 +38,6 @@ import {
   updateAppointment,
   getDashboardAppointments,
 } from "../../../store/actions/appointmentActions";
-import { navigateTo } from "../../../store/reducers/navigationSlice";
 import moment from "moment";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
@@ -82,9 +81,10 @@ const AddNewVitalModal = ({
 
 const Prescription = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const { id_doctor, id_speciality } = useSelector(
-    (state) => state.user.details
+    (state) => state.user.details,
   );
 
   const { patientById } = useSelector((state) => state.patients);
@@ -144,9 +144,9 @@ const Prescription = () => {
           dispatch(
             updateAppointment(req, () => {
               dispatch(getDashboardAppointments(dashboardListFilters));
-            })
+            }),
           );
-        })
+        }),
       );
     }
   };
@@ -154,14 +154,10 @@ const Prescription = () => {
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     onAfterPrint: () => {
-      dispatch(
-        navigateTo({
-          pathname: "/patient/" + patientById.id_patient,
-          state: {
-            selectedTab: 2,
-          },
-        })
-      );
+      history.push({
+        pathname: `/patient/${patientById.id_patient}`,
+        state: { selectedTab: 2 },
+      });
     },
   });
 
@@ -206,20 +202,16 @@ const Prescription = () => {
           handleUpdateAppointment();
           dispatch(getPrescriptions({ PatientId: res.patientId }));
           if (btnId === "SaveNext") {
-            dispatch(
-              navigateTo({
-                pathname: "/patient/" + patientById.id_patient,
-                state: {
-                  selectedTab: 2,
-                },
-              })
-            );
+            history.push({
+              pathname: `/patient/${patientById.id_patient}`,
+              state: { selectedTab: 2 },
+            });
           } else if (btnId === "SavePrint") {
             setPrintData(res);
             handlePrint();
           }
           reset();
-        })
+        }),
       );
     }
   };
@@ -232,7 +224,7 @@ const Prescription = () => {
         onClick={() => {
           if (newVital) {
             const isAlreadySelected = fields.some(
-              (item) => item.name === newVital.value
+              (item) => item.name === newVital.value,
             );
             if (!isAlreadySelected) {
               append({
@@ -244,7 +236,7 @@ const Prescription = () => {
             } else {
               cogoToast.error(
                 "Vital already selected, Please select other option.",
-                toastOption
+                toastOption,
               );
             }
           } else {
@@ -271,11 +263,11 @@ const Prescription = () => {
       console.log(`${daysDifference} day${daysDifference !== 1 ? "s" : ""}`);
     } else if (monthsDifference < 12) {
       return console.log(
-        `${monthsDifference} month${monthsDifference !== 1 ? "s" : ""}`
+        `${monthsDifference} month${monthsDifference !== 1 ? "s" : ""}`,
       );
     } else {
       return console.log(
-        `${yearsDifference} year${yearsDifference !== 1 ? "s" : ""}`
+        `${yearsDifference} year${yearsDifference !== 1 ? "s" : ""}`,
       );
     }
   };
@@ -351,7 +343,7 @@ const Prescription = () => {
                     e.preventDefault();
                     setShow(true);
                   }}
-                  tabindex="-1"
+                  tabIndex="-1"
                 >
                   <i className="fa fa-plus"></i>
                 </button>
@@ -453,9 +445,9 @@ const Prescription = () => {
                               new Date(
                                 moment().add(
                                   value,
-                                  watch("nextVisitUnit").toLowerCase()
-                                )
-                              )
+                                  watch("nextVisitUnit").toLowerCase(),
+                                ),
+                              ),
                             );
                           } else {
                             setValue("nextVisitDate", new Date());
@@ -478,8 +470,8 @@ const Prescription = () => {
                             setValue(
                               "nextVisitDate",
                               new Date(
-                                moment().add(nextVisit, value.toLowerCase())
-                              )
+                                moment().add(nextVisit, value.toLowerCase()),
+                              ),
                             );
                           }
                         }}

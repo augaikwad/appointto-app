@@ -21,7 +21,7 @@ const toastOption = { hideAfter: 5, position: "top-right" };
 export const getComplaints = (id_doctor, callback) => async (dispatch) => {
   try {
     const response = await service.post(
-      "Prescription/getcomplaints?id_doctor=" + id_doctor
+      "Prescription/getcomplaints?id_doctor=" + id_doctor,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -38,7 +38,7 @@ export const getComplaints = (id_doctor, callback) => async (dispatch) => {
 export const getObservations = (id_doctor, callback) => async (dispatch) => {
   try {
     const response = await service.post(
-      "Prescription/getobservations?id_doctor=" + id_doctor
+      "Prescription/getobservations?id_doctor=" + id_doctor,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -55,7 +55,7 @@ export const getObservations = (id_doctor, callback) => async (dispatch) => {
 export const getDiagnosis = (id_doctor, callback) => async (dispatch) => {
   try {
     const response = await service.post(
-      "Prescription/getdiagnosis?id_doctor=" + id_doctor
+      "Prescription/getdiagnosis?id_doctor=" + id_doctor,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -72,7 +72,7 @@ export const getDiagnosis = (id_doctor, callback) => async (dispatch) => {
 export const getWorkDone = (id_doctor, callback) => async (dispatch) => {
   try {
     const response = await service.post(
-      "Prescription/getworkdone?id_doctor=" + id_doctor
+      "Prescription/getworkdone?id_doctor=" + id_doctor,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -89,7 +89,7 @@ export const getWorkDone = (id_doctor, callback) => async (dispatch) => {
 export const getAdvices = (id_doctor, callback) => async (dispatch) => {
   try {
     const response = await service.post(
-      "Prescription/getadvice?id_doctor=" + id_doctor
+      "Prescription/getadvice?id_doctor=" + id_doctor,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -106,7 +106,7 @@ export const getAdvices = (id_doctor, callback) => async (dispatch) => {
 export const getInvestigations = (id_doctor, callback) => async (dispatch) => {
   try {
     const response = await service.post(
-      "Prescription/getinvestigations?id_doctor=" + id_doctor
+      "Prescription/getinvestigations?id_doctor=" + id_doctor,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -123,7 +123,7 @@ export const getInvestigations = (id_doctor, callback) => async (dispatch) => {
 export const getAdviceGroup = (id_doctor, callback) => async (dispatch) => {
   try {
     const response = await service.post(
-      "Prescription/GetAdviceGroup?DoctorId=" + id_doctor
+      "Prescription/GetAdviceGroup?DoctorId=" + id_doctor,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -155,7 +155,7 @@ export const getInvestigationsGroup =
   (id_doctor, callback) => async (dispatch) => {
     try {
       const response = await service.post(
-        "Prescription/GetInvestigationGroup?DoctorId=" + id_doctor
+        "Prescription/GetInvestigationGroup?DoctorId=" + id_doctor,
       );
       const { response_code, payload } = response.data;
       if (response_code === 2000) {
@@ -173,7 +173,7 @@ export const saveInvestigationsGroup = (req, callback) => async (dispatch) => {
   try {
     const response = await service.post(
       "Prescription/SaveInvestigationGroup",
-      req
+      req,
     );
     const { response_code } = response.data;
     if (response_code === 2000) {
@@ -189,7 +189,7 @@ export const saveInvestigationsGroup = (req, callback) => async (dispatch) => {
 export const getMedicinesByDoctorId = (id_doctor) => async (dispatch) => {
   try {
     const response = await service.get(
-      "Medicine/get-doctor-medicine?id_doctor=" + id_doctor
+      "Medicine/get-doctor-medicine?id_doctor=" + id_doctor,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -203,7 +203,7 @@ export const getMedicinesByDoctorId = (id_doctor) => async (dispatch) => {
 export const getRxGroups = (id_doctor, callback) => async (dispatch) => {
   try {
     const response = await service.post(
-      "Prescription/GetRxGroup?DoctorId=" + id_doctor
+      "Prescription/GetRxGroup?DoctorId=" + id_doctor,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -231,9 +231,10 @@ export const saveRxGroup = (req, callback) => async (dispatch) => {
   }
 };
 
-export const searchMedicines = (key) => async (dispatch) => {
+export const searchMedicines = (searchParam) => async (dispatch) => {
   try {
-    const response = await service.get("Medicine/Search?Keywords=" + key);
+    const queryString = new URLSearchParams(searchParam).toString();
+    const response = await service.get(`Medicine/Search?${queryString}`);
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setMedicines(payload));
@@ -277,7 +278,7 @@ export const saveUpdateTag = (category, req, callback) => async (dispatch) => {
   try {
     const response = await service.post(
       "Prescription/Save" + tagsCategory[category],
-      req
+      req,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -294,7 +295,7 @@ export const setPreviousPrescription = (req, callback) => async (dispatch) => {
   try {
     const queryString = new URLSearchParams(req);
     const response = await service.post(
-      "Prescription/setprevious?" + queryString
+      "Prescription/setprevious?" + queryString,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {

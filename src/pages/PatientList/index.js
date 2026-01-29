@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useLocation, withRouter } from "react-router-dom";
+import { useLocation, withRouter, useHistory } from "react-router-dom";
 import { Card } from "../../components";
 import { TextField } from "../../components/Forms";
 import { Row, Col, Button } from "react-bootstrap";
@@ -28,7 +28,6 @@ import {
   getPatientById,
   deletePatient,
 } from "../../store/actions/patientActions";
-import { navigateTo } from "../../store/reducers/navigationSlice";
 import { createAppointment } from "../../store/actions/appointmentActions";
 import { setAppointmentModal } from "../../store/reducers/appointmentsSlice";
 import {
@@ -101,13 +100,14 @@ const useStyles = createUseStyles({
 const PatientList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const history = useHistory();
   const location = useLocation();
   const { isInit } = location.state;
 
   const { selectedDoctorId } = useSelector((state) => state.user);
   const { id_clinic } = useSelector((state) => state.user.details);
   const { patientList, patientListFilter, patientModal } = useSelector(
-    (state) => state.patients
+    (state) => state.patients,
   );
 
   const { appointmentModal } = useSelector((state) => state.appointments);
@@ -127,7 +127,7 @@ const PatientList = () => {
       getPatientsList({
         ...patientListFilter,
         ...opt,
-      })
+      }),
     );
   };
 
@@ -142,13 +142,8 @@ const PatientList = () => {
   const handleButtonClick = (patientId, tab) => {
     dispatch(
       getPatientById({ PatientId: patientId }, (res) => {
-        dispatch(
-          navigateTo({
-            pathname: `/patient/${patientId}`,
-            state: { selectedTab: tab },
-          })
-        );
-      })
+        history.push(`/patient/${patientId}`, { selectedTab: tab });
+      }),
     );
   };
 
@@ -197,7 +192,7 @@ const PatientList = () => {
                 <Col lg={3}>
                   {!areObjectsEqual(
                     patientListFilter,
-                    initialState.patientListFilter
+                    initialState.patientListFilter,
                   ) && (
                     <Button
                       className="btn btn-sm btn-primary"
@@ -207,7 +202,7 @@ const PatientList = () => {
                           getPatientsList({
                             ...initialState.patientListFilter,
                             id_clinic,
-                          })
+                          }),
                         );
                       }}
                     >
@@ -301,7 +296,7 @@ const PatientList = () => {
                                   id_patient: item.id_patient,
                                   id_doctor: selectedDoctorId,
                                 },
-                              })
+                              }),
                             );
                           }}
                         />
@@ -344,10 +339,10 @@ const PatientList = () => {
                                         ...patientModal.formValue,
                                         ...res,
                                       }),
-                                    })
+                                    }),
                                   );
-                                }
-                              )
+                                },
+                              ),
                             );
                           }}
                           icon={faPencil}
@@ -373,9 +368,9 @@ const PatientList = () => {
                                 dispatch(
                                   deletePatient(item.id_patient, () => {
                                     dispatch(
-                                      getPatientsList(patientListFilter)
+                                      getPatientsList(patientListFilter),
                                     );
-                                  })
+                                  }),
                                 );
                               }
                             });

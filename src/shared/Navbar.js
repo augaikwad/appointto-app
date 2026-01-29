@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useHistory } from "react-router-dom";
 import NavbarSearch from "./NavbarSearch";
 import { persistStore } from "redux-persist";
 import store from "../store";
 import LogoLarge from "../assets/images/logo-large.svg";
 import LogoMini from "../assets/images/logo-mini.svg";
 import { useDispatch } from "react-redux";
-import { navigateTo } from "../store/reducers/navigationSlice";
 import { resetRegistration } from "../store/reducers/doctorSlice";
 
 function Navbar(props) {
   const dispatch = useDispatch();
+  const history = useHistory();
   let { pathname } = useLocation();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -34,10 +34,16 @@ function Navbar(props) {
   return (
     <nav className="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div className="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-        <Link className="navbar-brand brand-logo mr-5" to="/">
+        <Link
+          className="navbar-brand brand-logo mr-5"
+          to={{ pathname: "/dashboard", state: { isInit: true } }}
+        >
           <img src={LogoLarge} className="mr-2" alt="logo" />
         </Link>
-        <Link className="navbar-brand brand-logo-mini" to="/">
+        <Link
+          className="navbar-brand brand-logo-mini"
+          to={{ pathname: "/dashboard", state: { isInit: true } }}
+        >
           <img src={LogoMini} alt="logo" />
         </Link>
       </div>
@@ -106,7 +112,7 @@ function Navbar(props) {
                     sessionStorage.clear();
                     localStorage.clear();
                     dispatch(resetRegistration());
-                    dispatch(navigateTo({ pathname: "/login" }));
+                    history.push(`/login`);
                   }}
                 >
                   Login

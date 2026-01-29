@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import LoginLayout from "../shared/LoginLayout";
 import { Modal } from "../components";
@@ -8,7 +8,6 @@ import { TextField, TextFieldWithIcon } from "../components/Forms";
 import { login } from "../store/actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
 import { getDoctorsByClinicId } from "../store/actions/userActions";
-import { navigateTo } from "../store/reducers/navigationSlice";
 import {
   getOTPForResetPassword,
   verifyOTP,
@@ -21,7 +20,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
   const dispatch = useDispatch();
 
   const { forgetPasswordStep, otpData, verifyOTPData } = useSelector(
-    (state) => state.doctors
+    (state) => state.doctors,
   );
   const form = useForm({
     defaultValues: {
@@ -38,7 +37,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
           ...req,
           country_code: "91",
           otp_for: 2,
-        })
+        }),
       );
     } else if (forgetPasswordStep === 2) {
       let otpDataObj = { ...otpData };
@@ -57,7 +56,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
           reset({ mobile_no: "" });
           dispatch(resetRegistration());
           onHide();
-        })
+        }),
       );
     }
   };
@@ -176,6 +175,7 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
 
 function Login(props) {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const [isForgotPassModalOpen, setIsForgotPassModalOpen] = useState(false);
 
@@ -188,12 +188,10 @@ function Login(props) {
         const { id_clinic, id_doctor } = res;
         dispatch(
           getDoctorsByClinicId({ id_clinic }, id_doctor, () => {
-            dispatch(
-              navigateTo({ pathname: "/dashboard", state: { isInit: true } })
-            );
-          })
+            history.push(`/dashboard`, { isInit: true });
+          }),
         );
-      })
+      }),
     );
   };
 

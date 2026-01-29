@@ -56,7 +56,7 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
 
               let val = getValues(name) || [];
               setValue(name, [...val, ...[res]]);
-            })
+            }),
           );
           return val;
         }}
@@ -76,7 +76,7 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
             saveAdviceGroup(req, () => {
               callback();
               dispatch(getAdviceGroup(id_doctor));
-            })
+            }),
           );
         }}
         selectGroupBtnClick={() => {
@@ -94,12 +94,12 @@ const AdvicesTags = ({ name = "lstadvice" }) => {
         }}
         onGroupSelect={(group) => {
           const isGrpPresent = selectedGroup.some(
-            (itm) => itm.adviceGroupId === group.adviceGroupId
+            (itm) => itm.adviceGroupId === group.adviceGroupId,
           );
           if (isGrpPresent) {
             cogoToast.warn(
               "Group already selected, Please select other group.",
-              toastOption
+              toastOption,
             );
           } else {
             setSelectedGroup([...selectedGroup, ...[group]]);

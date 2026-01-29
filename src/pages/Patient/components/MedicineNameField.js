@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Modal, InputField } from "../../../components";
 import CreatableSelect from "react-select/creatable";
 import { createUseStyles } from "react-jss";
@@ -11,6 +11,7 @@ import {
   searchMedicines,
 } from "../../../store/actions/prescriptionActions";
 import useAxios from "../../../hooks/useAxios";
+import _ from "lodash";
 
 const useStyles = createUseStyles({
   nameEditBtn: {},
@@ -49,7 +50,7 @@ const MedicineNameField = ({
   isFilled,
   onChange,
   setValue,
-  ind,
+  index,
   rules = {},
 }) => {
   const classes = useStyles();
@@ -57,12 +58,12 @@ const MedicineNameField = ({
 
   const { id_doctor } = useSelector((state) => state.user.details);
   const { doctorMedicines, medicines } = useSelector(
-    (state) => state.prescription
+    (state) => state.prescription,
   );
 
   const [show, setShow] = useState(false);
 
-  const { watch } = useFormContext();
+  const { watch, setFocus } = useFormContext();
   const medicineWatch = watch(name);
 
   const [composition, setComposition] = useState("");
@@ -143,21 +144,26 @@ const MedicineNameField = ({
           fetchDoctorsMedicines();
           setValue(`${name}`, getOptions([res.payload])[0]);
           onChange(getOptions([res.payload])[0]);
+          setFocus(`prescribedMedicines.${index}.dose`);
         }
-      }
+      },
     );
   };
+
+  const handleInputChange = useCallback(
+    _.debounce((value) => {
+      if (value.length > 2) {
+        dispatch(searchMedicines({ Keywords: value, id_doctor: id_doctor }));
+      }
+    }, 1000),
+  );
 
   return (
     <>
       <CreatableReactSelectField
         name={name}
         options={getOptions([...doctorMedicines, ...medicines])}
-        onInputChange={(value) => {
-          if (value.length > 2) {
-            dispatch(searchMedicines(value));
-          }
-        }}
+        onInputChange={handleInputChange}
         onCreateOption={(val) => {
           let req = {
             medicineId: 0,

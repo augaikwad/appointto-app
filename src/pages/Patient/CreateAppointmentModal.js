@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Modal } from "../../components";
 import {
@@ -53,6 +53,7 @@ const getReasonObjByName = (name, reasons) => {
 const CreateAppointmentModal = ({ onHide }) => {
   const location = useLocation();
   const dispatch = useDispatch();
+  const reasonRef = useRef(false);
 
   const [reasons, setReasons] = useState([]);
 
@@ -128,6 +129,7 @@ const CreateAppointmentModal = ({ onHide }) => {
 
   const callback = () => {
     onHide();
+    reasonRef.current = false;
     if (["/dashboard", "/"].includes(location.pathname)) {
       dispatch(getDashboardAppointments(dashboardListFilters));
     }
@@ -153,6 +155,7 @@ const CreateAppointmentModal = ({ onHide }) => {
     return (
       <div className="text-right">
         <Button
+          type="submit"
           className="btn btn-sm btn-primary"
           onClick={handleSubmit(onSubmit)}
         >
@@ -300,8 +303,19 @@ const CreateAppointmentModal = ({ onHide }) => {
                   };
                   handleAddReason(req);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    reasonRef.current = true;
+                  }
+                }}
                 onChange={(val) => {
                   setValue("reason", val);
+
+                  //Check if this change was driven by the Enter key
+                  if (reasonRef.current) {
+                    // Manually trigger the RHF submit
+                    handleSubmit(onSubmit)();
+                  }
                 }}
                 menuPortalTarget={document.body}
                 styles={{

@@ -272,6 +272,7 @@ const AddEditPatientModal = (props) => {
         }}
         dialogClassName="modal-1030px"
         footerActions={<ModalFooterActions />}
+        enforceFocus={false}
       >
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
