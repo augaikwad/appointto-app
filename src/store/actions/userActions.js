@@ -1,5 +1,4 @@
 import service from "../../service";
-import cogoToast from "cogo-toast";
 import {
   setUser,
   setAppointmentStatuses,
@@ -10,16 +9,15 @@ import {
 import { setAuthToken } from "../../helpers/setAuthToken";
 import { setDashboardListFilters } from "../reducers/appointmentsSlice";
 
-const toastOption = { hideAfter: 5, position: "top-right" };
-
 // Login user
 export const login = (request, callback) => async (dispatch) => {
   try {
-    const response = await service.post("Login/login", request);
+    const response = await service.post("Login/login", request, {
+      silent: false,
+      showNotification: true,
+    });
     const { response_code, payload, message } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
-
       const { token } = payload;
       dispatch(setUser(payload));
 
@@ -60,22 +58,19 @@ export const getDoctorsByClinicId =
     try {
       const stringParams = new URLSearchParams(req);
       const response = await service.get(
-        "Doctor/get_doctorlist?" + stringParams
+        "Doctor/get_doctorlist?" + stringParams,
       );
       const { response_code, payload } = response.data;
       if (response_code === 2000) {
         dispatch(setDoctorsByClinicId(payload));
-
-        if (id_doctor) {
-          let idDoctor = id_doctor;
-          if (idDoctor === 0) {
-            idDoctor = payload[0].id_doctor;
-          }
+        if (id_doctor !== undefined && payload.length) {
+          const idDoctor = id_doctor === 0 ? payload[0].id_doctor : id_doctor;
+          const selectedDoctor = payload.find(
+            (dr) => dr.id_doctor === idDoctor,
+          );
 
           dispatch(setSelectedDoctorId(idDoctor));
-          dispatch(
-            setSelectedDoctor(payload.find((dr) => dr.id_doctor === idDoctor))
-          );
+          dispatch(setSelectedDoctor(selectedDoctor));
           dispatch(setDashboardListFilters({ id_doctor: idDoctor }));
         }
 

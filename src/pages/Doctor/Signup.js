@@ -6,15 +6,17 @@ import { Button } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { navigateTo } from "../../store/reducers/navigationSlice";
 import { signupUser } from "../../store/actions/doctorActions";
+import { useHistory } from "react-router-dom";
 
 function Register(props) {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const { otpData, verifyOTPData } = useSelector((state) => state.doctors);
 
   useEffect(() => {
     if (otpData === null && verifyOTPData === null) {
-      dispatch(navigateTo({ pathname: "/login" }));
+      history.push("/login");
     }
   }, [otpData, verifyOTPData]);
 
@@ -35,8 +37,7 @@ function Register(props) {
       termsAccepted: req.termsAccepted ? 1 : 0,
       registrationToken: verifyOTPData.registration_token,
     };
-
-    dispatch(signupUser(req));
+    dispatch(signupUser(req, history));
   };
 
   return (
@@ -125,7 +126,8 @@ function Register(props) {
                     <Button
                       variant="link"
                       onClick={() => {
-                        dispatch(navigateTo({ pathname: "/login" }));
+                        history.push("/login");
+                        // dispatch(navigateTo({ pathname: "/login" }));
                       }}
                     >
                       Login

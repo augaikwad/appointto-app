@@ -22,12 +22,15 @@ const PrescriptionSetting = () => {
     dispatch(
       getPrintingSetting(id_doctor, (res) => {
         reset(res);
-      })
+      }),
     );
   }, []);
 
   const onSubmit = (formData) => {
     let request = { ...formData };
+    // Object.keys(request).forEach((key) => {
+    //   request[key] = Number(request[key]);
+    // });
     request.id_doctor = id_doctor;
     request.id_clinic = id_clinic;
     if (prescriptionMargins.hasOwnProperty("id")) {
@@ -46,6 +49,7 @@ const PrescriptionSetting = () => {
               <TextField
                 name="hearder_margin"
                 type="number"
+                // step="any"
                 label="Header Margin (Inches)"
               />
             </Col>
@@ -53,6 +57,7 @@ const PrescriptionSetting = () => {
               <TextField
                 name="footer_margin"
                 type="number"
+                // step="any"
                 label="Footer Margin (Inches)"
               />
             </Col>
@@ -60,6 +65,7 @@ const PrescriptionSetting = () => {
               <TextField
                 name="left_margin"
                 type="number"
+                // step="any"
                 label="Left Margin (Inches)"
               />
             </Col>
@@ -67,6 +73,7 @@ const PrescriptionSetting = () => {
               <TextField
                 name="right_margin"
                 type="number"
+                // step="any"
                 label="Right Margin (Inches)"
               />
             </Col>

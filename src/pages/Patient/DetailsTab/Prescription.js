@@ -106,6 +106,7 @@ const Prescription = () => {
   const form = useForm({
     defaultValues: {
       ...prescriptionForm,
+      id_doctor: id_doctor,
       vitals: [],
       prescribedMedicines: [
         {
@@ -179,6 +180,7 @@ const Prescription = () => {
           Dose: med.dose,
           Timing: med.timing.value,
           Duration: med.duration.value,
+          id_doctor: id_doctor,
         };
         if (med.note !== "") {
           medObj.Note = med.note;

@@ -1,11 +1,8 @@
 import { actionTypes } from "./index";
 import service from "../../service";
 import config from "../../config";
-import cogoToast from "cogo-toast";
 
 const { API_BASE_URL } = config;
-
-const toastOption = { hideAfter: 5, position: "top-right" };
 
 export const applyBillingContextMiddleware =
   (dispatch, history, globalActions) => (action) => {
@@ -18,7 +15,7 @@ export const applyBillingContextMiddleware =
             .get(
               baseUrl +
                 "Doctor/GetTreatmentList?DoctorId=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -33,7 +30,6 @@ export const applyBillingContextMiddleware =
               console.log("Service error === ", error);
             });
         case actionTypes.GET_ALL_BILL_DATA_LIST:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(baseUrl + "Bill/GetAllBillData", action.request)
             .then((res) => {
@@ -49,65 +45,54 @@ export const applyBillingContextMiddleware =
                   payload: [],
                 });
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.CREATE_BILL:
-          globalActions.setLoadingIndicator(true);
           return service
-            .post(baseUrl + "Bill/Create", action.request)
+            .post(baseUrl + "Bill/Create", action.request, {
+              silent: false,
+              showNotification: true,
+            })
             .then((res) => {
               const { data } = res;
               if (data.response_code === 2000) {
-                cogoToast.success(data.message, toastOption);
                 if (action.callback) {
                   action.callback(data.payload);
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.UPDATE_BILL:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(baseUrl + "Bill/Update", action.request)
             .then((res) => {
               const { data } = res;
               if (data.response_code === 2000) {
-                cogoToast.success(data.message, toastOption);
                 if (action.callback) {
                   action.callback(data.payload);
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.DELETE_BILL:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(baseUrl + "Bill/Delete", action.request)
             .then((res) => {
               const { data } = res;
               if (data.response_code === 2000) {
-                cogoToast.success(data.message, toastOption);
                 if (action.callback) {
                   action.callback();
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.GET_BILL_SUMMARY:
           return service

@@ -14,10 +14,15 @@ import {
   resetPassword,
   resendOTP,
 } from "../store/actions/doctorActions";
-import { resetRegistration } from "../store/reducers/doctorSlice";
+import {
+  resetRegistration,
+  setVerifyOTPData,
+} from "../store/reducers/doctorSlice";
+import useAxios from "../hooks/useAxios";
 
 const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const { forgetPasswordStep, otpData, verifyOTPData } = useSelector(
     (state) => state.doctors,
@@ -28,6 +33,8 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
     },
   });
   const { handleSubmit, getValues, watch, reset } = form;
+
+  const { fetchData: VerifyOtp } = useAxios();
 
   const onSubmit = (data, e) => {
     let req = { ...data };
@@ -42,7 +49,26 @@ const ForgotPasswordModal = ({ show = false, onHide = () => {}, setShow }) => {
     } else if (forgetPasswordStep === 2) {
       let otpDataObj = { ...otpData };
       otpDataObj.otp_for = 2;
-      dispatch(verifyOTP({ ...req, ...otpDataObj }));
+
+      const request = { ...req, ...otpDataObj };
+
+      VerifyOtp(
+        {
+          url: `Registration/verify-otp`,
+          method: "post",
+          silent: false,
+          showNotification: true,
+        },
+        (status, res) => {
+          const { response_code, message, payload } = res.data;
+          if (response_code === 2000) {
+            dispatch(setVerifyOTPData(payload));
+            if (request.hasOwnProperty("otp_for") && request["otp_for"] === 0) {
+              history.push(`/signup`);
+            }
+          }
+        },
+      );
     } else if (forgetPasswordStep === 3) {
       const confirmReq = {
         mobileNumber: data.mobile_no,
@@ -188,7 +214,7 @@ function Login(props) {
         const { id_clinic, id_doctor } = res;
         dispatch(
           getDoctorsByClinicId({ id_clinic }, id_doctor, () => {
-            history.push(`/dashboard`, { isInit: true });
+            history.push(`/dashboard`, { isInit: false });
           }),
         );
       }),

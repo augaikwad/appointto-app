@@ -8,7 +8,7 @@ import {
 export const getPrintingSetting = (id_doctor, callback) => async (dispatch) => {
   try {
     const response = await service.get(
-      "Doctor/get_printing_setting?DoctorId=" + id_doctor
+      "Doctor/get_printing_setting?DoctorId=" + id_doctor,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -25,7 +25,10 @@ export const getPrintingSetting = (id_doctor, callback) => async (dispatch) => {
 
 export const addPrintingSetting = (req, callback) => async (dispatch) => {
   try {
-    const response = await service.post("Doctor/add_printing_setting", req);
+    const response = await service.post("Doctor/add_printing_setting", req, {
+      silent: false,
+      showNotification: true,
+    });
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setPrintingSettings(payload));
@@ -58,7 +61,7 @@ export const updatePrintingSetting = (req, callback) => async (dispatch) => {
 export const getUsers = (id_clinic, callback) => async (dispatch) => {
   try {
     const response = await service.get(
-      "Doctor/get_clinic_user_list?id_clinic=" + id_clinic
+      "Doctor/get_clinic_user_list?id_clinic=" + id_clinic,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
@@ -90,7 +93,7 @@ export const registerUser = (req, callback) => async (dispatch) => {
   try {
     const response = await service.post(
       "Registration/register-user-clinc",
-      req
+      req,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {

@@ -7,19 +7,14 @@ import * as serviceWorker from "./serviceWorker";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import store, { persistor } from "./store";
-import Loader from "./shared/Loader";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Suspense fallback={<Loader open={true} />}>
-      <Provider store={store}>
-        <PersistGate persistor={persistor}>
-          <App />
-        </PersistGate>
-      </Provider>
-    </Suspense>
-  </React.StrictMode>,
-  document.getElementById("root")
+  <Provider store={store}>
+    <PersistGate persistor={persistor}>
+      <App />
+    </PersistGate>
+  </Provider>,
+  document.getElementById("root"),
 );
 
 serviceWorker.unregister();

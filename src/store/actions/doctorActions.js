@@ -9,9 +9,6 @@ import {
   updateDoctorInfoSuccess,
   updateClinicInfoSuccess,
 } from "../reducers/doctorSlice";
-import cogoToast from "cogo-toast";
-import { navigateTo } from "../reducers/navigationSlice";
-const toastOption = { hideAfter: 5, position: "top-right" };
 
 export const getSpeciality = () => async (dispatch) => {
   try {
@@ -19,8 +16,6 @@ export const getSpeciality = () => async (dispatch) => {
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setSpeciality(payload));
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -29,31 +24,33 @@ export const getSpeciality = () => async (dispatch) => {
 
 export const getOTP = (request) => async (dispatch) => {
   try {
-    const response = await service.post("Registration/generate-otp", request);
+    const response = await service.post("Registration/generate-otp", request, {
+      silent: false,
+      showNotification: true,
+    });
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       dispatch(setOTPData(payload));
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
   }
 };
 
-export const verifyOTP = (request) => async (dispatch) => {
+export const verifyOTP = (request, history) => async (dispatch) => {
   try {
-    const response = await service.post("Registration/verify-otp", request);
+    const response = await service.post("Registration/verify-otp", request, {
+      silent: false,
+      showNotification: true,
+    });
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
+      sessionStorage.setItem("token", payload.registration_token);
       dispatch(setVerifyOTPData(payload));
       if (request.hasOwnProperty("otp_for") && request["otp_for"] === 0) {
-        dispatch(navigateTo({ pathname: "/signup" }));
+        history.push(`/signup`);
+        // dispatch(navigateTo({ pathname: "/signup" }));
       }
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -64,14 +61,11 @@ export const getOTPForResetPassword = (request) => async (dispatch) => {
   try {
     const response = await service.post(
       "Registration/reset-password-generate-otp",
-      request
+      request,
     );
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       dispatch(setOTPData(payload));
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -83,10 +77,7 @@ export const resendOTP = (request) => async (dispatch) => {
     const response = await service.post("Registration/resend-otp", request);
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       dispatch(setOTPData(payload));
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -98,30 +89,27 @@ export const resetPassword = (request, callback) => async (dispatch) => {
     const response = await service.post("Registration/reset-password", request);
     const { response_code, message } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       dispatch(resetPasswordSuccess());
       if (callback) {
         callback();
       }
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
   }
 };
 
-export const signupUser = (request) => async (dispatch) => {
+export const signupUser = (request, history) => async (dispatch) => {
   try {
-    const response = await service.post("Registration/register-user", request);
-    const { response_code, message, payload } = response.data;
+    const response = await service.post("Registration/register-user", request, {
+      silent: false,
+      showNotification: true,
+    });
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       sessionStorage.setItem("token", payload.token);
       dispatch(setSignupUserData(request));
-      dispatch(navigateTo({ pathname: "/registration" }));
-    } else {
-      cogoToast.error(message, toastOption);
+      history.push(`/registration`);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -131,11 +119,9 @@ export const signupUser = (request) => async (dispatch) => {
 export const getQualifications = () => async (dispatch) => {
   try {
     const response = await service.get("Doctor/get_qualifications");
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setQualifications(payload));
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -144,16 +130,16 @@ export const getQualifications = () => async (dispatch) => {
 
 export const updateDoctorInfo = (request, callback) => async (dispatch) => {
   try {
-    const response = await service.post("Doctor/Create", request);
+    const response = await service.post("Doctor/Create", request, {
+      silent: false,
+      showNotification: true,
+    });
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       dispatch(updateDoctorInfoSuccess(payload));
       if (callback) {
         callback();
       }
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -164,17 +150,18 @@ export const updateClinicInfo = (request, callback) => async (dispatch) => {
   try {
     const response = await service.post(
       "Doctor/add_clinic_information",
-      request
+      request,
+      {
+        silent: false,
+        showNotification: true,
+      },
     );
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       dispatch(updateClinicInfoSuccess(payload));
       if (callback) {
         callback();
       }
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -183,16 +170,16 @@ export const updateClinicInfo = (request, callback) => async (dispatch) => {
 
 export const updateScheduleInfo = (request, callback) => async (dispatch) => {
   try {
-    const response = await service.post("Doctor/add-clinic-schedule", request);
+    const response = await service.post("Doctor/add-clinic-schedule", request, {
+      silent: false,
+      showNotification: true,
+    });
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       dispatch(updateClinicInfoSuccess(payload));
       if (callback) {
         callback();
       }
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     console.error("Error fetching user data:", error);

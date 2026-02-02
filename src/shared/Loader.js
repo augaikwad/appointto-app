@@ -15,6 +15,9 @@ const useStyles = createUseStyles({
     "&.active": {
       display: "flex !important",
     },
+    "&.suspense-loader": {
+      backgroundColor: "transparent !important",
+    },
     "& > .spinner-border": {
       height: 60,
       width: 60,
@@ -23,10 +26,12 @@ const useStyles = createUseStyles({
   },
 });
 
-function Loader({ open }) {
+function Loader({ open, isSuspense = false }) {
   const classes = useStyles();
   return (
-    <div className={`${classes.loaderContainer} ${open ? "active" : ""}`}>
+    <div
+      className={`${classes.loaderContainer} ${isSuspense ? "suspense-loader" : ""} ${open ? "active" : ""}`}
+    >
       <Spinner animation="border" variant="info" />
     </div>
   );

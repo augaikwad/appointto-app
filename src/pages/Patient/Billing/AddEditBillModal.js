@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
 import { Modal } from "../../../components";
 import {
   TextField,
@@ -74,7 +75,7 @@ const AddEditBillModal = () => {
         id_doctor: res.id_doctor,
         id_patient: patientById.id_patient,
         id_clinic: res.id_clinic,
-      })
+      }),
     );
     reset(initialState.billModal.formValue);
     dispatch(setBillModal({ open: false }));
@@ -150,6 +151,11 @@ const AddEditBillModal = () => {
                 name="bill_date"
                 maxDate={new Date()}
                 showYearDropdown
+                popperContainer={({ children }) =>
+                  ReactDOM.createPortal(children, document.body)
+                }
+                dropdownMode="select"
+                popperClassName="datepicker-portal-fix"
               />
             </div>
             <div className="col-lg-6">
@@ -189,7 +195,7 @@ const AddEditBillModal = () => {
                 }}
                 onCreateOption={(val) => {
                   const findItem = treatmentList.some(
-                    (item) => item.treatment_name === val
+                    (item) => item.treatment_name === val,
                   );
                   if (!findItem) {
                     let req = {
@@ -201,12 +207,12 @@ const AddEditBillModal = () => {
                       saveTreatment(req, (response) => {
                         setValue("treatment", response);
                         dispatch(getTreatmentList(id_doctor));
-                      })
+                      }),
                     );
                   } else {
                     cogoToast.error(
                       "Treatment name already exist!",
-                      toastOption
+                      toastOption,
                     );
                   }
                 }}

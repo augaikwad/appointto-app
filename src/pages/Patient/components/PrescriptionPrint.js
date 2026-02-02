@@ -17,7 +17,7 @@ const useStyles = createUseStyles({
     },
   },
   header: {
-    background: "#ebebeb",
+    // background: "#ebebeb",
     display: "flex",
     "& > table": {
       width: "100%",
@@ -43,15 +43,16 @@ const useStyles = createUseStyles({
   medicineRow: {
     display: "flex",
     "&.header": {
-      background: "#b9b8b8",
+      // background: "#b9b8b8",
+      borderBottom: "1px solid #5f5f5f",
       marginTop: 16,
       "& > div": {
         fontWeight: "bold",
       },
     },
     "&.body": {
-      background: "#ebebeb",
-      borderBottom: "1px solid #898989",
+      // background: "#ebebeb",
+      borderBottom: "1px solid #b3b3b3",
     },
     "& > div": {
       padding: "10px 12px",

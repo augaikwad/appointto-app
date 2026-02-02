@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import { Button, Row, Col } from "react-bootstrap";
 import Modal from "../../../components/Modal";
 import { FormProvider, useForm } from "react-hook-form";
@@ -78,7 +79,7 @@ const AddEditUser = () => {
 
   const { id_clinic } = useSelector((state) => state.user.details);
   const { userRoles, addEditUserModal } = useSelector(
-    (state) => state.settings
+    (state) => state.settings,
   );
   const { formData, isAdd, open, step } = addEditUserModal;
 
@@ -105,7 +106,7 @@ const AddEditUser = () => {
   const setDefault = (userTypeId) => {
     const findBy = userTypeId === 1 ? "VISITING DOCTOR" : "RECEPTIONIST";
     const defaultValue = userRoles.find(
-      (item) => item.normalizedName === findBy
+      (item) => item.normalizedName === findBy,
     );
     setValue("userRole", defaultValue.name);
   };
@@ -115,9 +116,9 @@ const AddEditUser = () => {
     if (userTypeId && !isNaN(userTypeId)) {
       const filterBy = filteredUserRoles[userTypeId];
       const filteredOpt = userRoles.filter((role) =>
-        filterBy.includes(role.normalizedName)
+        filterBy.includes(role.normalizedName),
       );
-      setDefault(userTypeId);
+      // setDefault(userTypeId);
 
       setRolesOpt(filteredOpt);
       setLastStep(userTypeId === 2 ? 1 : 2);
@@ -140,14 +141,14 @@ const AddEditUser = () => {
               UserId: res.id_user,
             };
             reset({ ...data, ...nextFormData });
-          })
+          }),
         );
       }
       dispatch(
         setAddEditUserModal({
           ...addEditUserModal,
           step: step + 1,
-        })
+        }),
       );
     } else if (name === "SaveBtn") {
       if (lastStep === 1) {
@@ -155,7 +156,7 @@ const AddEditUser = () => {
           registerUser({ ...data, id_clinic: id_clinic }, () => {
             dispatch(setAddEditUserModal({ open: false }));
             dispatch(getUsers(id_clinic));
-          })
+          }),
         );
       } else if (lastStep === 2) {
         let request = getFormattedRequestForCreateDocUser({
@@ -167,7 +168,7 @@ const AddEditUser = () => {
             dispatch(setAddEditUserModal({ open: false }));
             dispatch(getUsers(id_clinic));
             dispatch(getDoctorsByClinicId({ id_clinic }, null));
-          })
+          }),
         );
       }
     }
@@ -365,6 +366,11 @@ const AddEditUser = () => {
                   rules={{
                     required: "Please Enter Date of Birth",
                   }}
+                  popperContainer={({ children }) =>
+                    ReactDOM.createPortal(children, document.body)
+                  }
+                  dropdownMode="select"
+                  popperClassName="datepicker-portal-fix"
                 />
               </Col>
               <Col lg={6}>
@@ -460,7 +466,7 @@ const Users = () => {
         ...addEditUserModal,
         open: true,
         formData: { ...formData, userTypeId: userTypeId },
-      })
+      }),
     );
   };
 

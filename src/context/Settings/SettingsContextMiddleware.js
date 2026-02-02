@@ -1,11 +1,8 @@
 import { actionTypes } from "./index";
 import service from "../../service";
 import config from "../../config";
-import cogoToast from "cogo-toast";
 
 const { API_BASE_URL } = config;
-
-const toastOption = { hideAfter: 5, position: "top-right" };
 
 export const applySettingsContextMiddleware =
   (dispatch, history, globalActions) => (action) => {
@@ -14,12 +11,11 @@ export const applySettingsContextMiddleware =
 
       switch (action.type) {
         case actionTypes.GET_PRINTING_SETTING:
-          globalActions.setLoadingIndicator(true);
           return service
             .get(
               baseUrl +
                 "Doctor/get_printing_setting?DoctorId=" +
-                parseInt(localStorage.getItem("id_doctor"))
+                parseInt(localStorage.getItem("id_doctor")),
             )
             .then((res) => {
               const { data } = res;
@@ -29,14 +25,11 @@ export const applySettingsContextMiddleware =
                   payload: data.payload,
                 });
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.ADD_PRINTING_SETTING:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(baseUrl + "Doctor/add_printing_setting", action.request)
             .then((res) => {
@@ -50,14 +43,11 @@ export const applySettingsContextMiddleware =
                   action.callback(data.payload);
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.UPDATE_PRINTING_SETTING:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(baseUrl + "Doctor/update_printing_setting", action.request)
             .then((res) => {
@@ -71,11 +61,9 @@ export const applySettingsContextMiddleware =
                   action.callback(data.payload);
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.GET_USER_ROLES:
           return service
@@ -93,12 +81,11 @@ export const applySettingsContextMiddleware =
               console.log("Service error === ", error);
             });
         case actionTypes.GET_USERS:
-          globalActions.setLoadingIndicator(true);
           return service
             .get(
               baseUrl +
                 "Doctor/get_clinic_user_list?id_clinic=" +
-                parseInt(localStorage.getItem("id_clinic"))
+                parseInt(localStorage.getItem("id_clinic")),
             )
             .then((res) => {
               const { data } = res;
@@ -108,14 +95,11 @@ export const applySettingsContextMiddleware =
                   payload: data.payload,
                 });
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.REGISTER_USER:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(baseUrl + "Registration/register-user-clinc", action.request)
             .then((res) => {
@@ -125,14 +109,11 @@ export const applySettingsContextMiddleware =
                   action.callback();
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.REGISTER_DOCTOR:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(baseUrl + "Doctor/create_clinic_doctor", action.request)
             .then((res) => {
@@ -142,11 +123,9 @@ export const applySettingsContextMiddleware =
                   action.callback();
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         default:
           dispatch(action);

@@ -222,7 +222,6 @@ const timingOptions = [
 const NewMedTable = ({ control, setValue }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const unitRef = useRef(null);
 
   const { id_doctor } = useSelector((state) => state.user.details);
   const { rxGroups } = useSelector((state) => state.prescription);
@@ -298,9 +297,14 @@ const NewMedTable = ({ control, setValue }) => {
 
           update(index, vals);
           setValue(name, val);
-          if (fields.length - 1 === index) {
-            append(initFields);
-          }
+
+          setTimeout(() => {
+            if (fields.length - 1 === index) {
+              append(initFields, { shouldFocus: false });
+            }
+
+            setFocus(`prescribedMedicines.${index}.dose`);
+          }, 100);
         }}
       />
     );
@@ -317,8 +321,9 @@ const NewMedTable = ({ control, setValue }) => {
         // "ArrowRight",
       ];
       if (e.key === "Tab" || e.keyCode === 9) {
-        unitRef.current?.focus();
-        setFocus(`prescribedMedicines.${index}.unit`);
+        setTimeout(() => {
+          setFocus(`prescribedMedicines.${index}.unit`);
+        }, 100);
       } else if (!acceptedKeys.includes(e.key)) {
         e.preventDefault();
       }
@@ -365,7 +370,6 @@ const NewMedTable = ({ control, setValue }) => {
     return (
       <ReactSelectField
         name={name}
-        ref={unitRef}
         options={unitOptions}
         menuPortalTarget={document.body}
         className={classes.reactSelect}
@@ -376,7 +380,9 @@ const NewMedTable = ({ control, setValue }) => {
         }}
         onKeyDown={(e) => {
           if (e.key === "Tab" || e.keyCode === 9) {
-            setFocus(`prescribedMedicines.${index}.timing`);
+            setTimeout(() => {
+              setFocus(`prescribedMedicines.${index}.timing`);
+            }, 100);
           }
         }}
       />
@@ -397,7 +403,9 @@ const NewMedTable = ({ control, setValue }) => {
         }}
         onKeyDown={(e) => {
           if (e.key === "Tab" || e.keyCode === 9) {
-            setFocus(`prescribedMedicines.${index}.duration`);
+            setTimeout(() => {
+              setFocus(`prescribedMedicines.${index}.duration`);
+            }, 100);
           }
         }}
       />
@@ -431,7 +439,9 @@ const NewMedTable = ({ control, setValue }) => {
         }}
         onKeyDown={(e) => {
           if (e.key === "Tab" || e.keyCode === 9) {
-            setFocus(`prescribedMedicines.${index}.note`);
+            setTimeout(() => {
+              setFocus(`prescribedMedicines.${index}.note`);
+            }, 100);
           }
         }}
       />
@@ -471,13 +481,20 @@ const NewMedTable = ({ control, setValue }) => {
     // );
   };
 
-  const noteFormatter = ({ name }) => {
+  const noteFormatter = ({ name, index }) => {
     return (
       <input
         type="text"
         className="form-control no-border"
         name={name}
         {...register(name)}
+        onKeyDown={(e) => {
+          if (e.key === "Tab" || e.keyCode === 9) {
+            setTimeout(() => {
+              setFocus(`prescribedMedicines.${index + 1}.medicineName`);
+            }, 100);
+          }
+        }}
       />
     );
   };

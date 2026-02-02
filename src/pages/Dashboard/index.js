@@ -24,15 +24,15 @@ function Dashboard() {
     newPatient,
     queueCount,
   } = useSelector((state) => state.appointments);
-
   useEffect(() => {
-    if (isInit) {
-      const filters = { ...aptInitState.dashboardListFilters, id_doctor };
-      dispatch(getDashboardAppointments(filters));
-      dispatch(setDashboardListFilters(filters));
-    } else {
-      dispatch(getDashboardAppointments(dashboardListFilters));
-    }
+    // if (isInit) {
+    //   const filters = { ...aptInitState.dashboardListFilters, id_doctor };
+    //   console.log("useEffect === ", filters);
+    //   dispatch(getDashboardAppointments(filters));
+    //   dispatch(setDashboardListFilters(filters));
+    // } else {
+    dispatch(getDashboardAppointments(dashboardListFilters));
+    // }
   }, []);
 
   const counts = [

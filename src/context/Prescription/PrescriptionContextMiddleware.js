@@ -1,11 +1,8 @@
 import { actionTypes } from "./index";
 import service from "../../service";
 import config from "../../config";
-import cogoToast from "cogo-toast";
 
 const { API_BASE_URL } = config;
-
-const toastOption = { hideAfter: 5, position: "top-right" };
 
 export const applyPrescriptionContextMiddleware =
   (dispatch, history, globalActions) => (action) => {
@@ -18,7 +15,7 @@ export const applyPrescriptionContextMiddleware =
             .post(
               baseUrl +
                 "Prescription/GetAdviceGroup?DoctorId=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -36,7 +33,6 @@ export const applyPrescriptionContextMiddleware =
               console.log("Service error === ", error);
             });
         case actionTypes.SAVE_ADVICE_GROUP:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(baseUrl + "Prescription/SaveAdviceGroup", action.request)
             .then((res) => {
@@ -46,18 +42,16 @@ export const applyPrescriptionContextMiddleware =
                   action.callback();
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.GET_INVESTIGATIONS_GROUP:
           return service
             .post(
               baseUrl +
                 "Prescription/GetInvestigationGroup?DoctorId=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -75,11 +69,10 @@ export const applyPrescriptionContextMiddleware =
               console.log("Service error === ", error);
             });
         case actionTypes.SAVE_INVESTIGATIONS_GROUP:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(
               baseUrl + "Prescription/SaveInvestigationGroup",
-              action.request
+              action.request,
             )
             .then((res) => {
               const { data } = res;
@@ -88,11 +81,9 @@ export const applyPrescriptionContextMiddleware =
                   action.callback();
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.SAVE_UPDATE_TAG:
           let url = baseUrl;
@@ -115,7 +106,7 @@ export const applyPrescriptionContextMiddleware =
             .post(
               baseUrl +
                 "Prescription/getcomplaints?id_doctor=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -137,7 +128,7 @@ export const applyPrescriptionContextMiddleware =
             .post(
               baseUrl +
                 "Prescription/getobservations?id_doctor=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -159,7 +150,7 @@ export const applyPrescriptionContextMiddleware =
             .post(
               baseUrl +
                 "Prescription/getdiagnosis?id_doctor=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -181,7 +172,7 @@ export const applyPrescriptionContextMiddleware =
             .post(
               baseUrl +
                 "Prescription/getworkdone?id_doctor=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -203,7 +194,7 @@ export const applyPrescriptionContextMiddleware =
             .post(
               baseUrl +
                 "Prescription/getadvice?id_doctor=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -225,7 +216,7 @@ export const applyPrescriptionContextMiddleware =
             .post(
               baseUrl +
                 "Prescription/getinvestigations?id_doctor=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -247,7 +238,7 @@ export const applyPrescriptionContextMiddleware =
             .get(
               baseUrl +
                 "Medicine/get-doctor-medicine?id_doctor=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -277,25 +268,23 @@ export const applyPrescriptionContextMiddleware =
               console.log("Service error === ", error);
             });
         case actionTypes.SAVE_PRESCRIPTION:
-          globalActions.setLoadingIndicator(true);
           return service
-            .post(baseUrl + "Prescription/SavePrescription", action.request)
+            .post(baseUrl + "Prescription/SavePrescription", action.request, {
+              silent: false,
+              showNotification: true,
+            })
             .then((res) => {
               const { data } = res;
               if (data.response_code === 2000) {
-                cogoToast.success(data.message, toastOption);
                 if (action.callback) {
                   action.callback(data.payload);
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.GET_PRESCRIPTIONS:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(baseUrl + "Prescription/GetPrescription", action.request)
             .then((res) => {
@@ -306,14 +295,11 @@ export const applyPrescriptionContextMiddleware =
                   payload: data.payload,
                 });
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.SAVE_RX_GROUP:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(baseUrl + "Prescription/SaveRxGroup", action.request)
             .then((res) => {
@@ -323,19 +309,16 @@ export const applyPrescriptionContextMiddleware =
                   action.callback();
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.GET_RX_GROUPS:
-          globalActions.setLoadingIndicator(true);
           return service
             .post(
               baseUrl +
                 "Prescription/GetRxGroup?DoctorId=" +
-                localStorage.getItem("id_doctor")
+                localStorage.getItem("id_doctor"),
             )
             .then((res) => {
               const { data } = res;
@@ -348,14 +331,11 @@ export const applyPrescriptionContextMiddleware =
                   action.callback();
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         case actionTypes.SET_PREVIOUS_PRESCRIPTION:
-          globalActions.setLoadingIndicator(true);
           const params = {
             RxGroupId: action.rxGroupId,
             id_doctor: parseInt(localStorage.getItem("id_doctor")),
@@ -371,11 +351,9 @@ export const applyPrescriptionContextMiddleware =
                   action.callback();
                 }
               }
-              globalActions.setLoadingIndicator(false);
             })
             .catch((error) => {
               console.log("Service error === ", error);
-              globalActions.setLoadingIndicator(false);
             });
         default:
           dispatch(action);

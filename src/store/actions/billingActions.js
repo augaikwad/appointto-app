@@ -6,13 +6,10 @@ import {
   setTransactionSummary,
 } from "../reducers/billingSlice";
 
-import cogoToast from "cogo-toast";
-const toastOption = { hideAfter: 5, position: "top-right" };
-
 export const getTreatmentList = (id_doctor) => async (dispatch) => {
   try {
     const response = await service.get(
-      "Doctor/GetTreatmentList?DoctorId=" + id_doctor
+      "Doctor/GetTreatmentList?DoctorId=" + id_doctor,
     );
     const { response_code, payload, message } = response.data;
     if (response_code === 2000) {
@@ -25,15 +22,15 @@ export const getTreatmentList = (id_doctor) => async (dispatch) => {
 
 export const createBill = (req, callback) => async (dispatch) => {
   try {
-    const response = await service.post("Bill/Create", req);
+    const response = await service.post("Bill/Create", req, {
+      silent: false,
+      showNotification: true,
+    });
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       if (callback) {
         callback(payload);
       }
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     // Handle error here
@@ -46,12 +43,9 @@ export const updateBill = (req, callback) => async (dispatch) => {
     const response = await service.post("Bill/Update", req);
     const { response_code, message, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       if (callback) {
         callback(payload);
       }
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     // Handle error here
@@ -94,7 +88,6 @@ export const deleteBill = (req, callback) => async (dispatch) => {
     const response = await service.post("Bill/Delete", req);
     const { response_code, message } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       if (callback) {
         callback();
       }
@@ -141,19 +134,19 @@ export const getAllBillingDataAction = (req) => async (dispatch) => {
       id_doctor: req.id_doctor,
       id_patient: req.id_patient,
       id_clinic: req.id_clinic,
-    })
+    }),
   );
   dispatch(
     getAllBillData({
       id_doctor: req.id_doctor,
       id_patient: req.id_patient,
-    })
+    }),
   );
   dispatch(
     getTransactionSummary({
       id_doctor: req.id_doctor,
       id_patient: req.id_patient,
-    })
+    }),
   );
 };
 
@@ -177,12 +170,9 @@ export const payAllPayment = (req, callback) => async (dispatch) => {
     const response = await service.post("Bill/AddAllPayment", req);
     const { response_code, payload, message } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       if (callback) {
         callback(payload);
       }
-    } else {
-      cogoToast.error(message, toastOption);
     }
   } catch (error) {
     // Handle error here

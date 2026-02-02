@@ -24,9 +24,9 @@ const DoctorInformation = () => {
     if (speciality.length === 0) {
       disptach(getSpeciality());
     }
-    if (qualifications.length === 0) {
-      disptach(getQualifications());
-    }
+    // if (qualifications.length === 0) {
+    //   disptach(getQualifications());
+    // }
   }, [speciality, qualifications]);
 
   const form = useForm({

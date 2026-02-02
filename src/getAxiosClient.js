@@ -3,6 +3,9 @@ import config from "./config";
 import { createBrowserHistory } from "history";
 import store from "./store";
 import { setLoading } from "./store/reducers/globalSlice";
+import cogoToast from "cogo-toast";
+
+const toastOption = { hideAfter: 5, position: "top-right" };
 
 const history = createBrowserHistory();
 let requestCounter = 0;
@@ -36,6 +39,9 @@ const getAxiosClient = (baseUrl = null) => {
   const client = axios.create(options);
   client.interceptors.request.use(
     (config) => {
+      if (config.silent === undefined) {
+        config.silent = true;
+      }
       if (!config?.silent) {
         showLoader(true);
       }
@@ -49,15 +55,29 @@ const getAxiosClient = (baseUrl = null) => {
       window.sessionStorage.LastServiceCallTime = Date.now();
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(error),
   );
 
   client.interceptors.response.use(
     (response) => {
+      const { config } = response;
+
+      if (config?.showNotification === undefined) {
+        config.showNotification = false;
+      }
+
       requestCounter = hideLoader(response?.config?.silent);
 
       if ("undefined" === typeof response || response.status < 200) {
         return Promise.reject(response);
+      }
+
+      const { message, response_code } = response?.data;
+      if (config.showNotification && message && message !== "") {
+        cogoToast[`${response_code === 2000 ? "success" : "error"}`](
+          message,
+          toastOption,
+        );
       }
       return response;
     },
@@ -98,7 +118,7 @@ const getAxiosClient = (baseUrl = null) => {
       } else {
         return Promise.reject(response);
       }
-    }
+    },
   );
   return client;
 };

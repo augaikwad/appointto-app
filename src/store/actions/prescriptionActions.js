@@ -1,5 +1,4 @@
 import service from "../../service";
-import cogoToast from "cogo-toast";
 import {
   setComplaints,
   setObservations,
@@ -15,8 +14,6 @@ import {
   setPrescriptions,
 } from "../reducers/prescriptionSlice";
 import { tagsCategory } from "../../utils/constants";
-
-const toastOption = { hideAfter: 5, position: "top-right" };
 
 export const getComplaints = (id_doctor, callback) => async (dispatch) => {
   try {
@@ -261,10 +258,12 @@ export const getPrescriptions = (req, callback) => async (dispatch) => {
 
 export const savePrescription = (req, callback) => async (dispatch) => {
   try {
-    const response = await service.post("Prescription/SavePrescription", req);
-    const { response_code, payload, message } = response.data;
+    const response = await service.post("Prescription/SavePrescription", req, {
+      silent: false,
+      showNotification: true,
+    });
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
-      cogoToast.success(message, toastOption);
       if (callback) {
         callback(payload);
       }

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import ReactDOM from "react-dom";
 import { Modal } from "../../components";
 import {
   TextField,
@@ -28,7 +29,7 @@ const getFormattedTime = (date, time) => {
       moment(date).set({
         hour: otime.get("hour"),
         minute: otime.get("minute"),
-      })
+      }),
     );
   }
   return oDate;
@@ -58,11 +59,11 @@ const CreateAppointmentModal = ({ onHide }) => {
   const [reasons, setReasons] = useState([]);
 
   const { doctorsByClinicId, selectedDoctor } = useSelector(
-    (state) => state.user
+    (state) => state.user,
   );
 
   const { dashboardListFilters, appointmentModal } = useSelector(
-    (state) => state.appointments
+    (state) => state.appointments,
   );
 
   const { form: formValues, show, isAdd } = appointmentModal;
@@ -88,7 +89,7 @@ const CreateAppointmentModal = ({ onHide }) => {
             getReasonCallback(res.payload?.appointmentReasons || []);
           }
         }
-      }
+      },
     );
   };
 
@@ -110,7 +111,7 @@ const CreateAppointmentModal = ({ onHide }) => {
           start_time: now,
           end_time: moment(now).add(15, "m").toDate(),
           reason: null,
-        })
+        }),
       );
     } else {
       const { reason } = formValues;
@@ -140,7 +141,7 @@ const CreateAppointmentModal = ({ onHide }) => {
     formData.start_time = moment(new Date(data.start_time)).format("h:mm A");
     formData.end_time = moment(new Date(data.end_time)).format("h:mm A");
     formData.date = moment(new Date(formData.date)).format(
-      "YYYY-MM-DDTHH:mm:ss.sssZ"
+      "YYYY-MM-DDTHH:mm:ss.sssZ",
     );
     formData.reason = data.reason.reason_name;
 
@@ -185,7 +186,7 @@ const CreateAppointmentModal = ({ onHide }) => {
             setValue("reason", val);
           }
         }
-      }
+      },
     );
   };
 
@@ -224,6 +225,11 @@ const CreateAppointmentModal = ({ onHide }) => {
                 inputOnChange={(date) => {
                   setValue("day", moment(new Date(date)).format("dddd"));
                 }}
+                popperContainer={({ children }) =>
+                  ReactDOM.createPortal(children, document.body)
+                }
+                dropdownMode="select"
+                popperClassName="datepicker-portal-fix"
               />
             </div>
             <div className="col-lg-6">
@@ -294,7 +300,7 @@ const CreateAppointmentModal = ({ onHide }) => {
                 options={getValueLabelOptions(
                   reasons,
                   "reason_name",
-                  "id_reason"
+                  "id_reason",
                 )}
                 onCreateOption={(val) => {
                   let req = {

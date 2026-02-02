@@ -50,7 +50,7 @@ const Index = () => {
         if (status === 200) {
           setReasons(res.payload?.appointmentReasons || []);
         }
-      }
+      },
     );
   };
 
@@ -85,7 +85,7 @@ const Index = () => {
           method: "post",
           data: payload,
         },
-        callback
+        callback,
       );
     } else {
       updateReason(
@@ -94,7 +94,7 @@ const Index = () => {
           method: "post",
           data: payload,
         },
-        callback
+        callback,
       );
     }
   };
@@ -103,7 +103,6 @@ const Index = () => {
     // 'Enter' is the modern standard (replaces the old keyCode 13)
     if (event.key === "Enter") {
       handleSaveClick();
-      console.log("Enter key pressed!", event.target.value, isAdd);
     }
   };
 
@@ -126,7 +125,7 @@ const Index = () => {
           id_reason: item.id_reason,
         },
       },
-      callback
+      callback,
     );
   };
 

@@ -182,10 +182,12 @@ const AppointmentsList = () => {
   };
 
   useEffect(() => {
-    getList({
-      id_doctor: doctor.id_doctor,
-      ...getDateRange(calendarView, calendarDate),
-    });
+    if (doctor) {
+      getList({
+        id_doctor: doctor.id_doctor,
+        ...getDateRange(calendarView, calendarDate),
+      });
+    }
   }, [calendarView, calendarDate, doctor]);
 
   const handleOnNavigate = (date, view) => {
@@ -208,17 +210,17 @@ const AppointmentsList = () => {
     } = event;
 
     const handleEdit = () => {
+      getList({
+        id_doctor: doctor.id_doctor,
+        ...getDateRange(calendarView, calendarDate),
+      });
       dispatch(
         setAppointmentModal({
           isAdd: false,
           show: true,
           form: event,
-        })
+        }),
       );
-      getList({
-        id_doctor: doctor.id_doctor,
-        ...getDateRange(calendarView, calendarDate),
-      });
     };
 
     const handleCancel = () => {
@@ -230,7 +232,7 @@ const AppointmentsList = () => {
             id_doctor: doctor.id_doctor,
             ...getDateRange(calendarView, calendarDate),
           });
-        })
+        }),
       );
     };
 

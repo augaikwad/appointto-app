@@ -2,14 +2,10 @@ import React from "react";
 import { Route, Redirect } from "react-router-dom";
 
 const RouteGuard = ({ component: Component, ...rest }) => {
-  function hasJWT() {
-    let flag = false;
-
-    //check user has JWT token
-    sessionStorage.getItem("token") ? (flag = true) : (flag = false);
-
-    return flag;
-  }
+  const hasJWT = () => {
+    const token = sessionStorage.getItem("token");
+    return !!token;
+  };
 
   return (
     <Route
@@ -18,7 +14,12 @@ const RouteGuard = ({ component: Component, ...rest }) => {
         hasJWT() ? (
           <Component {...props} />
         ) : (
-          <Redirect to={{ pathname: "/login" }} />
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: props.location },
+            }}
+          />
         )
       }
     />

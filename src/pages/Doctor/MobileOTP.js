@@ -10,9 +10,12 @@ import {
   verifyOTP,
   resendOTP,
 } from "../../store/actions/doctorActions";
+import { useHistory } from "react-router-dom";
 
 function MobileOTP(props) {
   const dispatch = useDispatch();
+  const history = useHistory();
+
   const { otpData } = useSelector((state) => state.doctors);
 
   const form = useForm();
@@ -27,7 +30,7 @@ function MobileOTP(props) {
     if (otpData === null) {
       dispatch(getOTP({ ...req, country_code: "91" }));
     } else {
-      dispatch(verifyOTP({ ...req, ...otpData }));
+      dispatch(verifyOTP({ ...req, ...otpData }, history));
     }
   };
 
