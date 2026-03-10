@@ -12,7 +12,10 @@ export const applyAppointmentContextMiddleware =
       switch (action.type) {
         case actionTypes.CREATE_APPOINTMENT:
           return service
-            .post(baseUrl + "Appointment/Create", action.request)
+            .post(baseUrl + "Appointment/Create", action.request, {
+              silent: false,
+              showNotification: true,
+            })
             .then((res) => {
               const { data } = res;
               if (data.response_code === 2000) {

@@ -33,7 +33,7 @@ const NavbarSearch = () => {
   const dispatch = useDispatch();
   const { id_doctor, id_clinic } = useSelector((state) => state.user.details);
   const { appointmentModal, dashboardListFilters } = useSelector(
-    (state) => state.appointments
+    (state) => state.appointments,
   );
   const { globalPatientList, patientModal, clearGlobalSearchInput } =
     useSelector((state) => state.patients);
@@ -52,8 +52,8 @@ const NavbarSearch = () => {
         },
         () => {
           setGlobalSearchLoading(false);
-        }
-      )
+        },
+      ),
     );
   }, 1000);
 
@@ -63,7 +63,7 @@ const NavbarSearch = () => {
       setGlobalSearchOpt([]);
       dispatch(setClearGlobalSearchInput(false));
     }
-  }, [clearGlobalSearchInput]);
+  }, [clearGlobalSearchInput, dispatch]);
 
   return (
     <>
@@ -104,9 +104,9 @@ const NavbarSearch = () => {
                     dispatch(
                       createAppointment(req, () => {
                         dispatch(
-                          getDashboardAppointments(dashboardListFilters)
+                          getDashboardAppointments(dashboardListFilters),
                         );
-                      })
+                      }),
                     );
                   }}
                 >
@@ -124,7 +124,7 @@ const NavbarSearch = () => {
                           id_doctor,
                           id_patient: option.id_patient,
                         },
-                      })
+                      }),
                     );
                   }}
                 >

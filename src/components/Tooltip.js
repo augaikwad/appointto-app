@@ -1,13 +1,19 @@
 import React from "react";
 import { OverlayTrigger, Tooltip as BSTooltip } from "react-bootstrap";
 
-const Tooltip = ({ text = "tooltip", placement = "right", children }) => {
+const Tooltip = ({
+  text = "tooltip",
+  placement = "right",
+  children,
+  ...rest
+}) => {
   const renderTooltip = (props) => <BSTooltip {...props}>{text}</BSTooltip>;
   return (
     <OverlayTrigger
       placement={placement}
       delay={{ show: 250, hide: 400 }}
       overlay={renderTooltip}
+      {...rest}
     >
       {children}
     </OverlayTrigger>

@@ -17,6 +17,8 @@ import {
 } from "../../../store/actions/prescriptionActions";
 import { hasError } from "../../../helpers/hasError";
 import clsx from "clsx";
+import { timingOptions } from "../../../utils/constants";
+import useAxios from "../../../hooks/useAxios";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
@@ -101,6 +103,11 @@ const useStyles = createUseStyles({
     },
     "& > div.groupsBody": {
       padding: "5px 8px",
+      "&>.badge": {
+        whiteSpace: "normal",
+        textAlign: "left",
+        lineHeight: 0.8,
+      },
     },
   },
   reactSelect: { "& > div": { border: "none", boxShadow: "none" } },
@@ -188,41 +195,9 @@ const CreateGroupModal = ({
   );
 };
 
-const timingOptions = [
-  {
-    value: "Beforefood",
-    label: "Before Food",
-  },
-  {
-    value: "Afterfood",
-    label: "After Food",
-  },
-  {
-    value: "EmptyStomach",
-    label: "Empty Stomach",
-  },
-  {
-    value: "BeforeBreakfast",
-    label: "Before Breakfast",
-  },
-  {
-    value: "AfterBreakfast",
-    label: "After Breakfast",
-  },
-  {
-    value: "SOS",
-    label: "SOS",
-  },
-  {
-    value: "BedTime",
-    label: "Bed Time",
-  },
-];
-
 const NewMedTable = ({ control, setValue }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-
   const { id_doctor } = useSelector((state) => state.user.details);
   const { rxGroups } = useSelector((state) => state.prescription);
 
@@ -230,8 +205,8 @@ const NewMedTable = ({ control, setValue }) => {
   const [rxGroupModalShow, setRxGroupModalShow] = useState(false);
 
   useEffect(() => {
-    dispatch(getRxGroups(id_doctor));
-  }, []);
+    if (rxGroupModalShow) dispatch(getRxGroups(id_doctor));
+  }, [rxGroupModalShow]);
 
   const [durationData, setDurationData] = useState([
     "Days",
@@ -242,7 +217,8 @@ const NewMedTable = ({ control, setValue }) => {
 
   const [durationOpt, setDurationOpt] = useState([]);
 
-  const { register, watch, formState, getValues, setFocus } = useFormContext();
+  const { register, watch, formState, getValues, setFocus, reset } =
+    useFormContext();
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "prescribedMedicines",
@@ -540,25 +516,34 @@ const NewMedTable = ({ control, setValue }) => {
   const setGroupToForm = (group) => {
     const formattedValue = [];
     group.rxGroupPrescribedMedicine.forEach((med, index) => {
+      const { medicineName, medicineId, composition } = med.medicineName;
       formattedValue.push({
         type: {
           label: med.type,
           value: med.type,
         },
-        medicineName: med.medicineName,
+        medicineName: {
+          ...med.medicineName,
+          label: medicineName,
+          value: medicineId,
+        },
+        composition: composition,
         dose: med.dose,
         unit: {
           label: med.unit,
           value: med.unit,
         },
         timing: timingOptions.filter((item) => item.value === med.timing)[0],
-        duration: med.duration,
-        note: med.note,
+        duration: {
+          label: med.duration,
+          value: med.duration,
+        },
+        note: med.note || "",
       });
     });
 
-    formattedValue.push(initFields);
     setValue("prescribedMedicines", formattedValue);
+    append(initFields, { shouldFocus: false });
   };
 
   const isMedicineFormValid = () => {
@@ -572,7 +557,25 @@ const NewMedTable = ({ control, setValue }) => {
       );
     }
 
-    return true;
+    return false;
+  };
+
+  const { fetchData: getPrevPrescription } = useAxios();
+
+  const handlePrevRxGroup = () => {
+    getPrevPrescription(
+      {
+        url: `Prescription/getprevious?id_doctor=${id_doctor}`,
+        method: "post",
+        silent: false,
+      },
+      (status, res) => {
+        const { response_code, payload } = res;
+        if (response_code === 2000 && payload) {
+          setGroupToForm(payload);
+        }
+      },
+    );
   };
 
   return (
@@ -676,7 +679,7 @@ const NewMedTable = ({ control, setValue }) => {
                 type: type.value,
                 dose,
                 timing: timing.value,
-                duration,
+                duration: duration.value,
                 note,
               };
               group.push(groupItem);
@@ -694,6 +697,7 @@ const NewMedTable = ({ control, setValue }) => {
         />
         <button
           className={`btn btn-sm btn-link ${classes.btn}`}
+          type="button"
           onClick={(e) => {
             e.preventDefault();
             if (isMedicineFormValid()) {
@@ -711,6 +715,7 @@ const NewMedTable = ({ control, setValue }) => {
         </button>
         <button
           className={`btn btn-sm btn-link ${classes.btn}`}
+          type="button"
           onClick={(e) => {
             e.preventDefault();
             setRxGroupModalShow(true);
@@ -721,15 +726,20 @@ const NewMedTable = ({ control, setValue }) => {
         </button>
         <button
           className={`btn btn-sm btn-link ${classes.btn}`}
+          type="button"
           onClick={(e) => {
             e.preventDefault();
-            const isPreviousGroup = rxGroups.filter((item) => item.isPrevious);
-            if (isPreviousGroup && isPreviousGroup.length) {
-              setGroupToForm(isPreviousGroup[0]);
-            } else {
-              cogoToast.warn("No Previos Rx. Group found", toastOption);
-            }
+            handlePrevRxGroup();
           }}
+          // onClick={(e) => {
+          //   e.preventDefault();
+          //   const isPreviousGroup = rxGroups.filter((item) => item.isPrevious);
+          //   if (isPreviousGroup && isPreviousGroup.length) {
+          //     setGroupToForm(isPreviousGroup[0]);
+          //   } else {
+          //     cogoToast.warn("No Previos Rx. Group found", toastOption);
+          //   }
+          // }}
           tabindex="-1"
         >
           Prev. Rx Group

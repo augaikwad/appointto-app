@@ -16,7 +16,7 @@ export const login = (request, callback) => async (dispatch) => {
       silent: false,
       showNotification: true,
     });
-    const { response_code, payload, message } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       const { token } = payload;
       dispatch(setUser(payload));

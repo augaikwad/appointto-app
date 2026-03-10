@@ -23,6 +23,19 @@ import { getPatientById } from "../../store/actions/patientActions";
 const useStyles = createUseStyles({
   tr: {
     borderBottom: "16px solid #ededed !important",
+    "&.completed": {
+      // filter: "blur(2px)" /* Adjust the pixels to control the blur intensity */,
+      // userSelect: "none" /* Optional: prevents selecting the text */,
+      // transition:
+      //   "filter 0.3s ease" /* Makes the blur effect smooth if toggled */,
+      "& td": {
+        opacity: 0.4,
+        userSelect: "none",
+      },
+      "&:hover td": {
+        opacity: 1,
+      },
+    },
   },
   td: {
     background: "#fff",
@@ -53,7 +66,7 @@ const ListWidget = () => {
   const history = useHistory();
 
   const { dashboardList, dashboardListFilters } = useSelector(
-    (state) => state.appointments
+    (state) => state.appointments,
   );
 
   const { appointmentStatuses } = useSelector((state) => state.user);
@@ -68,7 +81,7 @@ const ListWidget = () => {
     dispatch(
       updateAppointment(req, () => {
         dispatch(getDashboardAppointments(dashboardListFilters));
-      })
+      }),
     );
   };
 
@@ -76,7 +89,7 @@ const ListWidget = () => {
     dispatch(
       getPatientById({ PatientId: patientId }, () => {
         history.push(`/patient/${patientId}`, pageState);
-      })
+      }),
     );
   };
 
@@ -86,13 +99,19 @@ const ListWidget = () => {
     btnClasses = "",
     btnOnClick = () => {},
     icon = faUsersBetweenLines,
+    ...rest
   }) => {
     return (
-      <Tooltip text={tooltipText} placement={placement}>
+      <Tooltip
+        text={tooltipText}
+        placement={placement}
+        show={rest.disabled ? false : undefined}
+      >
         <button
           type="button"
-          className={`btn btn-rounded btn-icon ${classes.iconBtn} ${btnClasses}`}
+          className={`btn btn-rounded btn-icon ${classes.iconBtn} ${!rest.disabled ? btnClasses : ""}`}
           onClick={() => btnOnClick()}
+          {...rest}
         >
           <FontAwesomeIcon icon={icon} />
         </button>
@@ -122,8 +141,12 @@ const ListWidget = () => {
                 if (item.appointment_status === "Cancelled") {
                   return true;
                 }
+                const isCompleted = item.appointment_status === "3" ?? false;
                 return (
-                  <tr key={item.id_appointment} className={classes.tr}>
+                  <tr
+                    key={item.id_appointment}
+                    className={`${classes.tr} ${isCompleted ? "completed" : ""}`}
+                  >
                     <td className={`text-center ${classes.td}`} width="30px">
                       {ind + 1}
                     </td>
@@ -195,6 +218,7 @@ const ListWidget = () => {
                           req.checked_in = req.checked_in === 0 ? 1 : 0;
                           handleUpdateAppointment(req);
                         }}
+                        disabled={isCompleted}
                       />
                     </td>
                     <td
@@ -259,7 +283,7 @@ const ListWidget = () => {
                                   isAdd: false,
                                   show: true,
                                   form: item,
-                                })
+                                }),
                               );
                             }}
                           >

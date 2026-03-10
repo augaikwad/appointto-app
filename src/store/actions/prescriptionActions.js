@@ -228,13 +228,16 @@ export const saveRxGroup = (req, callback) => async (dispatch) => {
   }
 };
 
-export const searchMedicines = (searchParam) => async (dispatch) => {
+export const searchMedicines = (searchParam, callback) => async (dispatch) => {
   try {
     const queryString = new URLSearchParams(searchParam).toString();
     const response = await service.get(`Medicine/Search?${queryString}`);
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setMedicines(payload));
+      if (callback && typeof callback === "function") {
+        callback(payload);
+      }
     }
   } catch (error) {
     console.error("Error fetching user data:", error);

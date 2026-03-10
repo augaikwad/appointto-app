@@ -48,15 +48,6 @@ export const calendarDataFormatter = (data) => {
   return formattedData;
 };
 
-export const isPlainObject = (value) => {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    !Array.isArray(value) &&
-    typeof value !== "function"
-  );
-};
-
 export const areObjectsEqual = (objA, objB) => {
   const entriesA = Object.entries(objA);
   const entriesB = Object.entries(objB);
@@ -67,7 +58,7 @@ export const areObjectsEqual = (objA, objB) => {
 
   for (const [keyA, valueA] of entriesA) {
     const entryB = entriesB.find(
-      ([keyB, valueB]) => keyA === keyB && valueA === valueB
+      ([keyB, valueB]) => keyA === keyB && valueA === valueB,
     );
     if (!entryB) {
       return false;
@@ -80,7 +71,7 @@ export const areObjectsEqual = (objA, objB) => {
 export const getValueLabelOptions = (
   opts,
   labelField = "label",
-  valueField = "value"
+  valueField = "value",
 ) => {
   return opts.map((op) => ({
     label: op[labelField],

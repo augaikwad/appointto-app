@@ -31,7 +31,7 @@ function Dashboard() {
     //   dispatch(getDashboardAppointments(filters));
     //   dispatch(setDashboardListFilters(filters));
     // } else {
-    dispatch(getDashboardAppointments(dashboardListFilters));
+    // dispatch(getDashboardAppointments(dashboardListFilters));
     // }
   }, []);
 

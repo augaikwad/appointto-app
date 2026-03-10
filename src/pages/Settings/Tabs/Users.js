@@ -131,31 +131,44 @@ const AddEditUser = () => {
       if (lastStep === 2 && step === 1) {
         dispatch(
           registerUser({ ...data, id_clinic: id_clinic }, (res) => {
-            dispatch(getUsers(id_clinic));
-            const nextFormData = {
-              first_name: data.firstName,
-              last_name: data.lastName,
-              mobile_number: data.mobileNumber,
-              email_id: data.emailId,
-              role: data.userRole,
-              UserId: res.id_user,
-            };
-            reset({ ...data, ...nextFormData });
+            const { response_code } = res;
+            if (response_code === 2000) {
+              dispatch(getUsers(id_clinic));
+              const nextFormData = {
+                first_name: data.firstName,
+                last_name: data.lastName,
+                mobile_number: data.mobileNumber,
+                email_id: data.emailId,
+                role: data.userRole,
+                UserId: res.id_user,
+              };
+              reset({ ...data, ...nextFormData });
+              dispatch(
+                setAddEditUserModal({
+                  ...addEditUserModal,
+                  step: step + 1,
+                }),
+              );
+            }
+          }),
+        );
+      } else if (step === 0) {
+        dispatch(
+          setAddEditUserModal({
+            ...addEditUserModal,
+            step: step + 1,
           }),
         );
       }
-      dispatch(
-        setAddEditUserModal({
-          ...addEditUserModal,
-          step: step + 1,
-        }),
-      );
     } else if (name === "SaveBtn") {
       if (lastStep === 1) {
         dispatch(
-          registerUser({ ...data, id_clinic: id_clinic }, () => {
-            dispatch(setAddEditUserModal({ open: false }));
-            dispatch(getUsers(id_clinic));
+          registerUser({ ...data, id_clinic: id_clinic }, (res) => {
+            const { response_code } = res;
+            if (response_code === 2000) {
+              dispatch(setAddEditUserModal({ open: false }));
+              dispatch(getUsers(id_clinic));
+            }
           }),
         );
       } else if (lastStep === 2) {
@@ -164,10 +177,13 @@ const AddEditUser = () => {
           id_clinic,
         });
         dispatch(
-          registerDoctor(request, () => {
-            dispatch(setAddEditUserModal({ open: false }));
-            dispatch(getUsers(id_clinic));
-            dispatch(getDoctorsByClinicId({ id_clinic }, null));
+          registerDoctor(request, (res) => {
+            const { response_code } = res;
+            if (response_code === 2000) {
+              dispatch(setAddEditUserModal({ open: false }));
+              dispatch(getUsers(id_clinic));
+              dispatch(getDoctorsByClinicId({ id_clinic }, null));
+            }
           }),
         );
       }

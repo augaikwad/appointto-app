@@ -150,10 +150,17 @@ const MedicineNameField = ({
     );
   };
 
+  const [searchMedLoading, setSearchMedLoading] = useState(false);
+
   const handleInputChange = useCallback(
     _.debounce((value) => {
       if (value.length > 2) {
-        dispatch(searchMedicines({ Keywords: value, id_doctor: id_doctor }));
+        setSearchMedLoading(true);
+        dispatch(
+          searchMedicines({ Keywords: value, id_doctor: id_doctor }, () => {
+            setSearchMedLoading(false);
+          }),
+        );
       }
     }, 1000),
   );
@@ -178,6 +185,7 @@ const MedicineNameField = ({
         onChange={(val) => {
           onChange(val);
         }}
+        isLoading={searchMedLoading}
         rules={rules}
       />
       {medicineWatch && Object.keys(medicineWatch).length && (

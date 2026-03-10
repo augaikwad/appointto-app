@@ -6,6 +6,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { setDashboardListFilters } from "../../store/reducers/appointmentsSlice";
 import { getDashboardAppointments } from "../../store/actions/appointmentActions";
+import moment from "moment";
 
 const useStyles = createUseStyles({
   queueForFilter: {
@@ -28,20 +29,29 @@ const useStyles = createUseStyles({
 const ListFilters = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { doctorsByClinicId } = useSelector((state) => state.user);
+  const { doctorsByClinicId, selectedDoctor } = useSelector(
+    (state) => state.user,
+  );
   const { dashboardListFilters } = useSelector((state) => state.appointments);
-
   const [activeBtn, setActiveBtn] = useState(0);
 
   const form = useForm({
-    defaultValues: { ...dashboardListFilters },
+    defaultValues: dashboardListFilters,
   });
 
   const { setValue, getValues, reset } = form;
 
   useEffect(() => {
-    reset(dashboardListFilters);
-  }, [dashboardListFilters]);
+    //on init load today's appointment for selected doctor with status all
+    let req = {
+      appointment_date: moment().format("YYYY-MM-DD"),
+      id_doctor: selectedDoctor.id_doctor.toString(),
+      appointment_status: "0",
+    };
+
+    reset(req);
+    dispatch(getDashboardAppointments(req));
+  }, []);
 
   const filterList = (name, value) => {
     let req = getValues();

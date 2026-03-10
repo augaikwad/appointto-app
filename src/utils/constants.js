@@ -47,3 +47,34 @@ export const unitOptions = [
   { label: "cap", value: "cap" },
   { label: "puffs", value: "puffs" },
 ];
+
+export const timingOptions = [
+  {
+    value: "Beforefood",
+    label: "Before Food",
+  },
+  {
+    value: "Afterfood",
+    label: "After Food",
+  },
+  {
+    value: "EmptyStomach",
+    label: "Empty Stomach",
+  },
+  {
+    value: "BeforeBreakfast",
+    label: "Before Breakfast",
+  },
+  {
+    value: "AfterBreakfast",
+    label: "After Breakfast",
+  },
+  {
+    value: "SOS",
+    label: "SOS",
+  },
+  {
+    value: "BedTime",
+    label: "Bed Time",
+  },
+];

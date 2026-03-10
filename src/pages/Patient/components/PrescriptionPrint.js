@@ -3,6 +3,7 @@ import { createUseStyles } from "react-jss";
 import moment from "moment";
 import RXImg from "../../../content/images/rx.png";
 import { useSelector } from "react-redux";
+import { timingOptions } from "../../../utils/constants";
 
 const useStyles = createUseStyles({
   container: {
@@ -32,6 +33,16 @@ const useStyles = createUseStyles({
     padding: "30px 0",
     "& .advices": {
       marginTop: 15,
+      display: "flex",
+      "& > i": {
+        marginRight: 10,
+      },
+      "& ul": {
+        fontSize: "12pt",
+      },
+    },
+    "& .pt-12": {
+      fontSize: "12pt",
     },
   },
   rxImgContainer: {
@@ -41,9 +52,27 @@ const useStyles = createUseStyles({
     },
   },
   medicineRow: {
-    display: "flex",
+    fontSize: 18,
+    "& > .sr": {
+      width: 40,
+      textAlign: "center",
+      padding: "10px 12px",
+    },
+    "& .main-row": {
+      display: "flex",
+      "& > div": {
+        padding: "10px 12px",
+        fontSize: "18px",
+
+        "&.medicine": {
+          flex: 1,
+        },
+        "&.timing, &.duration, &.dose": {
+          width: "15%",
+        },
+      },
+    },
     "&.header": {
-      // background: "#b9b8b8",
       borderBottom: "1px solid #5f5f5f",
       marginTop: 16,
       "& > div": {
@@ -51,25 +80,8 @@ const useStyles = createUseStyles({
       },
     },
     "&.body": {
-      // background: "#ebebeb",
+      display: "flex",
       borderBottom: "1px solid #b3b3b3",
-    },
-    "& > div": {
-      padding: "10px 12px",
-      fontSize: "18px",
-      "&.medicine,&.timing": {
-        flex: "1 1 auto",
-        width: "40%",
-      },
-      "&.sr": {
-        width: 40,
-        textAlign: "center",
-        flex: "0 0 auto",
-      },
-      "&.dose": {
-        width: 135,
-        flex: "0 0 auto",
-      },
     },
   },
   footer: {
@@ -97,6 +109,11 @@ const PrescriptionPrint = React.forwardRef(({ data }, ref) => {
     );
   };
 
+  const getTimingLabel = (value) => {
+    const option = timingOptions.find((opt) => opt.value === value);
+    return option ? option.label : value;
+  };
+
   return (
     <div style={{ display: "none" }}>
       <div ref={ref} className={classes.container}>
@@ -107,7 +124,9 @@ const PrescriptionPrint = React.forwardRef(({ data }, ref) => {
                 <td width={"70px"}>
                   <b>Name</b>:
                 </td>
-                <td>{`${patientById?.first_name} ${patientById?.last_name} (${patientById?.age}y, ${patientById?.gender})`}</td>
+                <td>
+                  <b>{`${patientById?.first_name} ${patientById?.last_name} (${patientById?.age}y, ${patientById?.gender})`}</b>
+                </td>
                 <td width={"60px"}>
                   <b>Date</b>:
                 </td>
@@ -123,16 +142,22 @@ const PrescriptionPrint = React.forwardRef(({ data }, ref) => {
             <i>
               <b>Diagnosis</b>
             </i>
-            : {getStringFromObj(data?.lstDiagnosis)}
+            :{" "}
+            <span className="pt-12">
+              {getStringFromObj(data?.lstDiagnosis)}
+            </span>
           </div>
           <div className={classes.rxImgContainer}>
             <img src={RXImg} />
           </div>
           <div className={`${classes.medicineRow} header`}>
-            <div className="sr"></div>
-            <div className="medicine">Medicine</div>
-            <div className="dose">Dose</div>
-            <div className="timing">Timing - Duration</div>
+            <div className="main-row">
+              <div className="sr"></div>
+              <div className="medicine">Medicine</div>
+              <div className="dose">Dose</div>
+              <div className="timing">Timing</div>
+              <div className="duration">Duration</div>
+            </div>
           </div>
           {!!data.prescribedMedicines &&
             data.prescribedMedicines.length > 0 &&
@@ -142,14 +167,31 @@ const PrescriptionPrint = React.forwardRef(({ data }, ref) => {
                   <div className="sr">
                     <b>{ind + 1}</b>
                   </div>
-                  <div className="medicine">
-                    {med.type}. {med.medicineName}
-                  </div>
-                  <div className="dose">
-                    {med.dose} {`(${med.unit})`}
-                  </div>
-                  <div className="timing">
-                    {med.timing} - {med.duration}
+                  <div
+                    style={{
+                      display: "flex",
+                      flex: 1,
+                      flexDirection: "column",
+                    }}
+                  >
+                    <div className={`main-row`}>
+                      <div className="medicine">
+                        <b>
+                          {med.type}. {med.medicineName}
+                        </b>
+                      </div>
+                      <div className="dose">
+                        {med.dose} {`(${med.unit})`}
+                      </div>
+                      <div className="timing">{getTimingLabel(med.timing)}</div>
+                      <div className="duration">{med.duration}</div>
+                    </div>
+                    {med.note && med.note.trim() !== "" && (
+                      <div style={{ padding: "0 12px 10px" }}>
+                        <b>Note:</b>
+                        {med.note}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -158,11 +200,26 @@ const PrescriptionPrint = React.forwardRef(({ data }, ref) => {
             <i>
               <b>Advice</b>
             </i>
-            : {getStringFromObj(data?.lstAdvice)}
+            <ul>
+              {!!data?.lstAdvice &&
+                data?.lstAdvice.length > 0 &&
+                data?.lstAdvice.map((elem) => {
+                  return <li key={elem.id_advice}>{elem.name}</li>;
+                })}
+            </ul>
+            {/* : {getStringFromObj(data?.lstAdvice)} */}
+          </div>
+          <div className="nextVisitDate">
+            <i>
+              <b>Follow Up Date:</b>
+            </i>
+            {` ${data?.nextVisitDate ? moment(data.nextVisitDate).format("DD-MMM-yyyy") : "N/A"}`}
           </div>
         </div>
         <div className={classes.footer}>
-          <div>Dr. Doctor Name</div>
+          <div>
+            <b>{`Dr. ${data?.doctorName}`}</b>
+          </div>
         </div>
       </div>
     </div>

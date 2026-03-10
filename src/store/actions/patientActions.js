@@ -11,7 +11,7 @@ export const getPatientById = (reqParams, callback) => async (dispatch) => {
   const stringParams = new URLSearchParams(reqParams);
   try {
     const response = await service.get("Patient/get-patient?" + stringParams);
-    const { response_code, payload, message } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setPatientById(payload));
       if (callback) {
@@ -29,7 +29,7 @@ export const getGlobalList = (reqParams, callback) => async (dispatch) => {
     const response = await service.get(
       "Patient/get-patient-list?" + stringParams,
     );
-    const { response_code, payload, message } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setGlobalList(payload));
       if (callback) {
@@ -48,7 +48,7 @@ export const getPatientsList = (filters) => async (dispatch) => {
     const response = await service.get(
       "Patient/get-patient-list?" + stringParams,
     );
-    const { response_code, payload, message } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setPatientsList(payload));
     }
@@ -63,7 +63,7 @@ export const addPatientGeneralInfo = (req, callback) => async (dispatch) => {
       "Patient/add-patient-general",
       formattedObjForPatientSave(req),
     );
-    const { response_code, payload, message } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       if (callback) {
         callback(payload);
@@ -79,8 +79,12 @@ export const updatePatientGeneralInfo = (req, callback) => async (dispatch) => {
     const response = await service.post(
       "Patient/update-patient-general",
       formattedObjForPatientSave(req),
+      {
+        silent: false,
+        showNotification: true,
+      },
     );
-    const { response_code, payload, message } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       if (callback) {
         callback(payload);
@@ -111,7 +115,7 @@ export const addDocuments =
         configData,
       );
 
-      const { response_code, payload, message } = response.data;
+      const { response_code, payload } = response.data;
       if (response_code === 2000) {
         if (callback) {
           callback(payload);
@@ -143,7 +147,7 @@ export const deletePatient = (id, callback) => async (dispatch) => {
     const response = await service.post(
       `Patient/delete-patient-general?PatientId=${id}`,
     );
-    const { response_code, payload, message } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       if (callback) {
         callback(payload);

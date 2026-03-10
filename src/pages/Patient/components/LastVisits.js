@@ -1,12 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Tooltip } from "../../../components";
 import { createUseStyles } from "react-jss";
 import { format } from "date-fns";
 import CommonMedicineTable from "./CommonMedicineTable";
 import PrescriptionPrint from "../components/PrescriptionPrint";
 import ReactToPrint from "react-to-print";
-import { useDispatch, useSelector } from "react-redux";
-import { getPrescriptions } from "../../../store/actions/prescriptionActions";
+import { useSelector } from "react-redux";
+import useAxios from "../../../hooks/useAxios";
+import { timingOptions } from "../../../utils/constants";
 
 const useStyles = createUseStyles({
   container: {
@@ -66,6 +67,21 @@ const useStyles = createUseStyles({
         },
       },
     },
+    "& .list-pointer": {
+      position: "relative",
+      paddingLeft: "10px",
+      "&:before": {
+        content: '""',
+        position: "absolute",
+        left: 0,
+        top: "50%",
+        transform: "translateY(-50%)",
+        height: "4px",
+        width: "4px",
+        borderRadius: "50%",
+        background: "#414141",
+      },
+    },
   },
   timelineActionBtn: {
     height: "30px !important",
@@ -79,7 +95,15 @@ const headerColumns = [
   { field: "medicineName", label: "Medicine", width: "30%" },
   { field: "dose", label: "Dose", width: "80px" },
   { field: "unit", label: "Unit", width: "55px" },
-  { field: "timing", label: "Timing", width: "120px" },
+  {
+    field: "timing",
+    label: "Timing",
+    width: "120px",
+    formatter: (item, val) => {
+      const option = timingOptions.find((opt) => opt.value === val);
+      return option ? option.label : val;
+    },
+  },
   { field: "duration", label: "Duration", width: "120px" },
   { field: "note", label: "Notes" },
 ];
@@ -107,18 +131,8 @@ const PrintButton = ({ data }) => {
   );
 };
 
-const LastVisits = () => {
+const LastVisits = ({ loading = false, prescriptions = [] }) => {
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const { allPrescriptions } = useSelector((state) => state.prescription);
-  const { patientById } = useSelector((state) => state.patients);
-  const { selectedDoctor } = useSelector((state) => state.user);
-
-  useEffect(() => {
-    if (patientById !== null) {
-      dispatch(getPrescriptions({ PatientId: patientById.id_patient }));
-    }
-  }, [patientById]);
 
   const getCardTitle = (item) => {
     return (
@@ -126,23 +140,30 @@ const LastVisits = () => {
         <b className="pr-5">
           {format(new Date(item.prescriptionDate), "dd-MMM-yyyy")}
         </b>{" "}
-        By: {`${selectedDoctor.first_name} ${selectedDoctor.last_name}`}
+        By: {item.doctorName}
       </>
     );
   };
+
+  // Sort prescriptions by prescriptionId in descending order before rendering
+  const sortedPrescriptions = [...prescriptions].sort(
+    (a, b) => b.prescriptionId - a.prescriptionId,
+  );
 
   return (
     <div className={classes.container}>
       <div className="row">
         <div className="col-lg-12">
           <h5 className="text-center">
-            {allPrescriptions.length > 0 ? `Timeline` : "No Visits Available"}
+            {sortedPrescriptions.length > 0
+              ? `Timeline`
+              : "No Visits Available"}
           </h5>
         </div>
         <div className={`col-lg-12 ${classes.visitsContainer}`}>
           <div className={`timeline ${classes.visitsTimeline}`}>
-            {allPrescriptions.length > 0 &&
-              allPrescriptions.map((item, ind) => {
+            {sortedPrescriptions.length > 0 &&
+              sortedPrescriptions.map((item, ind) => {
                 return (
                   <div
                     key={ind}
@@ -223,11 +244,16 @@ const LastVisits = () => {
                               <div>
                                 {!!item.lstAdvice &&
                                   item.lstAdvice.length > 0 &&
-                                  item.lstAdvice
-                                    .map((elem) => {
-                                      return elem.name;
-                                    })
-                                    .join(", ")}
+                                  item.lstAdvice.map((elem) => {
+                                    return (
+                                      <div
+                                        key={elem.id_advice}
+                                        className="list-pointer"
+                                      >
+                                        {elem.name}
+                                      </div>
+                                    );
+                                  })}
                               </div>
                             </div>
                             <div className="form-group inline-form-group">

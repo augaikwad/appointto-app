@@ -7,9 +7,7 @@ const useAxios = ({ silent = true, showNotification = false } = {}) => {
   const [loading, setLoading] = useState(false);
 
   const fetchData = useCallback(async (requestParams, callback) => {
-    if (!silent) {
-      setLoading(true);
-    }
+    setLoading(true);
 
     setError(null);
 

@@ -10,6 +10,7 @@ const useStyles = createUseStyles({
     padding: "4px 5px",
     cursor: "pointer",
     margin: "0 4px 4px 0",
+    fontSize: 14,
   },
 });
 

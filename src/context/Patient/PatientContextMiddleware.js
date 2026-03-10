@@ -34,7 +34,10 @@ export const applyPatientContextMiddleware =
             });
         case actionTypes.UPDATE_PATIENT_GENERAL_INFO:
           return service
-            .post(baseUrl + "Patient/update-patient-general", action.request)
+            .post(baseUrl + "Patient/update-patient-general", action.request, {
+              silent: false,
+              showNotification: true,
+            })
             .then((res) => {
               const { data } = res;
               if (data.response_code === 2000) {
@@ -56,7 +59,10 @@ export const applyPatientContextMiddleware =
             });
         case actionTypes.CREATE_APPOINTMENT:
           return service
-            .post(baseUrl + "Appointment/Create", action.request)
+            .post(baseUrl + "Appointment/Create", action.request, {
+              silent: false,
+              showNotification: true,
+            })
             .then((res) => {
               const { data } = res;
               if (data.response_code === 2000) {

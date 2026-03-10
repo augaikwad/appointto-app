@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Tooltip, InputField, Modal } from "../../../components";
+import { Tooltip, Modal } from "../../../components";
 import Field from "../../../components/form/Field";
 import Select from "react-select";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
@@ -29,16 +29,14 @@ import { allowOnlyNumbers } from "../../../utils/common";
 import { useLocation, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getPrintingSetting } from "../../../store/actions/settingActions";
-import {
-  getPrescriptions,
-  savePrescription,
-} from "../../../store/actions/prescriptionActions";
+import { savePrescription } from "../../../store/actions/prescriptionActions";
 import {
   getAppointmentById,
   updateAppointment,
   getDashboardAppointments,
 } from "../../../store/actions/appointmentActions";
 import moment from "moment";
+import useAxios from "../../../hooks/useAxios";
 
 const toastOption = { hideAfter: 5, position: "top-right" };
 
@@ -93,11 +91,42 @@ const Prescription = () => {
 
   const printRef = useRef(null);
   const [printData, setPrintData] = useState([]);
-  const [hasAllergies, setHasAllergies] = useState(false);
   const [newVital, setNewVital] = useState(null);
-
+  const [showVitals, setShowVitals] = useState(false);
   const location = useLocation();
   const { id_appointment } = location.state;
+
+  const [prescriptions, setPrescriptions] = useState([]);
+
+  const { loading: timelineLoading, fetchData: getPrescriptions } = useAxios();
+
+  const fetchPrescriptions = () => {
+    if (patientById !== null) {
+      getPrescriptions(
+        {
+          url: "Prescription/GetPrescription",
+          method: "post",
+          data: { PatientId: patientById.id_patient },
+          silent: false,
+          showNotification: true,
+        },
+        (status, res) => {
+          const { response_code, payload } = res;
+          if (response_code === 2000) {
+            setPrescriptions(payload);
+          } else {
+            setPrescriptions([]);
+          }
+        },
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (patientById !== null) {
+      fetchPrescriptions();
+    }
+  }, [patientById]);
 
   useEffect(() => {
     dispatch(getPrintingSetting(id_doctor));
@@ -128,13 +157,6 @@ const Prescription = () => {
     control,
     name: "vitals",
   });
-
-  useEffect(() => {
-    if (patientById !== null) {
-      const { medicalPrecondition } = patientById;
-      setHasAllergies(medicalPrecondition.includes("allergies"));
-    }
-  }, [patientById]);
 
   const handleUpdateAppointment = () => {
     if (id_appointment && id_appointment > 0) {
@@ -202,7 +224,6 @@ const Prescription = () => {
         savePrescription(formData, (res) => {
           const btnId = e.target.id;
           handleUpdateAppointment();
-          dispatch(getPrescriptions({ PatientId: res.patientId }));
           if (btnId === "SaveNext") {
             history.push({
               pathname: `/patient/${patientById.id_patient}`,
@@ -213,6 +234,9 @@ const Prescription = () => {
             handlePrint();
           }
           reset();
+
+          // fetch updated prescriptions after save for timeline
+          fetchPrescriptions();
         }),
       );
     }
@@ -260,106 +284,136 @@ const Prescription = () => {
     const daysDifference = endMoment.diff(startMoment, "days");
     const monthsDifference = endMoment.diff(startMoment, "months");
     const yearsDifference = endMoment.diff(startMoment, "years");
+    setValue("nextVisitAfter", daysDifference);
+    setValue("nextVisitUnit", "Days");
 
-    if (daysDifference < 30) {
-      console.log(`${daysDifference} day${daysDifference !== 1 ? "s" : ""}`);
-    } else if (monthsDifference < 12) {
-      return console.log(
-        `${monthsDifference} month${monthsDifference !== 1 ? "s" : ""}`,
-      );
-    } else {
-      return console.log(
-        `${yearsDifference} year${yearsDifference !== 1 ? "s" : ""}`,
-      );
-    }
+    // if (daysDifference < 30) {
+    //   console.log(
+    //     `if - ${daysDifference} day${daysDifference !== 1 ? "s" : ""}`,
+    //   );
+    // } else if (monthsDifference < 12) {
+    //   return console.log(
+    //     `else if - ${monthsDifference} month${monthsDifference !== 1 ? "s" : ""}`,
+    //   );
+    // } else {
+    //   return console.log(
+    //     `else - ${yearsDifference} year${yearsDifference !== 1 ? "s" : ""}`,
+    //   );
+    // }
   };
 
   return (
     <>
-      {hasAllergies && (
-        <Alert variant="danger">Patient Allergies content ......</Alert>
-      )}
+      {patientById &&
+        patientById.medicalPrecondition &&
+        patientById.medicalPrecondition !== "" && (
+          <Alert variant="danger">
+            <b>Medical Precondition:</b> {patientById.medicalPrecondition}
+          </Alert>
+        )}
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="row">
             <div className="col-lg-1">
-              <h6 style={{ height: 32, lineHeight: "32px" }}>Vitals</h6>
+              <h6 style={{ height: 56, lineHeight: "32px" }}>
+                Vitals
+                <Tooltip
+                  text={`${showVitals ? "Hide" : "Show"} Vitals`}
+                  placement="top"
+                >
+                  <button
+                    className="btn btn-outline-primary btn-rounded btn-icon ml-2"
+                    style={{ height: 32, width: 32 }}
+                    type="button"
+                    onClick={(e) => {
+                      setShowVitals(!showVitals);
+                    }}
+                    tabIndex="-1"
+                  >
+                    <i className={`fa fa-eye${showVitals ? "-slash" : ""}`}></i>
+                  </button>
+                </Tooltip>
+              </h6>
             </div>
-            <div className="col-lg-9">
-              <div className="row">
-                <div className="col-lg-3">
-                  <MaskedField
-                    label="BP"
-                    name="bp"
-                    mask="111/111"
-                    inline={true}
-                    labelWidth="80px"
-                  />
-                </div>
-                <div className="col-lg-3">
-                  <TextField
-                    label="TEMP"
-                    name="tempratureInFahrenhiet"
-                    inline={true}
-                    labelWidth="80px"
-                  />
-                </div>
-                <div className="col-lg-3">
-                  <TextField
-                    label="SPO2"
-                    name="oxizenSaturation"
-                    inline={true}
-                    labelWidth="80px"
-                  />
-                </div>
-                <div className="col-lg-3">
-                  <TextField
-                    label="PR"
-                    name="pr"
-                    inline={true}
-                    labelWidth="80px"
-                  />
-                </div>
-              </div>
-              <div className="row">
-                {fields.map((field, index) => {
-                  return (
+            {showVitals && (
+              <>
+                <div className="col-lg-9">
+                  <div className="row">
                     <div className="col-lg-3">
-                      <TextField
-                        label={field.label}
-                        name={`vitals.${index}.value`}
+                      <MaskedField
+                        label="BP"
+                        name="bp"
+                        mask="111/111"
                         inline={true}
                         labelWidth="80px"
                       />
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="col-lg-1">
-              <Tooltip text="Add New Vital" placement="top">
-                <button
-                  className="btn btn-sm btn-primary btn-icon"
-                  style={{ height: 32, width: 32 }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShow(true);
-                  }}
-                  tabIndex="-1"
-                >
-                  <i className="fa fa-plus"></i>
-                </button>
-              </Tooltip>
-              <AddNewVitalModal
-                show={show}
-                onHide={() => setShow(false)}
-                newVitalState={{
-                  value: newVital,
-                  setValue: setNewVital,
-                }}
-                footerActions={<FooterActions />}
-              />
-            </div>
+                    <div className="col-lg-3">
+                      <TextField
+                        label="TEMP"
+                        name="tempratureInFahrenhiet"
+                        inline={true}
+                        labelWidth="80px"
+                      />
+                    </div>
+                    <div className="col-lg-3">
+                      <TextField
+                        label="SPO2"
+                        name="oxizenSaturation"
+                        inline={true}
+                        labelWidth="80px"
+                      />
+                    </div>
+                    <div className="col-lg-3">
+                      <TextField
+                        label="PR"
+                        name="pr"
+                        inline={true}
+                        labelWidth="80px"
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
+                    {fields.map((field, index) => {
+                      return (
+                        <div className="col-lg-3">
+                          <TextField
+                            label={field.label}
+                            name={`vitals.${index}.value`}
+                            inline={true}
+                            labelWidth="80px"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="col-lg-1">
+                  <Tooltip text="Add New Vital" placement="top">
+                    <button
+                      className="btn btn-sm btn-primary btn-icon"
+                      style={{ height: 32, width: 32 }}
+                      type="button"
+                      onClick={() => {
+                        setShow(true);
+                      }}
+                      tabIndex="-1"
+                    >
+                      <i className="fa fa-plus"></i>
+                    </button>
+                  </Tooltip>
+                  <AddNewVitalModal
+                    show={show}
+                    onHide={() => setShow(false)}
+                    newVitalState={{
+                      value: newVital,
+                      setValue: setNewVital,
+                    }}
+                    footerActions={<FooterActions />}
+                  />
+                </div>
+              </>
+            )}
           </div>
           <div className="row">
             <div className="col-lg-5">
@@ -489,6 +543,7 @@ const Prescription = () => {
                       calculateNextVisitDays(val);
                       return val;
                     }}
+                    minDate={new Date()}
                   />
                 </div>
               </div>
@@ -500,7 +555,7 @@ const Prescription = () => {
                 style={{ minWidth: 120 }}
                 onClick={handleSubmit(onSubmit)}
               >
-                Save & Print
+                Print
               </Button>
               <Button
                 id="Save"
@@ -516,14 +571,14 @@ const Prescription = () => {
                 style={{ minWidth: 120 }}
                 onClick={handleSubmit(onSubmit)}
               >
-                Save & Next
+                Next
               </Button>
             </div>
           </div>
         </form>
       </FormProvider>
       <PrescriptionPrint ref={printRef} data={printData} />
-      <LastVisits />
+      <LastVisits loading={timelineLoading} prescriptions={prescriptions} />
     </>
   );
 };

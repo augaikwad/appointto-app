@@ -20,7 +20,7 @@ export const getDashboardAppointments = (request) => async (dispatch) => {
       "Appointment/get-appointment-by-doctor",
       formattedFilters(request),
     );
-    const { response_code, payload, message } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setDashboardAppointments(payload));
     }
@@ -32,8 +32,11 @@ export const getDashboardAppointments = (request) => async (dispatch) => {
 
 export const createAppointment = (req, callback) => async (dispatch) => {
   try {
-    const response = await service.post("Appointment/Create", req);
-    const { response_code, message, payload } = response.data;
+    const response = await service.post("Appointment/Create", req, {
+      silent: false,
+      showNotification: true,
+    });
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       if (callback) {
         callback(payload);
@@ -52,7 +55,7 @@ export const updateAppointment = (req, callback) => async (dispatch) => {
       silent: false,
       showNotification: true,
     });
-    const { response_code, message } = response.data;
+    const { response_code } = response.data;
     if (response_code === 2000) {
       if (callback) {
         callback();

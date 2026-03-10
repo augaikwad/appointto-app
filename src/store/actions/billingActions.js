@@ -11,7 +11,7 @@ export const getTreatmentList = (id_doctor) => async (dispatch) => {
     const response = await service.get(
       "Doctor/GetTreatmentList?DoctorId=" + id_doctor,
     );
-    const { response_code, payload, message } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setTreatmentList(payload));
     }
@@ -26,7 +26,7 @@ export const createBill = (req, callback) => async (dispatch) => {
       silent: false,
       showNotification: true,
     });
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       if (callback) {
         callback(payload);
@@ -41,7 +41,7 @@ export const createBill = (req, callback) => async (dispatch) => {
 export const updateBill = (req, callback) => async (dispatch) => {
   try {
     const response = await service.post("Bill/Update", req);
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       if (callback) {
         callback(payload);
@@ -86,7 +86,7 @@ export const getAllBillData = (req) => async (dispatch) => {
 export const deleteBill = (req, callback) => async (dispatch) => {
   try {
     const response = await service.post("Bill/Delete", req);
-    const { response_code, message } = response.data;
+    const { response_code } = response.data;
     if (response_code === 2000) {
       if (callback) {
         callback();
@@ -168,7 +168,7 @@ export const addPayment = (req, callback) => async (dispatch) => {
 export const payAllPayment = (req, callback) => async (dispatch) => {
   try {
     const response = await service.post("Bill/AddAllPayment", req);
-    const { response_code, payload, message } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       if (callback) {
         callback(payload);

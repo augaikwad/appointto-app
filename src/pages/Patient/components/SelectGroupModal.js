@@ -28,6 +28,11 @@ const useStyles = createUseStyles({
     },
     "& > div.groupsBody": {
       padding: "5px 8px",
+      "& > .badge": {
+        whiteSpace: "normal",
+        textAlign: "left",
+        lineHeight: "0.8rem",
+      },
     },
   },
 });

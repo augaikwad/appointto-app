@@ -13,7 +13,7 @@ import {
 export const getSpeciality = () => async (dispatch) => {
   try {
     const response = await service.get("Doctor/get_speciality");
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setSpeciality(payload));
     }
@@ -28,7 +28,7 @@ export const getOTP = (request) => async (dispatch) => {
       silent: false,
       showNotification: true,
     });
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setOTPData(payload));
     }
@@ -43,7 +43,7 @@ export const verifyOTP = (request, history) => async (dispatch) => {
       silent: false,
       showNotification: true,
     });
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       sessionStorage.setItem("token", payload.registration_token);
       dispatch(setVerifyOTPData(payload));
@@ -63,7 +63,7 @@ export const getOTPForResetPassword = (request) => async (dispatch) => {
       "Registration/reset-password-generate-otp",
       request,
     );
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setOTPData(payload));
     }
@@ -75,7 +75,7 @@ export const getOTPForResetPassword = (request) => async (dispatch) => {
 export const resendOTP = (request) => async (dispatch) => {
   try {
     const response = await service.post("Registration/resend-otp", request);
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(setOTPData(payload));
     }
@@ -87,7 +87,7 @@ export const resendOTP = (request) => async (dispatch) => {
 export const resetPassword = (request, callback) => async (dispatch) => {
   try {
     const response = await service.post("Registration/reset-password", request);
-    const { response_code, message } = response.data;
+    const { response_code } = response.data;
     if (response_code === 2000) {
       dispatch(resetPasswordSuccess());
       if (callback) {
@@ -134,7 +134,7 @@ export const updateDoctorInfo = (request, callback) => async (dispatch) => {
       silent: false,
       showNotification: true,
     });
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(updateDoctorInfoSuccess(payload));
       if (callback) {
@@ -156,7 +156,7 @@ export const updateClinicInfo = (request, callback) => async (dispatch) => {
         showNotification: true,
       },
     );
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(updateClinicInfoSuccess(payload));
       if (callback) {
@@ -174,7 +174,7 @@ export const updateScheduleInfo = (request, callback) => async (dispatch) => {
       silent: false,
       showNotification: true,
     });
-    const { response_code, message, payload } = response.data;
+    const { response_code, payload } = response.data;
     if (response_code === 2000) {
       dispatch(updateClinicInfoSuccess(payload));
       if (callback) {

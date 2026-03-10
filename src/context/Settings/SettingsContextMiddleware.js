@@ -101,7 +101,14 @@ export const applySettingsContextMiddleware =
             });
         case actionTypes.REGISTER_USER:
           return service
-            .post(baseUrl + "Registration/register-user-clinc", action.request)
+            .post(
+              baseUrl + "Registration/register-user-clinc",
+              action.request,
+              {
+                silent: false,
+                showNotification: true,
+              },
+            )
             .then((res) => {
               const { data } = res;
               if (data.response_code === 2000) {
@@ -115,13 +122,14 @@ export const applySettingsContextMiddleware =
             });
         case actionTypes.REGISTER_DOCTOR:
           return service
-            .post(baseUrl + "Doctor/create_clinic_doctor", action.request)
+            .post(baseUrl + "Doctor/create_clinic_doctor", action.request, {
+              silent: false,
+              showNotification: true,
+            })
             .then((res) => {
               const { data } = res;
-              if (data.response_code === 2000) {
-                if (action.callback) {
-                  action.callback();
-                }
+              if (action.callback) {
+                action.callback(data);
               }
             })
             .catch((error) => {

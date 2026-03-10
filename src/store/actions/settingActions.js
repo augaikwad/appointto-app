@@ -94,12 +94,10 @@ export const registerUser = (req, callback) => async (dispatch) => {
     const response = await service.post(
       "Registration/register-user-clinc",
       req,
+      { silent: false, showNotification: true },
     );
-    const { response_code, payload } = response.data;
-    if (response_code === 2000) {
-      if (callback) {
-        callback(payload);
-      }
+    if (callback) {
+      callback(response.data);
     }
   } catch (error) {
     // Handle error here
@@ -109,12 +107,12 @@ export const registerUser = (req, callback) => async (dispatch) => {
 
 export const registerDoctor = (req, callback) => async (dispatch) => {
   try {
-    const response = await service.post("Doctor/create_clinic_doctor", req);
-    const { response_code, payload } = response.data;
-    if (response_code === 2000) {
-      if (callback) {
-        callback(payload);
-      }
+    const response = await service.post("Doctor/create_clinic_doctor", req, {
+      silent: false,
+      showNotification: true,
+    });
+    if (callback) {
+      callback(response.data);
     }
   } catch (error) {
     // Handle error here
