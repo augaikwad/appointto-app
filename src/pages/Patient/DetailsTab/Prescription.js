@@ -34,6 +34,7 @@ import {
   getAppointmentById,
   updateAppointment,
   getDashboardAppointments,
+  createAppointment,
 } from "../../../store/actions/appointmentActions";
 import moment from "moment";
 import useAxios from "../../../hooks/useAxios";
@@ -100,6 +101,22 @@ const Prescription = () => {
 
   const { loading: timelineLoading, fetchData: getPrescriptions } = useAxios();
 
+  const createAppointmentForFollowUp = (data) => {
+    const followUpReq = {
+      id_appointment: 0,
+      id_doctor: data.id_doctor,
+      id_patient: data.patientId,
+      date: data.nextVisitDate,
+      day: moment(new Date(data.nextVisitDate)).format("dddd"),
+      start_time: moment().format("h:mm A"),
+      end_time: moment().add(15, "minutes").format("h:mm A"),
+      reason: "Follow up",
+      appointment_status: "",
+    };
+
+    dispatch(createAppointment(followUpReq));
+  };
+
   const fetchPrescriptions = () => {
     if (patientById !== null) {
       getPrescriptions(
@@ -148,10 +165,12 @@ const Prescription = () => {
           note: "",
         },
       ],
+      nextVisitAfter: 7,
+      nextVisitDate: new Date(moment().add(7, "days")),
     },
   });
 
-  const { handleSubmit, reset, control, setValue, watch, formState } = form;
+  const { handleSubmit, reset, control, setValue, watch } = form;
 
   const { fields, append } = useFieldArray({
     control,
@@ -235,6 +254,8 @@ const Prescription = () => {
           }
           reset();
 
+          createAppointmentForFollowUp(res);
+
           // fetch updated prescriptions after save for timeline
           fetchPrescriptions();
         }),
@@ -278,28 +299,15 @@ const Prescription = () => {
   const [toothChartShow, setToothChartShow] = useState(false);
 
   const calculateNextVisitDays = (selectedDate) => {
-    const startMoment = moment(new Date());
+    const startMoment = moment();
     const endMoment = moment(selectedDate);
 
     const daysDifference = endMoment.diff(startMoment, "days");
-    const monthsDifference = endMoment.diff(startMoment, "months");
-    const yearsDifference = endMoment.diff(startMoment, "years");
-    setValue("nextVisitAfter", daysDifference);
-    setValue("nextVisitUnit", "Days");
 
-    // if (daysDifference < 30) {
-    //   console.log(
-    //     `if - ${daysDifference} day${daysDifference !== 1 ? "s" : ""}`,
-    //   );
-    // } else if (monthsDifference < 12) {
-    //   return console.log(
-    //     `else if - ${monthsDifference} month${monthsDifference !== 1 ? "s" : ""}`,
-    //   );
-    // } else {
-    //   return console.log(
-    //     `else - ${yearsDifference} year${yearsDifference !== 1 ? "s" : ""}`,
-    //   );
-    // }
+    const daysDiff = endMoment.diff(startMoment, "days") + 1;
+
+    setValue("nextVisitAfter", daysDiff);
+    setValue("nextVisitUnit", "Days");
   };
 
   return (
@@ -543,7 +551,7 @@ const Prescription = () => {
                       calculateNextVisitDays(val);
                       return val;
                     }}
-                    minDate={new Date()}
+                    minDate={moment().add(1, "days").toDate()}
                   />
                 </div>
               </div>

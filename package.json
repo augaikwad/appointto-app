@@ -106,6 +106,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:dev": "env-cmd -f .env.development react-scripts build",
+    "build:prod": "env-cmd -f .env.production react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -128,6 +130,7 @@
     ]
   },
   "devDependencies": {
+    "env-cmd": "^10.1.0",
     "sass": "^1.51.0"
   }
 }

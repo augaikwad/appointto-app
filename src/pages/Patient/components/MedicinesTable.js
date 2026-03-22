@@ -287,14 +287,73 @@ const NewMedTable = ({ control, setValue }) => {
   };
 
   const doseFormatter = ({ name, index }) => {
+    // const handleOnKeyDown = (e) => {
+    //   const acceptedKeys = [
+    //     "1",
+    //     "0",
+    //     " ",
+    //     "Backspace",
+    //     // "ArrowLeft",
+    //     // "ArrowRight",
+    //   ];
+    //   if (e.key === "Tab" || e.keyCode === 9) {
+    //     setTimeout(() => {
+    //       setFocus(`prescribedMedicines.${index}.unit`);
+    //     }, 100);
+    //   } else if (!acceptedKeys.includes(e.key)) {
+    //     e.preventDefault();
+    //   }
+    // };
+
+    const handleOnChange = (e) => {
+      const { value } = e.target;
+      let newVal = [];
+
+      for (let i = 0; i < value.length; i++) {
+        if (!isNaN(value[i]) && value[i] !== " ") {
+          newVal.push(value[i]);
+        } else if (value[i] === "-" || value[i] === " ") {
+          if (newVal.length > 0 && newVal[newVal.length - 1] !== "-") {
+            newVal.push("-");
+          }
+        }
+      }
+
+      let stringVal = newVal.join("").replace(/-+/g, "-").replace(/^-|-$/g, "");
+
+      // Limit to 8 digits only
+      const digitsOnly = stringVal.replace(/\D/g, "");
+      if (digitsOnly.length > 8) {
+        stringVal = digitsOnly.slice(0, 8);
+      }
+
+      // Add dash after every 2 digits automatically
+      let formattedVal = stringVal;
+      if (stringVal.length > 0) {
+        formattedVal = stringVal.replace(/(\d{2})(?=\d)/g, "$1-");
+      }
+
+      setValue(name, formattedVal);
+    };
+
     const handleOnKeyDown = (e) => {
       const acceptedKeys = [
-        "1",
         "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "-",
         " ",
         "Backspace",
-        // "ArrowLeft",
-        // "ArrowRight",
+        "Delete",
+        "ArrowLeft",
+        "ArrowRight",
       ];
       if (e.key === "Tab" || e.keyCode === 9) {
         setTimeout(() => {
@@ -303,21 +362,6 @@ const NewMedTable = ({ control, setValue }) => {
       } else if (!acceptedKeys.includes(e.key)) {
         e.preventDefault();
       }
-    };
-
-    const handleOnChange = (e) => {
-      const { value } = e.target;
-      let newVal = [];
-
-      for (let i = 0; i < value.length; i++) {
-        if (value[i] === "0" || value[i] === "1") {
-          newVal.push(value[i]);
-        } else if (value[i] === " ") {
-          newVal.push(0);
-        }
-      }
-      const stringVal = newVal.join("-");
-      setValue(name, stringVal);
     };
 
     return (

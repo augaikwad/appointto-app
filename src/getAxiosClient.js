@@ -27,6 +27,7 @@ const hideLoader = (isSilent) => {
 
 const getAxiosClient = (baseUrl = null) => {
   const { API_BASE_URL } = config;
+  console.log("API_BASE_URL", API_BASE_URL);
   const options = {
     baseURL: API_BASE_URL ? API_BASE_URL : baseUrl,
     headers: {
