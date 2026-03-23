@@ -12,7 +12,7 @@ const useAxios = ({ silent = true, showNotification = false } = {}) => {
     setError(null);
 
     const client = getAxiosClient();
-
+    debugger;
     try {
       // 2. Fire the request
       const response = await client.request({
@@ -31,13 +31,14 @@ const useAxios = ({ silent = true, showNotification = false } = {}) => {
 
       return response.data;
     } catch (err) {
+      console.log(err.response?.status);
       const { status } = err;
       // 4. Handle error
       setError(err);
       if (callback && typeof callback === "function") {
         callback(status, err);
       }
-      throw err; // Re-throw so the component can catch it if needed
+      throw Promise.reject(err); // Re-throw so the component can catch it if needed
     } finally {
       // 5. Turn off loader
       setLoading(false);

@@ -3,7 +3,6 @@ import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { Button, Form } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import { ReactSelectField } from "../../../components/Forms";
-import InputMask from "react-input-mask";
 import MedicineNameField from "./MedicineNameField";
 import CommonMedicineTable from "./CommonMedicineTable";
 import { AutocompleteField, Modal } from "../../../components";

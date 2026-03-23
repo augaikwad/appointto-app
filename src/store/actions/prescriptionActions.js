@@ -186,11 +186,11 @@ export const saveInvestigationsGroup = (req, callback) => async (dispatch) => {
 export const getMedicinesByDoctorId = (id_doctor) => async (dispatch) => {
   try {
     const response = await service.get(
-      "Medicine/get-doctor-medicine?id_doctor=" + id_doctor,
+      `Medicine/get-doctor-medicine?id_doctor=${id_doctor}&page=1&pageSize=10`,
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {
-      dispatch(setMedicinesByDoctorId(payload));
+      dispatch(setMedicinesByDoctorId(payload.data));
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
