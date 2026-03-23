@@ -44,8 +44,20 @@ const useStyles = createUseStyles({
   td: {
     background: "#fff",
     padding: "5px 10px !important",
-    "&.actions > button:not(:first-child)": {
-      marginLeft: 14,
+    "&.actions > button": {
+      height: 30,
+      width: 30,
+      "&:not(:first-child)": {
+        marginLeft: 14,
+      },
+    },
+    "& > .med-td": {
+      display: "flex",
+      flexDirection: "column",
+      "& > .med": {
+        marginBottom: 7,
+      },
+      "& > .composition": {},
     },
   },
   medicineSearch: {
@@ -209,6 +221,18 @@ const Index = () => {
     >
       <div className="table-responsive">
         <table className="table table-borderless">
+          <thead>
+            <tr>
+              <th width={"70px"}>Type</th>
+              <th>Medicine</th>
+              <th width={"70px"}>Unit</th>
+              <th width={"100px"}>Dose</th>
+              <th width={"150px"}>Timing</th>
+              <th width={"150px"}>Duration</th>
+              <th width={"200px"}>Note</th>
+              <th>Action</th>
+            </tr>
+          </thead>
           <tbody>
             {listData.data.length === 0 && (
               <tr key="NoRecords">
@@ -221,7 +245,22 @@ const Index = () => {
               listData.data.map((item, ind) => {
                 return (
                   <tr key={item.medicineId} className={classes.tr}>
-                    <td className={`${classes.td}`}>{item.medicineName}</td>
+                    <td className={`${classes.td}`}>{item.type}</td>
+                    <td className={`${classes.td}`}>
+                      <div className="med-td">
+                        <div className="med">
+                          <b>{item.medicineName}</b>
+                        </div>
+                        <div className="composition">
+                          <i>{item.composition}</i>
+                        </div>
+                      </div>
+                    </td>
+                    <td className={`${classes.td}`}>{item.unit}</td>
+                    <td className={`${classes.td}`}>{item.dose}</td>
+                    <td className={`${classes.td}`}>{item.timing}</td>
+                    <td className={`${classes.td}`}>{item.duration}</td>
+                    <td className={`${classes.td}`}>{item.notes}</td>
                     <td className={`${classes.td} actions`} width="130px">
                       <Tooltip text="Edit Medicine" placement="top">
                         <Button
