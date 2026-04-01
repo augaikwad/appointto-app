@@ -148,7 +148,7 @@ const Medical = (props) => {
         </div>
         <div className="col-lg-6">
           <CreatableReactSelect
-            label="Curerent Medications"
+            label="Current Medications"
             name="current_medicine"
           />
         </div>

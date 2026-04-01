@@ -183,13 +183,13 @@ const AddEditPatientModal = (props) => {
 
   const onSubmit = (data, e) => {
     const { name } = e.target;
-    // if (name === "save") {
-    //   handleSave(data);
-    // } else if (name === "addToQueue") {
-    //   handleAddToQueue(data);
-    // } else if (name === "addAppointment") {
-    //   handleAddAppointment(data);
-    // }
+    if (name === "save") {
+      handleSave(data);
+    } else if (name === "addToQueue") {
+      handleAddToQueue(data);
+    } else if (name === "addAppointment") {
+      handleAddAppointment(data);
+    }
   };
 
   const ModalFooterActions = () => {
