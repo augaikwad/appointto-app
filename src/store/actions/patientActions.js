@@ -148,6 +148,11 @@ export const deletePatient = (id, callback) => async (dispatch) => {
   try {
     const response = await service.post(
       `Patient/delete-patient-general?PatientId=${id}`,
+      null,
+      {
+        silent: false,
+        showNotification: true,
+      },
     );
     const { response_code, payload } = response.data;
     if (response_code === 2000) {

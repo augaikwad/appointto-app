@@ -358,13 +358,17 @@ const PatientList = () => {
                               text: "Once deleted, Information cannot be recovered!",
                               icon: "question",
                               showCancelButton: true,
-                              confirmButtonText: "Yes, delete it!",
+                              showConfirmButton: false,
+                              cancelButtonText: "Yes, delete it!",
+                              showDenyButton: true,
+                              denyButtonText: "Cancel",
                               customClass: {
                                 confirmButton: classes.confirmButton,
                                 cancelButton: classes.cancelButton,
                               },
+                              reverseButtons: true,
                             }).then((result) => {
-                              if (result.isConfirmed) {
+                              if (result.isDismissed) {
                                 dispatch(
                                   deletePatient(item.id_patient, () => {
                                     dispatch(
