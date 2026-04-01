@@ -414,6 +414,8 @@ const AddEditMedicineModal = (props) => {
           if (status === 200) {
             cogoToast.success(res.message, toastOption);
             onHide();
+          } else {
+            cogoToast.error("Something went wrong...!", toastOption);
           }
         },
       );
@@ -455,6 +457,31 @@ const AddEditMedicineModal = (props) => {
     if (!rawValue.includes("-")) {
       const formattedValue = rawValue.split("").join("-");
       setValue("dose", formattedValue, { shouldValidate: true });
+    }
+  };
+
+  const handleOnKeyDown = (e) => {
+    const acceptedKeys = [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "-",
+      ".",
+      "Backspace",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "Tab",
+    ];
+    if (!acceptedKeys.includes(e.key)) {
+      e.preventDefault();
     }
   };
 
@@ -520,6 +547,7 @@ const AddEditMedicineModal = (props) => {
                 }}
                 placeholder="Please enter dose"
                 onBlur={formatDose}
+                onKeyDown={(e) => handleOnKeyDown(e)}
               />
             </Col>
             <Col xs={12}>

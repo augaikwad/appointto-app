@@ -1,5 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useFormContext, useFieldArray, Controller } from "react-hook-form";
+import {
+  useFormContext,
+  useFieldArray,
+  Controller,
+  useWatch,
+} from "react-hook-form";
 import { Button, Form } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import { ReactSelectField } from "../../../components/Forms";
@@ -203,16 +208,28 @@ const NewMedTable = ({ control, setValue }) => {
   const [open, setOpen] = useState(false);
   const [rxGroupModalShow, setRxGroupModalShow] = useState(false);
 
+  const [unitMap, setUnitMap] = useState(null);
+  const { fetchData: getUnitMapping } = useAxios();
+
+  useEffect(() => {
+    getUnitMapping(
+      {
+        url: `Medicine/get-medicine-type-units`,
+        method: "get",
+      },
+      (status, res) => {
+        if (status === 200) {
+          setUnitMap(res.payload);
+        } else {
+          setUnitMap(null);
+        }
+      },
+    );
+  }, []);
+
   useEffect(() => {
     if (rxGroupModalShow) dispatch(getRxGroups(id_doctor));
   }, [rxGroupModalShow]);
-
-  const [durationData, setDurationData] = useState([
-    "Days",
-    "Weeks",
-    "Months",
-    "Years",
-  ]);
 
   const [durationOpt, setDurationOpt] = useState([]);
 
@@ -235,6 +252,22 @@ const NewMedTable = ({ control, setValue }) => {
         components={{
           DropdownIndicator: () => null,
           IndicatorSeparator: () => null,
+        }}
+        onChange={(selected) => {
+          if (selected) {
+            setValue(`prescribedMedicines.${index}.type`, selected);
+            if (unitMap) {
+              const mappedUnit = unitMap.find(
+                (item) => item.type === selected.value,
+              );
+              if (mappedUnit) {
+                setValue(`prescribedMedicines.${index}.unit`, {
+                  value: mappedUnit.unit,
+                  label: mappedUnit.unit,
+                });
+              }
+            }
+          }
         }}
         onKeyDown={(e) => {
           if (e.key === "Tab" || e.keyCode === 9) {
@@ -278,7 +311,7 @@ const NewMedTable = ({ control, setValue }) => {
               append(initFields, { shouldFocus: false });
             }
 
-            setFocus(`prescribedMedicines.${index}.dose`);
+            setFocus(`prescribedMedicines.${index + 1}.medicineName`);
           }, 100);
         }}
       />
@@ -286,24 +319,6 @@ const NewMedTable = ({ control, setValue }) => {
   };
 
   const doseFormatter = ({ name, index }) => {
-    // const handleOnKeyDown = (e) => {
-    //   const acceptedKeys = [
-    //     "1",
-    //     "0",
-    //     " ",
-    //     "Backspace",
-    //     // "ArrowLeft",
-    //     // "ArrowRight",
-    //   ];
-    //   if (e.key === "Tab" || e.keyCode === 9) {
-    //     setTimeout(() => {
-    //       setFocus(`prescribedMedicines.${index}.unit`);
-    //     }, 100);
-    //   } else if (!acceptedKeys.includes(e.key)) {
-    //     e.preventDefault();
-    //   }
-    // };
-
     const handleOnChange = (e) => {
       const { value } = e.target;
       let newVal = [];
@@ -348,7 +363,7 @@ const NewMedTable = ({ control, setValue }) => {
         "8",
         "9",
         "-",
-        " ",
+        ".",
         "Backspace",
         "Delete",
         "ArrowLeft",
@@ -363,6 +378,18 @@ const NewMedTable = ({ control, setValue }) => {
       }
     };
 
+    const handleOnBlur = (e) => {
+      const rawValue = e.target.value.trim();
+
+      // 1. Exit if empty
+      if (!rawValue && rawValue.includes("-")) return;
+
+      if (!rawValue.includes("-")) {
+        const formattedValue = rawValue.split("").join("-");
+        setValue(name, formattedValue, { shouldValidate: true });
+      }
+    };
+
     return (
       <Controller
         name={name}
@@ -374,11 +401,12 @@ const NewMedTable = ({ control, setValue }) => {
             {...field}
             type="text"
             className="form-control no-border"
+            onBlur={handleOnBlur}
             onKeyDown={(e) => handleOnKeyDown(e)}
-            onChange={(e) => {
-              field.onChange(e);
-              handleOnChange(e);
-            }}
+            // onChange={(e) => {
+            //   field.onChange(e);
+            //   handleOnChange(e);
+            // }}
           />
         )}
       />

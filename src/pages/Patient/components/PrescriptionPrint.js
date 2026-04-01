@@ -34,15 +34,16 @@ const useStyles = createUseStyles({
     "& .advices": {
       marginTop: 15,
       display: "flex",
+      alignItems: "baseline",
       "& > i": {
         marginRight: 10,
       },
       "& ul": {
-        fontSize: "12pt",
+        fontSize: "13.5pt",
       },
     },
     "& .pt-12": {
-      fontSize: "12pt",
+      fontSize: "13.5pt",
     },
   },
   rxImgContainer: {
@@ -138,6 +139,14 @@ const PrescriptionPrint = React.forwardRef(({ data }, ref) => {
           </table>
         </div>
         <div className={classes.body}>
+          {data?.quickNotes && (
+            <div style={{ marginBottom: 10 }}>
+              <i>
+                <b>Quick Note</b>
+              </i>
+              : <span className="pt-12">{data?.quickNotes}</span>
+            </div>
+          )}
           <div>
             <i>
               <b>Diagnosis</b>

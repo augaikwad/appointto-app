@@ -46,7 +46,7 @@ const AddEditPatientModal = (props) => {
   const { id_doctor, id_clinic } = useSelector((state) => state.user.details);
   const { patientModal, activeTab } = useSelector((state) => state.patients);
   const { dashboardListFilters, appointmentModal } = useSelector(
-    (state) => state.appointments
+    (state) => state.appointments,
   );
 
   const { open, isAdd, formValue } = patientModal;
@@ -68,7 +68,7 @@ const AddEditPatientModal = (props) => {
       setPatientModal({
         ...patientModal,
         formValue: { ...formValue, id_patient: response.id_patient },
-      })
+      }),
     );
     dispatch(setActiveTab(activeTab + 1));
 
@@ -103,9 +103,9 @@ const AddEditPatientModal = (props) => {
             ...patientModal,
             open: false,
             formValue: { ...formValue, id_patient: res.id_patient },
-          })
+          }),
         );
-      })
+      }),
     );
     history.push({
       pathname: "/dashboard",
@@ -120,7 +120,7 @@ const AddEditPatientModal = (props) => {
       dispatch(
         addPatientGeneralInfo(formData, (response) => {
           addToQueue({ id_patient: response.id_patient });
-        })
+        }),
       );
     } else {
       addToQueue({ id_patient: formValue.id_patient });
@@ -138,7 +138,7 @@ const AddEditPatientModal = (props) => {
               ...patientModal,
               open: false,
               formValue: { ...formValue, id_patient: response.id_patient },
-            })
+            }),
           );
           dispatch(
             setAppointmentModal({
@@ -150,9 +150,9 @@ const AddEditPatientModal = (props) => {
                 id_patient: response.id_patient,
                 id_doctor: id_doctor,
               },
-            })
+            }),
           );
-        })
+        }),
       );
     } else {
       dispatch(
@@ -164,14 +164,14 @@ const AddEditPatientModal = (props) => {
           },
           isAdd: true,
           show: true,
-        })
+        }),
       );
       dispatch(
         setPatientModal({
           ...patientModal,
           open: false,
           formValue: { ...formValue },
-        })
+        }),
       );
     }
     refreshDashboardList();
@@ -183,13 +183,13 @@ const AddEditPatientModal = (props) => {
 
   const onSubmit = (data, e) => {
     const { name } = e.target;
-    if (name === "save") {
-      handleSave(data);
-    } else if (name === "addToQueue") {
-      handleAddToQueue(data);
-    } else if (name === "addAppointment") {
-      handleAddAppointment(data);
-    }
+    // if (name === "save") {
+    //   handleSave(data);
+    // } else if (name === "addToQueue") {
+    //   handleAddToQueue(data);
+    // } else if (name === "addAppointment") {
+    //   handleAddAppointment(data);
+    // }
   };
 
   const ModalFooterActions = () => {

@@ -1,12 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { Tooltip } from "../../../components";
 import { createUseStyles } from "react-jss";
 import { format } from "date-fns";
 import CommonMedicineTable from "./CommonMedicineTable";
 import PrescriptionPrint from "../components/PrescriptionPrint";
 import ReactToPrint from "react-to-print";
-import { useSelector } from "react-redux";
-import useAxios from "../../../hooks/useAxios";
 import { timingOptions } from "../../../utils/constants";
 
 const useStyles = createUseStyles({
@@ -178,6 +176,12 @@ const LastVisits = ({ loading = false, prescriptions = [] }) => {
                       <div className="timeline-body">
                         <div className="row">
                           <div className="col-lg-12">
+                            {item?.quickNotes && (
+                              <div className="form-group inline-form-group">
+                                <label>Quick Note:</label>
+                                <div>{item.quickNotes}</div>
+                              </div>
+                            )}
                             <div className="form-group inline-form-group">
                               <label>Complaints:</label>
                               <div>

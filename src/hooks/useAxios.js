@@ -12,7 +12,6 @@ const useAxios = ({ silent = true, showNotification = false } = {}) => {
     setError(null);
 
     const client = getAxiosClient();
-    debugger;
     try {
       // 2. Fire the request
       const response = await client.request({
@@ -21,22 +20,27 @@ const useAxios = ({ silent = true, showNotification = false } = {}) => {
         showNotification,
       });
 
-      const { status, data } = response;
+      const status = response?.status;
+      const data = response?.data;
 
       // 3. Handle success
-      setResponse(response.data);
+      setResponse(response?.data);
       if (callback && typeof callback === "function") {
         callback(status, data);
       }
 
-      return response.data;
+      return response?.data;
     } catch (err) {
-      console.log(err.response?.status);
-      const { status } = err;
+      const status =
+        err?.response?.status || (err?.code === "ECONNABORTED" ? 408 : null);
+      const errorJson = err?.response?.data || {
+        message: err?.message || "Unknown error",
+      };
+
       // 4. Handle error
       setError(err);
       if (callback && typeof callback === "function") {
-        callback(status, err);
+        callback(status, errorJson);
       }
       throw Promise.reject(err); // Re-throw so the component can catch it if needed
     } finally {

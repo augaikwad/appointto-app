@@ -425,6 +425,16 @@ const Prescription = () => {
           </div>
           <div className="row">
             <div className="col-lg-5">
+              <TextField
+                label={"Quick Notes"}
+                name="quickNotes"
+                as="textarea"
+                rows={3}
+              />
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-lg-5">
               <ComplaintsTags />
             </div>
             {id_speciality === 6 && (
