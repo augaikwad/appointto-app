@@ -45,7 +45,6 @@ const General = (props) => {
               label="Mobile Number"
               name="mobile_number"
               type="number"
-              maxLength="10"
               placeholder="Enter Mobile Number"
               rules={{
                 required: "Please enter mobile number",

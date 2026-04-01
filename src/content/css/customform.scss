@@ -93,6 +93,7 @@ div.form-group {
 
   &.error div.invalid-feedback {
     display: block;
+    text-align: left;
   }
 
   &.error .form-control {
@@ -100,7 +101,7 @@ div.form-group {
   }
 }
 
-.form-control {
+.form-control:not(textarea) {
   &,
   & .form-control-sm {
     padding: 4px 10px !important;
