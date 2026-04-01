@@ -107,6 +107,8 @@ export const addDocuments =
         headers: {
           "content-type": "multipart/form-data",
         },
+        silent: false,
+        showNotification: true,
       };
 
       const response = await service.post(
